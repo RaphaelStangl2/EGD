@@ -1,4 +1,4 @@
-package com.example.ble_test.data
+package com.example.egd.data
 
 sealed interface ConnectionState{
     object Connected: ConnectionState

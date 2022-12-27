@@ -1,28 +1,69 @@
-package com.example.ble_test
+package com.example.egd
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Scaffold
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.*
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.ble_test.ui.BLEViewModel
-import com.example.ble_test.ui.ConnectScreen
-import com.example.ble_test.ui.DataScreen
+import com.example.egd.data.BottomNavItem
+import com.example.egd.ui.EGDViewModel
+import com.example.egd.ui.HomeScreen
+
+@Composable
+fun BottomAppBar(navController: NavHostController,
+                 modifier: Modifier = Modifier){
+
+    val items = listOf(
+        BottomNavItem.Home,
+        BottomNavItem.Map,
+        BottomNavItem.Statistics,
+        BottomNavItem.Profile
+    )
+
+    BottomNavigation() {
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentRoute = navBackStackEntry?.destination?.route
 
 
-enum class BLEScreen() {
-    Start,
-    Data
+        items.forEach { item ->
+            BottomNavigationItem(
+                icon = { Icon(painterResource(id = R.mipmap.ic_launcher), contentDescription = item.title) },
+                label = { Text(text = item.title,
+                    fontSize = 9.sp) },
+                selectedContentColor = Color.Black,
+                unselectedContentColor = Color.Black.copy(0.4f),
+                alwaysShowLabel = true,
+                selected = currentRoute == item.screen_route,
+                onClick = {
+                    navController.navigate(item.screen_route) {
+
+                        navController.graph.startDestinationRoute?.let { screen_route ->
+                            popUpTo(screen_route) {
+                                saveState = true
+                            }
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            )
+        }
+    }
 }
 
 @Composable
-fun BLEApp(modifier: Modifier = Modifier,
-           viewModel: BLEViewModel = viewModel(),
+fun EGDApp(modifier: Modifier = Modifier,
+           viewModel: EGDViewModel = viewModel(),
            onBluetoothStateChanged:()->Unit
 ){
 
@@ -35,32 +76,26 @@ fun BLEApp(modifier: Modifier = Modifier,
                 navigateUp = { /* TODO: implement back navigation */ }
             )
         }*/
+        bottomBar = {
+            BottomAppBar(navController)
+        }
+        
+
     ) { innerPadding ->
         val uiState by viewModel.uiState.collectAsState()
 
         NavHost(
             navController = navController,
-            startDestination = BLEScreen.Start.name,
+            startDestination = BottomNavItem.Home.screen_route,
             modifier = modifier.padding(innerPadding)
         ){
-            composable(route = BLEScreen.Start.name) {
-                ConnectScreen(
-                    onNextButtonClicked = {
-                        navController.navigate(BLEScreen.Data.name)
-                    }
-                )
+            composable(route = BottomNavItem.Home.screen_route) {
+                HomeScreen(viewModel = viewModel)
             }
 
-            composable(route =BLEScreen.Data.name){
-                DataScreen(viewModel = viewModel, bleUiState = uiState, onBluetoothStateChanged = {
 
-                    onBluetoothStateChanged()
-                })
-
-            }
 
         }
-        // TODO: add NavHost
     }
 
 }

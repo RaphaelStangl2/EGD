@@ -1,8 +1,8 @@
-package com.example.ble_test
+package com.example.egd
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class ApplicationExample: Application () {
+class MainApplication: Application () {
 }

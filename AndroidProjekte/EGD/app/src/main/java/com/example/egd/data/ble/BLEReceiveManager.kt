@@ -1,4 +1,4 @@
-package com.example.ble_test.data.ble
+package com.example.egd.data.ble
 
 import android.annotation.SuppressLint
 import android.bluetooth.*
@@ -8,7 +8,7 @@ import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
-import com.example.ble_test.data.BLEUiState
+import com.example.egd.data.EGDUiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -27,7 +27,7 @@ class BLEReceiveManager @Inject constructor(
     private val CHARACTERISTICS_UUID = "533cb516-77bb-11ed-a1eb-0242ac120002"
     private val CCCD_DESCRIPTOR_UUID = "00002902-0000-1000-8000-00805F9B34FB"
 
-    val data: MutableSharedFlow<BLEUiState> = MutableSharedFlow()
+    val data: MutableSharedFlow<EGDUiState> = MutableSharedFlow()
 
     private val bleScanner by lazy {
         bluetoothAdapter.bluetoothLeScanner
@@ -121,7 +121,7 @@ class BLEReceiveManager @Inject constructor(
 
                         coroutineScope.launch {
                             data.emit(
-                                BLEUiState(test)
+                                EGDUiState(test)
                             )
                         }
 

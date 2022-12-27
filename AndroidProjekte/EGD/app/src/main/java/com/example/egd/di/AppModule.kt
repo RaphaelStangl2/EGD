@@ -1,9 +1,9 @@
-package com.example.ble_test.di
+package com.example.egd.di
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context
-import com.example.ble_test.data.ble.BLEReceiveManager
+import com.example.egd.data.ble.BLEReceiveManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

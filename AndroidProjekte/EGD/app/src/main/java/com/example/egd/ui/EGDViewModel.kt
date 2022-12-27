@@ -1,13 +1,13 @@
-package com.example.ble_test.ui
+package com.example.egd.ui
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ble_test.data.BLEUiState
-import com.example.ble_test.data.ConnectionState
-import com.example.ble_test.data.ble.BLEReceiveManager
+import com.example.egd.data.ConnectionState
+import com.example.egd.data.EGDUiState
+import com.example.egd.data.ble.BLEReceiveManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,17 +21,17 @@ import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
-class BLEViewModel @Inject constructor(
+class EGDViewModel @Inject constructor(
     private val bleReceiveManager: BLEReceiveManager
 ) : ViewModel(){
 
-    private val _uiState = MutableStateFlow(BLEUiState())
-    val uiState: StateFlow<BLEUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(EGDUiState())
+    val uiState: StateFlow<EGDUiState> = _uiState.asStateFlow()
 
     var connectionState by mutableStateOf<ConnectionState>(ConnectionState.Uninitialized)
 
 
-    private fun subscribeToChanges(){
+    /*private fun subscribeToChanges(){
         viewModelScope.launch {
             bleReceiveManager.data.collect{ result ->
                 _uiState.update { currentState ->
@@ -66,6 +66,6 @@ class BLEViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         bleReceiveManager.closeConnection()
-    }
+    }*/
 
 }

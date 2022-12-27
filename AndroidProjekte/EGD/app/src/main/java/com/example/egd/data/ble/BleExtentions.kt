@@ -1,4 +1,4 @@
-package com.example.ble_test.data.ble
+package com.example.egd.data.ble
 
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic

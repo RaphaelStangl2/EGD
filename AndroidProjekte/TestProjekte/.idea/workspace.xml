@@ -5,9 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9d54ef5a-0e83-4543-b30f-e61945f7dec0" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/bluetoothBLEtutorial/BLETutorialYt/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bluetoothBLEtutorial/BLETutorialYt" beforeDir="false" afterPath="$PROJECT_DIR$/bluetoothBLEtutorial/BLETutorialYt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BLE_Test/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../BLE_Test/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BLE_Test/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../BLE_Test/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BLE_Test/app/src/main/java/com/example/ble_test/data/BLEUiState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../BLE_Test/app/src/main/java/com/example/ble_test/data/BLEUiState.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BLE_Test/app/src/main/java/com/example/ble_test/data/ConnectionState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../BLE_Test/app/src/main/java/com/example/ble_test/data/ConnectionState.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BLE_Test/app/src/main/java/com/example/ble_test/data/ble/BLEReceiveManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../BLE_Test/app/src/main/java/com/example/ble_test/data/ble/BLEReceiveManager.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BLE_Test/app/src/main/java/com/example/ble_test/data/ble/BleExtentions.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../BLE_Test/app/src/main/java/com/example/ble_test/data/ble/BleExtentions.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BLE_Test/app/src/main/java/com/example/ble_test/di/AppModule.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../BLE_Test/app/src/main/java/com/example/ble_test/di/AppModule.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BLE_Test/app/src/main/java/com/example/ble_test/ui/BLEViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../BLE_Test/app/src/main/java/com/example/ble_test/ui/BLEViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BLE_Test/app/src/main/java/com/example/ble_test/ui/ConnectScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../BLE_Test/app/src/main/java/com/example/ble_test/ui/ConnectScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BLE_Test/app/src/main/java/com/example/ble_test/ui/DataScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../BLE_Test/app/src/main/java/com/example/ble_test/ui/DataScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BLE_Test/app/src/main/java/com/example/ble_test/ui/PermissionUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../BLE_Test/app/src/main/java/com/example/ble_test/ui/PermissionUtils.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BLE_Test/app/src/main/java/com/example/ble_test/ui/SystemBroadcastReceiver.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../BLE_Test/app/src/main/java/com/example/ble_test/ui/SystemBroadcastReceiver.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BLE_Test/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../BLE_Test/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bluetoothBLEtutorial/BLETutorialYt/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/bluetoothBLEtutorial/BLETutorialYt/.idea/gradle.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bluetoothBLEtutorial/BLETutorialYt/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/bluetoothBLEtutorial/BLETutorialYt/app/build.gradle" afterDir="false" />
     </list>
@@ -39,7 +51,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="RunOnceActivity.cidr.known.project.marker" value="true" />
     <property name="cidr.known.project.marker" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/basic-android-kotlin-compose-tra/basic-android-kotlin-compose-training-cupcake-starter" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.17" />
     <property name="project.structure.side.proportion" value="0.2" />

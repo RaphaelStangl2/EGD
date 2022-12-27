@@ -1,4 +1,4 @@
-package com.example.bletutorial.data
+package com.example.ble_test.data
 
 sealed interface ConnectionState{
     object Connected: ConnectionState

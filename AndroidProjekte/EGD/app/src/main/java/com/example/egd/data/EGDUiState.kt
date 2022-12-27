@@ -1,4 +1,5 @@
 package com.example.egd.data
 
-class EGDUiState {
-}
+data class EGDUiState (
+    val test: String = ""
+)

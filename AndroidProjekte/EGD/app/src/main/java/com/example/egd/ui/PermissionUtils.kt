@@ -1,4 +1,4 @@
-package com.example.ble_test.ui
+package com.example.egd.ui
 
 import android.Manifest
 import android.os.Build

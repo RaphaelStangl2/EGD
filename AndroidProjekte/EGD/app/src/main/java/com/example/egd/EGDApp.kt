@@ -2,6 +2,7 @@ package com.example.egd
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
+import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -18,6 +19,9 @@ import androidx.navigation.compose.rememberNavController
 import com.example.egd.data.BottomNavItem
 import com.example.egd.ui.EGDViewModel
 import com.example.egd.ui.HomeScreen
+import com.example.egd.ui.MapScreen
+import com.example.egd.ui.StatisticsScreen
+import java.util.Vector
 
 @Composable
 fun BottomAppBar(navController: NavHostController,
@@ -27,19 +31,24 @@ fun BottomAppBar(navController: NavHostController,
         BottomNavItem.Home,
         BottomNavItem.Map,
         BottomNavItem.Statistics,
-        BottomNavItem.Profile
     )
 
-    BottomNavigation() {
+    BottomNavigation(
+        backgroundColor = MaterialTheme.colors.primary,
+        contentColor = Color.White
+    ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
 
 
         items.forEach { item ->
             BottomNavigationItem(
-                icon = { Icon(painterResource(id = R.mipmap.ic_launcher), contentDescription = item.title) },
+                modifier = Modifier,
+                icon = { Icon(painterResource(id = item.icon), contentDescription = item.title, tint = Color.White) },
                 label = { Text(text = item.title,
-                    fontSize = 9.sp) },
+                    fontSize = 15.sp,
+                    color = Color.White
+                    ) },
                 selectedContentColor = Color.Black,
                 unselectedContentColor = Color.Black.copy(0.4f),
                 alwaysShowLabel = true,
@@ -92,8 +101,12 @@ fun EGDApp(modifier: Modifier = Modifier,
             composable(route = BottomNavItem.Home.screen_route) {
                 HomeScreen(viewModel = viewModel)
             }
-
-
+            composable(route = BottomNavItem.Map.screen_route) {
+                MapScreen(viewModel = viewModel)
+            }
+            composable(route = BottomNavItem.Statistics.screen_route) {
+                StatisticsScreen(viewModel = viewModel)
+            }
 
         }
     }

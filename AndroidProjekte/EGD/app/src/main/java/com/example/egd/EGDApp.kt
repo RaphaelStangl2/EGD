@@ -144,7 +144,7 @@ fun EGDApp(modifier: Modifier = Modifier,
                 Scaffold(
                     topBar = { TopAppBarBackButton(navController, {Text("Get Started")}) }
                 ) { innerPadding ->
-                    GetStartedTest(viewModel, modifier = Modifier.padding(innerPadding))
+                    GetStarted(viewModel, modifier = Modifier.padding(innerPadding))
                 }
             }
 

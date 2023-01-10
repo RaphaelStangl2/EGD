@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.egd.data.ConnectionState
 import com.example.egd.data.EGDUiState
+import com.example.egd.data.GetStartedUiState
 import com.example.egd.data.LoginUiState
 import com.example.egd.data.ble.BLEReceiveManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,13 +27,24 @@ class EGDViewModel @Inject constructor(
     private val bleReceiveManager: BLEReceiveManager
 ) : ViewModel(){
 
-    private val _uiState = MutableStateFlow(LoginUiState())
-    val loginUiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
+    private val _getStartedUiState = MutableStateFlow(GetStartedUiState())
+    val getStartedUiState: StateFlow<GetStartedUiState> = _getStartedUiState.asStateFlow()
+
+    private val _loginUiState = MutableStateFlow(LoginUiState())
+    val loginUiState: StateFlow<LoginUiState> = _loginUiState.asStateFlow()
 
     var connectionState by mutableStateOf<ConnectionState>(ConnectionState.Uninitialized)
 
+    fun setStep(stepVal: Int){
+        _getStartedUiState.update { currentState ->
+            currentState.copy(
+                step = stepVal
+            )
+        }
+    }
+
     fun setVisibility(visibility: Boolean){
-        _uiState.update { currentState ->
+        _loginUiState.update { currentState ->
             currentState.copy(
                 passwordVisibility = visibility
             )
@@ -40,7 +52,7 @@ class EGDViewModel @Inject constructor(
     }
 
     fun setPassword(password: String){
-        _uiState.update { currentState ->
+        _loginUiState.update { currentState ->
             currentState.copy(
                 password = password
             )
@@ -48,7 +60,7 @@ class EGDViewModel @Inject constructor(
     }
 
     fun setEmail(email: String){
-        _uiState.update { currentState ->
+        _loginUiState.update { currentState ->
             currentState.copy(
                 email = email
             )

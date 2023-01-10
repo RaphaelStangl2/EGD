@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.egd.data.ConnectionState
 import com.example.egd.data.EGDUiState
+import com.example.egd.data.LoginUiState
 import com.example.egd.data.ble.BLEReceiveManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,11 +26,34 @@ class EGDViewModel @Inject constructor(
     private val bleReceiveManager: BLEReceiveManager
 ) : ViewModel(){
 
-    private val _uiState = MutableStateFlow(EGDUiState())
-    val uiState: StateFlow<EGDUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(LoginUiState())
+    val loginUiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
     var connectionState by mutableStateOf<ConnectionState>(ConnectionState.Uninitialized)
 
+    fun setVisibility(visibility: Boolean){
+        _uiState.update { currentState ->
+            currentState.copy(
+                passwordVisibility = visibility
+            )
+        }
+    }
+
+    fun setPassword(password: String){
+        _uiState.update { currentState ->
+            currentState.copy(
+                password = password
+            )
+        }
+    }
+
+    fun setEmail(email: String){
+        _uiState.update { currentState ->
+            currentState.copy(
+                email = email
+            )
+        }
+    }
 
     /*private fun subscribeToChanges(){
         viewModelScope.launch {

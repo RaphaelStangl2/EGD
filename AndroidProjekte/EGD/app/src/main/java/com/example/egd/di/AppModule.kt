@@ -3,6 +3,9 @@ package com.example.egd.di
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.example.egd.data.ble.BLEReceiveManager
 import dagger.Module
 import dagger.Provides

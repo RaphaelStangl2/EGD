@@ -16,4 +16,6 @@
         <color name="secondaryDarkColor">#FFc7c58d</color>
         <color name="primaryTextColor">#FFffffff</color>
         <color name="secondaryTextColor">#FF000000</color>
+        <color name="backgroundColor">#FFF7F7F7</color>
+        <color name="progressBar">#FF25B805</color>
 </resources>

@@ -16,4 +16,7 @@ val SecondaryLightColor = Color(0xFFfffff1)
 val SecondaryDarkColor = Color(0xFFc7c58d)
 val OnPrimary = Color(0xFFffffff)
 val OnSecondary = Color(0xFF000000)
+val BackgroundColor = Color(0xFFF7F7F7)
+val ProgressBar = Color(0xFF25B805)
+
 

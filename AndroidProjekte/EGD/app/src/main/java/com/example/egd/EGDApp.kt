@@ -2,7 +2,6 @@ package com.example.egd
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
-import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -17,11 +16,41 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.egd.data.BottomNavItem
-import com.example.egd.ui.EGDViewModel
-import com.example.egd.ui.HomeScreen
-import com.example.egd.ui.MapScreen
-import com.example.egd.ui.StatisticsScreen
-import java.util.Vector
+import com.example.egd.data.StartItem
+import com.example.egd.ui.*
+
+/*@Composable
+fun TopAppBar(
+    title: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    navigationIcon: @Composable (() -> Unit)? = null,
+    actions: @Composable RowScope.() -> Unit = {},
+    backgroundColor: Color = MaterialTheme.colors.primarySurface,
+    contentColor: Color = contentColorFor(backgroundColor),
+    elevation: Dp = AppBarDefaults.TopAppBarElevation
+
+){
+
+}*/
+
+@Composable
+fun TopAppBarBackButton(
+    navController: NavHostController,
+    title: @Composable () -> Unit,
+    modifier: Modifier = Modifier
+){
+    TopAppBar(
+        title = title,
+        navigationIcon = {
+            IconButton(onClick = {navController.navigateUp()}) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_baseline_arrow_back_24),
+                    contentDescription = "Back Arrow"
+                )
+            }
+        }
+    )
+}
 
 @Composable
 fun BottomAppBar(navController: NavHostController,
@@ -70,6 +99,7 @@ fun BottomAppBar(navController: NavHostController,
     }
 }
 
+
 @Composable
 fun EGDApp(modifier: Modifier = Modifier,
            viewModel: EGDViewModel = viewModel(),
@@ -78,37 +108,79 @@ fun EGDApp(modifier: Modifier = Modifier,
 
     val navController = rememberNavController()
 
-    Scaffold(
-        /*topBar = {
-            CupcakeAppBar(
-                canNavigateBack = false,
-                navigateUp = { /* TODO: implement back navigation */ }
-            )
-        }*/
+    /*Scaffold(
+
         bottomBar = {
             BottomAppBar(navController)
         }
-        
 
-    ) { innerPadding ->
-        val uiState by viewModel.uiState.collectAsState()
+
+    ) { innerPadding ->*/
+        val uiState by viewModel.loginUiState.collectAsState()
 
         NavHost(
             navController = navController,
-            startDestination = BottomNavItem.Home.screen_route,
-            modifier = modifier.padding(innerPadding)
+            startDestination = StartItem.StartScreen.screen_route,
+            //modifier = modifier.padding(innerPadding)
         ){
+            composable(route = StartItem.StartScreen.screen_route){
+                StartScreen(
+                    onGetStartedButtonClicked = {
+                        navController.navigate(StartItem.GetStartedScreen.screen_route)
+                    },
+                    onLoginButtonClicked = {
+                        navController.navigate(StartItem.LoginScreen.screen_route)
+                    })
+            }
+            composable(route = StartItem.LoginScreen.screen_route) {
+                Scaffold(
+                    topBar = { TopAppBarBackButton(navController, {Text("Sign In")}) }
+                ) { innerPadding ->
+                    LoginScreen(viewModel, modifier = Modifier.padding(innerPadding))
+                }
+            }
+
+            composable(route = StartItem.GetStartedScreen.screen_route){
+                Scaffold(
+                    topBar = { TopAppBarBackButton(navController, {Text("Get Started")}) }
+                ) { innerPadding ->
+                    GetStartedTest(viewModel, modifier = Modifier.padding(innerPadding))
+                }
+            }
+
             composable(route = BottomNavItem.Home.screen_route) {
-                HomeScreen(viewModel = viewModel)
+                Scaffold(
+                    bottomBar = {
+                        BottomAppBar(navController)
+                    }
+                ) { innerPadding ->
+                    HomeScreen(viewModel = viewModel, modifier = Modifier.padding(innerPadding))
+                }
             }
             composable(route = BottomNavItem.Map.screen_route) {
-                MapScreen(viewModel = viewModel)
+                Scaffold(
+                    bottomBar = {
+                        BottomAppBar(navController)
+                    }
+                ) { innerPadding ->
+                    MapScreen(viewModel = viewModel, modifier = Modifier.padding(innerPadding))
+                }
             }
             composable(route = BottomNavItem.Statistics.screen_route) {
-                StatisticsScreen(viewModel = viewModel)
+                Scaffold(
+                    bottomBar = {
+                        BottomAppBar(navController)
+                    }
+                ) { innerPadding ->
+
+                    StatisticsScreen(
+                        viewModel = viewModel,
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                }
             }
 
         }
-    }
+    //}
 
 }

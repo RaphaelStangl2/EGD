@@ -51,6 +51,34 @@ class EGDViewModel @Inject constructor(
         }
     }
 
+    fun setFuelConsumption(carConsumption: String){
+
+        var count = 0
+
+        for (element in carConsumption){
+            if (element == '.'){
+                count++
+            }
+        }
+
+
+        if (count <= 1 && carConsumption.length <= 4){
+            _getStartedUiState.update { currentState ->
+                currentState.copy(
+                    averageCarConsumption = carConsumption
+                )
+            }
+        }
+    }
+
+    fun setCarName(carName: String){
+        _getStartedUiState.update { currentState ->
+            currentState.copy(
+                carName = carName
+            )
+        }
+    }
+
     fun setStep(stepVal: Int){
         _getStartedUiState.update { currentState ->
             currentState.copy(

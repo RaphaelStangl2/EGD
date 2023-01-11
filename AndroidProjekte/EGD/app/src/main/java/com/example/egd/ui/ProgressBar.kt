@@ -13,8 +13,6 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun ProgressBar(progress: Int, numberOfSteps: Int, progressBarWidth: Dp){
-
-
     val dividerWidth = (progressBarWidth/numberOfSteps) - 6.dp
 
     Row(){
@@ -32,7 +30,4 @@ fun ProgressBar(progress: Int, numberOfSteps: Int, progressBarWidth: Dp){
             Text(" ")
         }
     }
-
-
-
 }

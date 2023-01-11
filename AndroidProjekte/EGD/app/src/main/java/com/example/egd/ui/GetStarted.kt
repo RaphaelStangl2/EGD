@@ -1,6 +1,7 @@
 package com.example.egd.ui
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 
 import androidx.compose.runtime.Composable
@@ -8,6 +9,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -22,6 +24,9 @@ fun GetStarted(viewModel: EGDViewModel, modifier: Modifier) {
     var step = uiState.step
     var numberOfSteps = uiState.numberOfSteps
     var egdDevice = uiState.EGDDevice
+    var carName = uiState.carName
+    var fuelConsumption = uiState.averageCarConsumption
+
 
 
     Column(
@@ -43,7 +48,7 @@ fun GetStarted(viewModel: EGDViewModel, modifier: Modifier) {
                 ConnectScreen()
             }
             if(step == 3) {
-                CarInfoScreen()
+                CarInfoScreen(carName, fuelConsumption, viewModel)
             }
 
         } else if (numberOfSteps == 3) {
@@ -118,15 +123,15 @@ fun ConnectScreen() {
 }
 
 @Composable
-fun CarInfoScreen() {
+fun CarInfoScreen(carName:String, fuelConsumption: String, viewModel: EGDViewModel) {
     Row(){
         Text(text="Car Name:")
     }
     Row(){
         TextField(
-            value = "",
-            onValueChange = {},
-            placeholder = {Text(text="My Hyundai Car")},
+            value = carName,
+            onValueChange = {viewModel.setCarName(it)},
+            placeholder = {Text(text="My Car")},
             colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
         )
     }
@@ -135,12 +140,17 @@ fun CarInfoScreen() {
     Row(){
         Text(text="Average fuel consumption per 100 km:")
     }
-    Row(){
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ){
         TextField(
-            value = "",
-            onValueChange = {},
-            placeholder = {Text(text="5l")},
-            colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
+            value = fuelConsumption.toString(),
+            onValueChange = {viewModel.setFuelConsumption(it)},
+            placeholder = {Text(text= "7")},
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background),
+            modifier = Modifier.width(77.dp)
         )
+        Text(text="liters")
     }
 }

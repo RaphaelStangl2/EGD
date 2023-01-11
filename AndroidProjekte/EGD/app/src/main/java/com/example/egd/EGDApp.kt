@@ -37,12 +37,13 @@ fun TopAppBar(
 fun TopAppBarBackButton(
     navController: NavHostController,
     title: @Composable () -> Unit,
+    onBackButtonClick: () -> Unit,
     modifier: Modifier = Modifier
 ){
     TopAppBar(
         title = title,
         navigationIcon = {
-            IconButton(onClick = {navController.navigateUp()}) {
+            IconButton(onClick = {onBackButtonClick()}) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_baseline_arrow_back_24),
                     contentDescription = "Back Arrow"
@@ -116,7 +117,8 @@ fun EGDApp(modifier: Modifier = Modifier,
 
 
     ) { innerPadding ->*/
-        val uiState by viewModel.loginUiState.collectAsState()
+        val loginUiState by viewModel.loginUiState.collectAsState()
+        val getStartedUiState by viewModel.getStartedUiState.collectAsState()
 
         NavHost(
             navController = navController,
@@ -134,7 +136,7 @@ fun EGDApp(modifier: Modifier = Modifier,
             }
             composable(route = StartItem.LoginScreen.screen_route) {
                 Scaffold(
-                    topBar = { TopAppBarBackButton(navController, {Text("Sign In")}) }
+                    topBar = { TopAppBarBackButton(navController, {Text("Sign In")}, onBackButtonClick = {navController.navigateUp()}) }
                 ) { innerPadding ->
                     LoginScreen(viewModel, modifier = Modifier.padding(innerPadding))
                 }
@@ -142,8 +144,16 @@ fun EGDApp(modifier: Modifier = Modifier,
 
             composable(route = StartItem.GetStartedScreen.screen_route){
                 Scaffold(
-                    topBar = { TopAppBarBackButton(navController, {Text("Get Started")}) }
-                ) { innerPadding ->
+                    topBar = { TopAppBarBackButton(navController, {Text("Get Started")}, onBackButtonClick = {
+                        if ( getStartedUiState.step == 1 ){
+                            navController.navigateUp()
+                        }
+                        else{
+                            viewModel.setStep(getStartedUiState.step-1)
+                        }
+                    })
+                    })
+                { innerPadding ->
                     GetStarted(viewModel, modifier = Modifier.padding(innerPadding))
                 }
             }

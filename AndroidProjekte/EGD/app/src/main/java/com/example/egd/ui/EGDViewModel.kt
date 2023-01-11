@@ -35,6 +35,22 @@ class EGDViewModel @Inject constructor(
 
     var connectionState by mutableStateOf<ConnectionState>(ConnectionState.Uninitialized)
 
+    fun setEGDDevice(egdDevice: Boolean){
+        _getStartedUiState.update { currentState ->
+            currentState.copy(
+                EGDDevice = egdDevice
+            )
+        }
+    }
+
+    fun setNumberOfSteps(stepVal: Int){
+        _getStartedUiState.update { currentState ->
+            currentState.copy(
+                numberOfSteps = stepVal
+            )
+        }
+    }
+
     fun setStep(stepVal: Int){
         _getStartedUiState.update { currentState ->
             currentState.copy(

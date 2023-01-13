@@ -54,7 +54,7 @@ fun LoginScreen(
         Row(){
             OutlinedTextField(
                 value = email,
-                onValueChange = {viewModel.setEmail(it)},
+                onValueChange = {viewModel.setEmailLogin(it)},
                 placeholder = { Text(text = "Email")},
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.textFieldColors(
@@ -66,7 +66,7 @@ fun LoginScreen(
         Row(){
             OutlinedTextField(
                 value = password,
-                onValueChange = {viewModel.setPassword(it)},
+                onValueChange = {viewModel.setPasswordLogin(it)},
                 placeholder = { Text(text = "Password")},
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.textFieldColors(

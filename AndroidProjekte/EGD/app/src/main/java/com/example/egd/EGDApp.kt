@@ -154,7 +154,9 @@ fun EGDApp(modifier: Modifier = Modifier,
                     })
                     })
                 { innerPadding ->
-                    GetStarted(viewModel, modifier = Modifier.padding(innerPadding))
+                    GetStarted(viewModel, { navController.navigate(BottomNavItem.Home.screen_route){ popUpTo(0) } },
+                        modifier = Modifier.padding(innerPadding)
+                    )
                 }
             }
 

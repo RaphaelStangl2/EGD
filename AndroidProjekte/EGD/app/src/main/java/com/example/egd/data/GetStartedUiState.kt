@@ -5,5 +5,9 @@ data class GetStartedUiState(
     val numberOfSteps: Int = 5,
     val EGDDevice: Boolean = true,
     val carName: String = "",
-    val averageCarConsumption: String = ""
+    val averageCarConsumption: String = "",
+    val email: String = "",
+    val password: String = "",
+    val firstName:String = ""
+
 )

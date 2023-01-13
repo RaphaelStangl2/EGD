@@ -5,10 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.egd.data.ConnectionState
-import com.example.egd.data.EGDUiState
-import com.example.egd.data.GetStartedUiState
-import com.example.egd.data.LoginUiState
+import com.example.egd.data.*
 import com.example.egd.data.ble.BLEReceiveManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,7 +30,42 @@ class EGDViewModel @Inject constructor(
     private val _loginUiState = MutableStateFlow(LoginUiState())
     val loginUiState: StateFlow<LoginUiState> = _loginUiState.asStateFlow()
 
+    private val _mapUiState = MutableStateFlow(MapUiState())
+    val mapUiState: StateFlow<MapUiState> = _mapUiState.asStateFlow()
+
     var connectionState by mutableStateOf<ConnectionState>(ConnectionState.Uninitialized)
+
+    fun setSearchBarContent(searchBarContent: String){
+        _mapUiState.update { currentState ->
+            currentState.copy(
+                searchBarContent = searchBarContent
+            )
+        }
+    }
+
+    fun setFirstName(firstName: String){
+        _getStartedUiState.update { currentState ->
+            currentState.copy(
+                firstName = firstName
+            )
+        }
+    }
+
+    fun setEmailRegister(email: String){
+        _getStartedUiState.update { currentState ->
+            currentState.copy(
+                email = email
+            )
+        }
+    }
+
+    fun setPasswordRegister(password: String){
+        _getStartedUiState.update { currentState ->
+            currentState.copy(
+                password = password
+            )
+        }
+    }
 
     fun setEGDDevice(egdDevice: Boolean){
         _getStartedUiState.update { currentState ->
@@ -95,7 +127,7 @@ class EGDViewModel @Inject constructor(
         }
     }
 
-    fun setPassword(password: String){
+    fun setPasswordLogin(password: String){
         _loginUiState.update { currentState ->
             currentState.copy(
                 password = password
@@ -103,7 +135,7 @@ class EGDViewModel @Inject constructor(
         }
     }
 
-    fun setEmail(email: String){
+    fun setEmailLogin(email: String){
         _loginUiState.update { currentState ->
             currentState.copy(
                 email = email

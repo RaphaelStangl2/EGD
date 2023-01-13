@@ -8,24 +8,45 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.egd.R
 
 @Composable
-fun GetStarted(viewModel: EGDViewModel, modifier: Modifier) {
+fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modifier) {
     val configuration = LocalConfiguration.current
 
     val screenWidth = configuration.screenWidthDp.dp
     val progressBarWidth = screenWidth - (screenWidth.times(0.12F))
 
     val uiState = viewModel.getStartedUiState.collectAsState().value
+    val loginUiState = viewModel.loginUiState.collectAsState().value
 
     var step = uiState.step
     var numberOfSteps = uiState.numberOfSteps
     var egdDevice = uiState.EGDDevice
     var carName = uiState.carName
     var fuelConsumption = uiState.averageCarConsumption
+    var firstName = uiState.firstName
+    var email = uiState.email
+    var password = uiState.password
+
+    var passwordVisibility = loginUiState.passwordVisibility
+
+
+
+    val icon = if (passwordVisibility)
+        painterResource(id = R.drawable.ic_baseline_visibility_24)
+    else
+        painterResource(id = R.drawable.ic_baseline_visibility_off_24)
 
 
 
@@ -47,18 +68,31 @@ fun GetStarted(viewModel: EGDViewModel, modifier: Modifier) {
             if (step == 2){
                 ConnectScreen()
             }
-            if(step == 3) {
+            else if(step == 3) {
                 CarInfoScreen(carName, fuelConsumption, viewModel)
             }
+            else if(step == 5) {
+                RegisterScreen(viewModel = viewModel, userName = firstName, email = email, password = password, passwordVisibility = passwordVisibility, icon = icon)
+            }
+
 
         } else if (numberOfSteps == 3) {
-
+            if (step == 3){
+                RegisterScreen(viewModel = viewModel, userName = firstName, email = email, password = password, passwordVisibility = passwordVisibility, icon = icon)
+            }
         }
 
 
             Row(verticalAlignment = Alignment.Bottom) {
                 Button(
-                    onClick = { viewModel.setStep(step + 1) },
+                    onClick = {
+                        if (step + 1 > numberOfSteps){
+                            onRegistered()
+                        }else{
+                            viewModel.setStep(step + 1)
+                        }
+
+                    },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(text = "NEXT")
@@ -153,4 +187,59 @@ fun CarInfoScreen(carName:String, fuelConsumption: String, viewModel: EGDViewMod
         )
         Text(text="liters")
     }
+}
+
+
+@Composable
+fun RegisterScreen(viewModel: EGDViewModel, userName:String, email: String, password: String, passwordVisibility: Boolean, icon: Painter) {
+
+    Row(){
+        TextField(
+            value = userName,
+            onValueChange = {viewModel.setFirstName(it)},
+            colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background),
+            label = {Text(text="User Name")}
+        )
+    }
+    Spacer(modifier = Modifier.height(7.dp))
+
+
+    Row(){
+        TextField(
+            value = email,
+            onValueChange = {viewModel.setEmailRegister(it)},
+            colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background),
+            label = {Text(text="Email")}
+
+        )
+    }
+    Spacer(modifier = Modifier.height(7.dp))
+
+
+    Row(){
+        TextField(
+            value = password,
+            onValueChange = {viewModel.setPasswordRegister(it)},
+            colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background),
+            label = {Text(text = "Password")},
+            trailingIcon = {
+                IconButton(onClick = {viewModel.setVisibility(!passwordVisibility)}){
+
+                    Icon(
+                        painter = icon,
+                        contentDescription = "visibility Icon",
+                    )
+                }
+            },
+            visualTransformation = if (passwordVisibility) VisualTransformation.None
+            else PasswordVisualTransformation()
+        )
+    }
+
+
+    Row(){
+        Text(text = "at least 8 symbols", fontStyle = FontStyle.Italic)
+    }
+    Spacer(modifier = Modifier.height(10.dp))
+
 }

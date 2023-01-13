@@ -79,4 +79,12 @@ dependencies {
 
     //permission
     implementation "com.google.accompanist:accompanist-permissions:0.21.1-beta"
+
+
+    //maps Interface
+    implementation 'com.google.maps.android:maps-compose:2.4.0'
+    implementation 'com.google.android.gms:play-services-maps:18.1.0'
+    implementation 'com.google.android.gms:play-services-location:20.0.0'
+
+
 }

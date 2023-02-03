@@ -5,8 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.egd.data.ConnectionState
-import com.example.egd.data.EGDUiState
+import com.example.egd.data.*
 import com.example.egd.data.ble.BLEReceiveManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,11 +24,135 @@ class EGDViewModel @Inject constructor(
     private val bleReceiveManager: BLEReceiveManager
 ) : ViewModel(){
 
-    private val _uiState = MutableStateFlow(EGDUiState())
-    val uiState: StateFlow<EGDUiState> = _uiState.asStateFlow()
+    private val _getStartedUiState = MutableStateFlow(GetStartedUiState())
+    val getStartedUiState: StateFlow<GetStartedUiState> = _getStartedUiState.asStateFlow()
+
+    private val _loginUiState = MutableStateFlow(LoginUiState())
+    val loginUiState: StateFlow<LoginUiState> = _loginUiState.asStateFlow()
+
+    private val _mapUiState = MutableStateFlow(MapUiState())
+    val mapUiState: StateFlow<MapUiState> = _mapUiState.asStateFlow()
+
+    private val _homeUiState = MutableStateFlow(HomeScreenState())
+    val homeUiState: StateFlow<HomeScreenState> = _homeUiState.asStateFlow()
 
     var connectionState by mutableStateOf<ConnectionState>(ConnectionState.Uninitialized)
 
+    fun setHomeSearchBarContent(searchBarContent: String){
+        _homeUiState.update { currentState ->
+            currentState.copy(
+                searchBarContent = searchBarContent
+            )
+        }
+    }
+
+    fun setMapSearchBarContent(searchBarContent: String){
+        _mapUiState.update { currentState ->
+            currentState.copy(
+                searchBarContent = searchBarContent
+            )
+        }
+    }
+
+    fun setFirstName(firstName: String){
+        _getStartedUiState.update { currentState ->
+            currentState.copy(
+                firstName = firstName
+            )
+        }
+    }
+
+    fun setEmailRegister(email: String){
+        _getStartedUiState.update { currentState ->
+            currentState.copy(
+                email = email
+            )
+        }
+    }
+
+    fun setPasswordRegister(password: String){
+        _getStartedUiState.update { currentState ->
+            currentState.copy(
+                password = password
+            )
+        }
+    }
+
+    fun setEGDDevice(egdDevice: Boolean){
+        _getStartedUiState.update { currentState ->
+            currentState.copy(
+                EGDDevice = egdDevice
+            )
+        }
+    }
+
+    fun setNumberOfSteps(stepVal: Int){
+        _getStartedUiState.update { currentState ->
+            currentState.copy(
+                numberOfSteps = stepVal
+            )
+        }
+    }
+
+    fun setFuelConsumption(carConsumption: String){
+
+        var count = 0
+
+        for (element in carConsumption){
+            if (element == '.'){
+                count++
+            }
+        }
+
+
+        if (count <= 1 && carConsumption.length <= 4){
+            _getStartedUiState.update { currentState ->
+                currentState.copy(
+                    averageCarConsumption = carConsumption
+                )
+            }
+        }
+    }
+
+    fun setCarName(carName: String){
+        _getStartedUiState.update { currentState ->
+            currentState.copy(
+                carName = carName
+            )
+        }
+    }
+
+    fun setStep(stepVal: Int){
+        _getStartedUiState.update { currentState ->
+            currentState.copy(
+                step = stepVal
+            )
+        }
+    }
+
+    fun setVisibility(visibility: Boolean){
+        _loginUiState.update { currentState ->
+            currentState.copy(
+                passwordVisibility = visibility
+            )
+        }
+    }
+
+    fun setPasswordLogin(password: String){
+        _loginUiState.update { currentState ->
+            currentState.copy(
+                password = password
+            )
+        }
+    }
+
+    fun setEmailLogin(email: String){
+        _loginUiState.update { currentState ->
+            currentState.copy(
+                email = email
+            )
+        }
+    }
 
     /*private fun subscribeToChanges(){
         viewModelScope.launch {

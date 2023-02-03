@@ -1,14 +1,18 @@
 package com.example.egd.ui
 
+import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.ViewModel
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModel
 
 @Composable
-fun HomeScreen(
+fun StatisticsScreen(
     viewModel: ViewModel,
     modifier: Modifier = Modifier
 ){
-    Text(text="Home Screen")
+    Button(onClick = {}){
+        Text(text="Statistics Screen")
+
+    }
 }

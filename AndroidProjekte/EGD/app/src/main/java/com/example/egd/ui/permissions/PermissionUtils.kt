@@ -1,4 +1,4 @@
-package com.example.egd.ui
+package com.example.egd.ui.permissions
 
 import android.Manifest
 import android.os.Build

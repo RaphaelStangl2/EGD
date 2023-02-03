@@ -33,9 +33,20 @@ class EGDViewModel @Inject constructor(
     private val _mapUiState = MutableStateFlow(MapUiState())
     val mapUiState: StateFlow<MapUiState> = _mapUiState.asStateFlow()
 
+    private val _homeUiState = MutableStateFlow(HomeScreenState())
+    val homeUiState: StateFlow<HomeScreenState> = _homeUiState.asStateFlow()
+
     var connectionState by mutableStateOf<ConnectionState>(ConnectionState.Uninitialized)
 
-    fun setSearchBarContent(searchBarContent: String){
+    fun setHomeSearchBarContent(searchBarContent: String){
+        _homeUiState.update { currentState ->
+            currentState.copy(
+                searchBarContent = searchBarContent
+            )
+        }
+    }
+
+    fun setMapSearchBarContent(searchBarContent: String){
         _mapUiState.update { currentState ->
             currentState.copy(
                 searchBarContent = searchBarContent

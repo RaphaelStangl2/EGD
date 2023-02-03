@@ -9,7 +9,7 @@ val Purple700 = Color(0xFF3700B3)
 val Teal200 = Color(0xFF03DAC5)
 
 val PrimaryColor = Color(0xFF234e70)
-val PrimaryLightColor = Color(0xFF537a9f)
+val PrimaryLightColor = Color(0xFF3399ff)
 val PrimaryDarkColor = Color(0xFF002645)
 val SecondaryColor = Color(0xFFfbf8be)
 val SecondaryLightColor = Color(0xFFfffff1)

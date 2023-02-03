@@ -18,6 +18,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.egd.data.BottomNavItem
 import com.example.egd.data.StartItem
 import com.example.egd.ui.*
+import com.example.egd.ui.getStarted.GetStarted
 
 /*@Composable
 fun TopAppBar(
@@ -32,6 +33,22 @@ fun TopAppBar(
 ){
 
 }*/
+
+@Composable
+fun TopAppBarProfile(viewModel: EGDViewModel){
+    TopAppBar(
+        title = {Text("")},
+        /*actions = {
+            //SearchBarHome(searchBarContent = "", viewModel = viewModel)
+            IconButton(onClick = {}){
+                Icon(painterResource(id = R.drawable.ic_baseline_search_24), contentDescription = "Account Icon")
+            }
+            IconButton(onClick = {}){
+                Icon(painterResource(id = R.drawable.ic_baseline_person_24), contentDescription = "Account Icon")
+            }
+        }*/
+    )
+}
 
 @Composable
 fun TopAppBarBackButton(
@@ -164,6 +181,9 @@ fun EGDApp(modifier: Modifier = Modifier,
                 Scaffold(
                     bottomBar = {
                         BottomAppBar(navController)
+                    },
+                    topBar = {
+                        TopAppBarProfile(viewModel)
                     }
                 ) { innerPadding ->
                     HomeScreen(viewModel = viewModel, modifier = Modifier.padding(innerPadding))

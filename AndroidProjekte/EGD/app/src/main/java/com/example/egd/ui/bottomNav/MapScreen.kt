@@ -52,7 +52,7 @@ fun MapScreen(
             )
             OutlinedTextField(
                 value = searchBarContent,
-                onValueChange = {viewModel.setSearchBarContent(it)},
+                onValueChange = {viewModel.setMapSearchBarContent(it)},
                 leadingIcon = { Icon(painter = painterResource(id = R.drawable.ic_baseline_search_24), contentDescription = "Search Bar")},
                 trailingIcon = {
                     IconButton(onClick = {}){

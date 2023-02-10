@@ -28,6 +28,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    private String userName;
+
     private String email;
     //private String telephoneNumber;
 

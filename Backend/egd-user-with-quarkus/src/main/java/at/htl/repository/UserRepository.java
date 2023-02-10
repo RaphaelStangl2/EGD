@@ -14,7 +14,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
+@Transactional
 @ApplicationScoped
 public class  UserRepository {
 
@@ -23,13 +26,11 @@ public class  UserRepository {
 
 
     //USERS
-    @Transactional
     public User addUser(User user) {
         entityManager.persist(user);
         return user;
     }
 
-    @Transactional
     public void removeUser(final long reservationId) {
         final User user = findById(reservationId);
         entityManager.remove(user);
@@ -54,16 +55,32 @@ public class  UserRepository {
     // pepper value
     private static final String PEPPER = "egd-is-king";
 
+
+
+    public String sendTemporaryPassword(String email) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        // Generate a temporary password
+        String temporaryPassword = UUID.randomUUID().toString().substring(0, 8);
+
+        temporaryPassword = this.getSaltedHash(temporaryPassword);
+
+        // Send Prozess mit email
+        return temporaryPassword;
+
+    }
+
+
     public static String getSaltedHash(String password) throws NoSuchAlgorithmException, InvalidKeySpecException {
         // generate a random salt
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];
         random.nextBytes(salt);
 
-        // hash the password with the salt and pepper
+        // hash the password with the salt
 
-        //PBEKeySpec ist eine Klasse in Java, die verwendet wird, um eine Passwortbasierte Schlüsselspezifikation (PBEKeySpec)
-        // zu erstellen. Sie nimmt das Passwort als Zeichenfolge, den Salt-Wert, die Anzahl der Iterationen und die Länge des
+        //PBEKeySpec ist eine Klasse in Java, die verwendet wird, um eine Passwortbasierte
+        // Schlüsselspezifikation (PBEKeySpec)
+        // zu erstellen. Sie nimmt das Passwort als Zeichenfolge, den Salt-Wert, die Anzahl der
+        // Iterationen und die Länge des
         // generierten Schlüssels als Argumente.
         PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, ITERATIONS, KEY_LENGTH);
 
@@ -71,8 +88,10 @@ public class  UserRepository {
         //Schlüsselspezifikationen (z.B. PBEKeySpec) zu erstellen oder geheime Schlüssel aus anderen geheimen
         //Schlüsseln zu importieren. Mit getInstance(ALGORITHM) wird eine neue Instanz von SecretKeyFactory
         //mit dem angegebenen Algorithmus erstellt.
+
         SecretKeyFactory skf = SecretKeyFactory.getInstance(ALGORITHM);
-        byte[] hash = skf.generateSecret(spec).getEncoded();//verwendet die gegebenen PBEKeySpec und generiert einen geheimen Schlüssel.
+        byte[] hash = skf.generateSecret(spec).getEncoded();
+        //verwendet die gegebenen PBEKeySpec und generiert einen geheimen Schlüssel.
         //getEncoded gibt es in byte
 
         //concatenate pepper and hash
@@ -89,7 +108,7 @@ public class  UserRepository {
 
 
 
-    public static boolean check(String password, String stored) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public static boolean check(String password, String stored) throws NoSuchAlgorithmException {
         // extract the salt and the hash from the stored string
         String[] parts = stored.split(":");
         byte[] salt = fromHex(parts[0]);
@@ -98,7 +117,13 @@ public class  UserRepository {
         // hash the password with the salt and pepper
         PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, ITERATIONS, KEY_LENGTH);
         SecretKeyFactory skf = SecretKeyFactory.getInstance(ALGORITHM);
-        byte[] testHash = skf.generateSecret(spec).getEncoded();
+        byte[] testHash = new byte[0];
+
+        try {
+            testHash = skf.generateSecret(spec).getEncoded();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        }
 
         //concatenate pepper and testHash
         byte[] pepperTestHash = new byte[testHash.length + PEPPER.getBytes().length];
@@ -110,8 +135,10 @@ public class  UserRepository {
     }
 
 
+
     //fromHex(String hex) wandelt eine hexadezimale Zeichenfolge in ein Byte-Array um.
-    //Hierfür wird jeder zwei Zeichen lange Teil des Strings in ein byte umgewandelt und in das Array gespeichert.
+    //Hierfür wird jeder zwei Zeichen lange Teil des Strings in ein byte umgewandelt
+    // und in das Array gespeichert.
     private static byte[] fromHex(String hex) {
         byte[] bytes = new byte[hex.length() / 2];
         for (int i = 0; i < bytes.length; i++) {
@@ -132,5 +159,21 @@ public class  UserRepository {
         } else {
             return hex;
         }
+    }
+
+
+    public User findByEmail(String email) {
+
+            return entityManager.createQuery("SELECT u FROM User u where u.email = : email", User.class)
+                    .setParameter("email", email)
+                    .getSingleResult();
+
+    }
+    public void update(User user) {
+        entityManager.merge(user);
+    }
+
+    public String generateTempPassword() {
+        return UUID.randomUUID().toString().substring(0, 8);
     }
 }

@@ -8,6 +8,6 @@ data class GetStartedUiState(
     val averageCarConsumption: String = "",
     val email: String = "",
     val password: String = "",
-    val firstName:String = ""
-
+    val userName:String = "",
+    val doNotShowRational: Boolean = false
 )

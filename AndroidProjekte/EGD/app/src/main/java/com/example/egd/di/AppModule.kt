@@ -7,6 +7,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.egd.data.ble.BLEReceiveManager
+import com.example.egd.data.http.HttpService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,6 +24,12 @@ object AppModule {
     fun provideBluetoothAdapter(@ApplicationContext context: Context):BluetoothAdapter{
         val manager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         return manager.adapter
+    }
+
+    @Provides
+    @Singleton
+    fun provideHttpManager(@ApplicationContext context: Context):HttpService{
+        return HttpService
     }
 
     @Provides

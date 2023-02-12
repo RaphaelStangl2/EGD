@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.egd.R
+import com.example.egd.ui.getStarted.GetStartedButton
 
 @Composable
 fun StartScreen(
@@ -60,16 +61,7 @@ fun StartScreen(
 
             Spacer(modifier = Modifier.height(35.dp))
             Row(){
-                Button(onClick = {onGetStartedButtonClicked()}, modifier = Modifier
-                    .fillMaxWidth()
-                    .height(40.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.White, contentColor = MaterialTheme.colors.primary ),
-                    elevation = elevation(
-                        defaultElevation = 0.dp,
-                        pressedElevation = 0.dp)
-                ){
-                    Text(text= "Get started", fontWeight = FontWeight.Bold)
-                }
+                GetStartedButton({onGetStartedButtonClicked()}, "Get Started")
             }
             Spacer(modifier = Modifier.height(20.dp))
             Row() {

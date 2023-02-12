@@ -4,6 +4,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 
+import androidx.compose.ui.platform.LocalContext
 
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.egd.R
+import com.google.android.gms.common.internal.ResourceUtils
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -38,6 +40,10 @@ fun HomeScreen(
 
     val scrollState = rememberScrollState()
     var searchBarContent = homeUiState.searchBarContent
+    viewModel.readCarsFromJson(LocalContext.current.resources.openRawResource(R.raw.car))
+
+    var listCars = homeUiState.cars
+
 
     Column (
         modifier = modifier
@@ -52,9 +58,10 @@ fun HomeScreen(
         Column(modifier = Modifier
             .fillMaxHeight()
             .verticalScroll(scrollState)){
-            for(i in 1..2)
-            {
-                CarCard(name = "MyCar" + i, )
+            if (listCars != null) {
+                for(car in listCars) {
+                    CarCard(name = car.name)
+                }
             }
         }
     }

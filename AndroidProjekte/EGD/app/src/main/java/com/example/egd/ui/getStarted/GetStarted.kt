@@ -24,7 +24,9 @@ import androidx.navigation.compose.rememberNavController
 import com.example.egd.R
 import com.example.egd.ui.EGDViewModel
 import com.example.egd.ui.ProgressBar
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modifier) {
     val configuration = LocalConfiguration.current
@@ -40,7 +42,7 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
     var egdDevice = uiState.EGDDevice
     var carName = uiState.carName
     var fuelConsumption = uiState.averageCarConsumption
-    var firstName = uiState.firstName
+    var userName = uiState.userName
     var email = uiState.email
     var password = uiState.password
 
@@ -71,19 +73,19 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
             DeviceSelectionFields(viewModel, egdDevice)
         } else if (numberOfSteps == 5) {
             if (step == 2){
-                ConnectScreen()
+                ConnectScreen(viewModel)
             }
             else if(step == 3) {
                 CarInfoScreen(carName, fuelConsumption, viewModel)
             }
             else if(step == 5) {
-                RegisterScreen(viewModel = viewModel, userName = firstName, email = email, password = password, passwordVisibility = passwordVisibility, icon = icon)
+                RegisterScreen(viewModel = viewModel, userName = userName, email = email, password = password, passwordVisibility = passwordVisibility, icon = icon)
             }
 
 
         } else if (numberOfSteps == 3) {
             if (step == 3){
-                RegisterScreen(viewModel = viewModel, userName = firstName, email = email, password = password, passwordVisibility = passwordVisibility, icon = icon)
+                RegisterScreen(viewModel = viewModel, userName = userName, email = email, password = password, passwordVisibility = passwordVisibility, icon = icon)
             }
         }
 

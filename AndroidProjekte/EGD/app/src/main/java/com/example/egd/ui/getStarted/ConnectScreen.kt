@@ -5,20 +5,64 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.egd.ui.EGDViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionRequired
+import com.google.accompanist.permissions.rememberPermissionState
 
+@ExperimentalPermissionsApi
 @Composable
-fun ConnectScreen() {
-    Row(){
-        Text(text="Connect to your EGD Device")
-    }
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth().height(500.dp)){
+fun ConnectScreen(viewModel:EGDViewModel) {
 
-        Button(onClick = {}, modifier = Modifier.size(150.dp, 150.dp), shape = RoundedCornerShape(75.dp)){
-            Text(text="CONNECT")
+    val viewModelValue = viewModel.getStartedUiState.collectAsState().value
+
+    var doNotShowRationale = viewModelValue.doNotShowRational
+    val bluetoothPermission = rememberPermissionState(android.Manifest.permission.ACCESS_FINE_LOCATION)
+
+    PermissionRequired(
+        permissionState = bluetoothPermission,
+        permissionNotGrantedContent = {
+            if (doNotShowRationale) {
+                Text("Feature not available")
+            } else {
+                Column {
+                    Text("The camera is important for this app. Please grant the permission.")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row {
+                        Button(onClick = { bluetoothPermission.launchPermissionRequest() }) {
+                            Text("OK")
+                        }
+                    }
+                }
+            }
+        },
+        permissionNotAvailableContent = {
+            Column {
+                Text(
+                    "Camera permission denied. See this FAQ with information about why we " +
+                            "need this permission. Please, grant us access on the Settings screen."
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(onClick = {}) {
+                    Text("Open Settings")
+                }
+            }
+        }
+    ) {
+        Row(){
+            Text(text="Connect to your EGD Device")
+        }
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier
+            .fillMaxWidth()
+            .height(500.dp)){
+
+            Button(onClick = {}, modifier = Modifier.size(150.dp, 150.dp), shape = RoundedCornerShape(75.dp)){
+                Text(text="CONNECT")
+            }
         }
     }
 }

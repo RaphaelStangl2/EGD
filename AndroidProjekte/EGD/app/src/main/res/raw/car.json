@@ -1,0 +1,13 @@
+[
+  {
+    "name" : "RsheedsCar",
+    "model" :  "Fiord",
+    "consumption" : 7
+
+  },
+  {
+    "name" : "RaphaelsCar",
+    "model" :  "Hyundai",
+    "consumption" : 5
+  }
+]

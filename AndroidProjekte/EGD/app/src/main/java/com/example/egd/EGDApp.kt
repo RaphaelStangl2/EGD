@@ -1,5 +1,6 @@
 package com.example.egd
 
+import android.bluetooth.BluetoothAdapter
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -19,6 +20,8 @@ import com.example.egd.data.BottomNavItem
 import com.example.egd.data.StartItem
 import com.example.egd.ui.*
 import com.example.egd.ui.getStarted.GetStarted
+import com.example.egd.ui.internet.NoInternetScreen
+import com.example.egd.ui.permissions.SystemBroadcastReceiver
 
 /*@Composable
 fun TopAppBar(
@@ -121,10 +124,18 @@ fun BottomAppBar(navController: NavHostController,
 @Composable
 fun EGDApp(modifier: Modifier = Modifier,
            viewModel: EGDViewModel = viewModel(),
-           onBluetoothStateChanged:()->Unit
+           onBluetoothStateChanged:()->Unit,
+           onNoInternetConnection:()->Boolean
 ){
 
     val navController = rememberNavController()
+
+    SystemBroadcastReceiver(systemAction = BluetoothAdapter.ACTION_STATE_CHANGED){ bluetoothState ->
+        val action = bluetoothState?.action ?: return@SystemBroadcastReceiver
+        if(action == BluetoothAdapter.ACTION_STATE_CHANGED){
+            onBluetoothStateChanged()
+        }
+    }
 
     /*Scaffold(
 
@@ -139,17 +150,26 @@ fun EGDApp(modifier: Modifier = Modifier,
 
         NavHost(
             navController = navController,
-            startDestination = StartItem.StartScreen.screen_route,
+            startDestination =  if(onNoInternetConnection())
+                                    StartItem.StartScreen.screen_route
+                                else
+                                    StartItem.NoConnectionScreen.screen_route,
             //modifier = modifier.padding(innerPadding)
         ){
             composable(route = StartItem.StartScreen.screen_route){
-                StartScreen(
-                    onGetStartedButtonClicked = {
-                        navController.navigate(StartItem.GetStartedScreen.screen_route)
-                    },
-                    onLoginButtonClicked = {
-                        navController.navigate(StartItem.LoginScreen.screen_route)
-                    })
+                    StartScreen(
+                        onGetStartedButtonClicked = {
+                            navController.navigate(StartItem.GetStartedScreen.screen_route)
+                        },
+                        onLoginButtonClicked = {
+                            navController.navigate(StartItem.LoginScreen.screen_route)
+                        })
+                }
+
+
+
+            composable(route = StartItem.NoConnectionScreen.screen_route){
+                NoInternetScreen({onNoInternetConnection()}) { navController.navigate(StartItem.StartScreen.screen_route) }
             }
             composable(route = StartItem.LoginScreen.screen_route) {
                 Scaffold(

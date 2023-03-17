@@ -17,6 +17,6 @@ jobs:
       - name: Build with Maven
         run: mvn --batch-mode --update-snapshots package
       - name: Build with Maven
-        run: mvn -B ./Backend/egd-user-with-quarkus clean package --no-transfer-progress
+        run: mvn -f ./Backend/egd-user-with-quarkus/pom.xml clean package
       - name: Run Quarkus Tests
-        run: mvn -B ./Backend/egd-user-with-quarkus -Dquarkus.http.test-port=8081 verify --no-transfer-progress
+        run: mvn -f ./Backend/egd-user-with-quarkus -Dquarkus.http.test-port=8081 verify --no-transfer-progress

@@ -1,5 +1,7 @@
 package com.example.egd.ui
 
+import android.annotation.SuppressLint
+import android.location.Location
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -7,22 +9,30 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.egd.data.*
 import com.example.egd.data.ble.BLEReceiveManager
+import com.example.egd.data.entities.Car
+import com.example.egd.data.entities.User
+import com.example.egd.data.http.HttpService
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.text.NumberFormat
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
+import okhttp3.Response
+import java.io.InputStream
 import javax.inject.Inject
 
 @HiltViewModel
 class EGDViewModel @Inject constructor(
-    private val bleReceiveManager: BLEReceiveManager
+    private val bleReceiveManager: BLEReceiveManager,
+    val fusedLocationClient: FusedLocationProviderClient
 ) : ViewModel(){
+
+    private val _editCarUiState = MutableStateFlow(EditCarUiState())
+    val editCarUiState: StateFlow<EditCarUiState> = _editCarUiState.asStateFlow()
 
     private val _getStartedUiState = MutableStateFlow(GetStartedUiState())
     val getStartedUiState: StateFlow<GetStartedUiState> = _getStartedUiState.asStateFlow()
@@ -33,10 +43,29 @@ class EGDViewModel @Inject constructor(
     private val _mapUiState = MutableStateFlow(MapUiState())
     val mapUiState: StateFlow<MapUiState> = _mapUiState.asStateFlow()
 
+
     private val _homeUiState = MutableStateFlow(HomeScreenState())
     val homeUiState: StateFlow<HomeScreenState> = _homeUiState.asStateFlow()
 
     var connectionState by mutableStateOf<ConnectionState>(ConnectionState.Uninitialized)
+
+    fun setCar(car:Car){
+        _editCarUiState.update { currentState ->
+            currentState.copy(
+                car = car,
+                name = car.name,
+                consumption = car.consumption.toString()
+            )
+        }
+    }
+
+    fun setCurrentLocation(location: Location?) {
+        _mapUiState.update { currentState ->
+            currentState.copy(
+                startLocation = location
+            )
+        }
+    }
 
     fun setHomeSearchBarContent(searchBarContent: String){
         _homeUiState.update { currentState ->
@@ -54,10 +83,10 @@ class EGDViewModel @Inject constructor(
         }
     }
 
-    fun setFirstName(firstName: String){
+    fun setFirstName(userName: String){
         _getStartedUiState.update { currentState ->
             currentState.copy(
-                firstName = firstName
+                userName = userName
             )
         }
     }
@@ -154,6 +183,48 @@ class EGDViewModel @Inject constructor(
         }
     }
 
+    fun readCarsFromJson(inputStream:InputStream){
+
+        var jsonStringVar = inputStream.bufferedReader()
+            .use { it.readText() }
+
+        val listCarType = object : TypeToken<Array<Car>>() {}.type
+        //Gson().fromJson(jsonString, listCountryType)
+        var carList = Gson().fromJson(jsonStringVar, Array<Car>::class.java)
+
+        _homeUiState.update { currentState ->
+            currentState.copy(
+                cars = carList
+            )
+        }
+    }
+
+    suspend fun sendLoginRequest(){
+        val value = loginUiState.value
+        var response: Response
+
+        //HttpService.loginRequest(User("", value.email, value.password))
+
+        try{
+            response = HttpService.retrofitService.postLogin(User("", value.email, value.password))
+        }catch (e: Exception) {
+        }
+    }
+
+    fun sendRegisterRequest(){
+        var response: Response
+        val value = loginUiState.value
+
+        viewModelScope.launch {
+            try{
+                response = HttpService.retrofitService.postRegistration(User("", value.email, value.password))
+            }catch (e: Exception) {
+            }
+        }
+        //httpService.registerRequest(User(value.userName, value.email, value.password))
+    }
+
+
     /*private fun subscribeToChanges(){
         viewModelScope.launch {
             bleReceiveManager.data.collect{ result ->
@@ -190,5 +261,16 @@ class EGDViewModel @Inject constructor(
         super.onCleared()
         bleReceiveManager.closeConnection()
     }*/
+
+
+    @SuppressLint("MissingPermission")
+    fun getUserPosition(callback: (Location?) -> Unit) {
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            callback(location)
+        }.addOnFailureListener { exception ->
+            // Handle failure
+            callback(null)
+        }
+    }
 
 }

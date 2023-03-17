@@ -1,43 +1,41 @@
 package com.example.egd.ui
 
+import android.location.Location
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 
+import androidx.compose.ui.platform.LocalContext
 
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.lifecycle.ViewModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.egd.R
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.rememberCameraPositionState
+import com.example.egd.data.entities.Car
 
 @Composable
 fun HomeScreen(
     viewModel: EGDViewModel,
     modifier: Modifier = Modifier,
+    goToMap: () -> Unit,
+    goToEditScreen: () -> Unit
 ){
     val homeUiState = viewModel.homeUiState.collectAsState().value
 
     val scrollState = rememberScrollState()
     var searchBarContent = homeUiState.searchBarContent
+    viewModel.readCarsFromJson(LocalContext.current.resources.openRawResource(R.raw.car))
+
+    var listCars = homeUiState.cars
+
 
     Column (
         modifier = modifier
@@ -52,9 +50,10 @@ fun HomeScreen(
         Column(modifier = Modifier
             .fillMaxHeight()
             .verticalScroll(scrollState)){
-            for(i in 1..2)
-            {
-                CarCard(name = "MyCar" + i, )
+            if (listCars != null) {
+                for(car in listCars) {
+                    CarCard(car = car,name = car.name, car.latitude, car.longitude, viewModel, {goToMap()}, {goToEditScreen()})
+                }
             }
         }
     }
@@ -92,7 +91,12 @@ fun SearchBarHome(searchBarContent: String, viewModel: EGDViewModel){
 }
 
 @Composable
-fun CarCard(name: String) {
+fun CarCard(car: Car, name: String, latitude: Double, longitude: Double, viewModel: EGDViewModel, goToMap: () -> Unit, goToEditScreen: () -> Unit) {
+
+    var expanded by remember {
+        mutableStateOf(false)
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -105,7 +109,7 @@ fun CarCard(name: String) {
         Column(modifier = Modifier.fillMaxWidth()){
             Row(
                 modifier = Modifier
-                    .padding(start = 17.dp, top=10.dp, bottom = 10.dp)
+                    .padding(start = 17.dp, top = 10.dp, bottom = 10.dp)
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
@@ -113,7 +117,12 @@ fun CarCard(name: String) {
 
                 Text(text = name, fontWeight = MaterialTheme.typography.body2.fontWeight)
 
-                IconButton(onClick = {}) {
+                IconButton(onClick =
+                {
+                    viewModel.setCar(car)
+                    goToEditScreen()
+
+                }) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_baseline_edit_24),
                         contentDescription = "edit Icon",
@@ -128,7 +137,13 @@ fun CarCard(name: String) {
                 verticalAlignment = Alignment.CenterVertically)
             {
                 Button(
-                    onClick = {},
+                    onClick = {
+                        var location = Location("")
+                        location.latitude = latitude
+                        location.longitude = longitude
+                        viewModel.setCurrentLocation( location)
+                        goToMap()
+                              },
                     colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background, contentColor = MaterialTheme.colors.primaryVariant),
                     modifier = Modifier.shadow(0.dp),
                     elevation = ButtonDefaults.elevation(
@@ -140,9 +155,27 @@ fun CarCard(name: String) {
                 ) {
                     Text(text="Go to map",color = MaterialTheme.colors.primaryVariant, fontWeight = MaterialTheme.typography.body2.fontWeight)
                 }
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(painterResource(id = R.drawable.ic_baseline_more_vert_24), contentDescription = "More Vert Icon")
+
+                Box(){
+                    IconButton(onClick = { expanded = !expanded }) {
+                        Icon(painterResource(id = R.drawable.ic_baseline_more_vert_24), contentDescription = "More Vert Icon")
+                    }
+
+                    MaterialTheme(shapes = MaterialTheme.shapes.copy(medium = RoundedCornerShape(3.dp))) {
+                        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }, modifier = Modifier.background(color = Color.White)) {
+                            DropdownMenuItem(
+                                onClick = {
+                                    expanded = false
+                                },
+                                enabled = false,
+                                modifier = Modifier.background(color = Color.White)
+                            ) {
+                                Text(text = "Delete")
+                            }
+                        }
+                    }
                 }
+                
             }
         }
 

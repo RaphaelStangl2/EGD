@@ -86,5 +86,19 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
     implementation 'com.google.android.gms:play-services-location:20.0.0'
 
+    //Gson
+    implementation 'com.google.code.gson:gson:2.8.7'
+
+    // Retrofit with Moshi Converter
+    implementation 'com.squareup.retrofit2:converter-moshi:2.9.0'
+
+    // Moshi
+    implementation 'com.squareup.moshi:moshi-kotlin:1.13.0'
+
+    //GPS Dialogue
+    implementation "com.google.android.gms:play-services-location:18.0.0"
+
+    //await() implementation
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.1'
 
 }

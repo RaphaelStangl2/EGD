@@ -12,5 +12,11 @@ data class Car(
     var model:String,
     @SerializedName("consumption")
     @Expose
-    var consumption:Double
+    var consumption:Double,
+    @SerializedName("latitude")
+    @Expose
+    var latitude:Double,
+    @SerializedName("longitude")
+    @Expose
+    var longitude:Double
     )

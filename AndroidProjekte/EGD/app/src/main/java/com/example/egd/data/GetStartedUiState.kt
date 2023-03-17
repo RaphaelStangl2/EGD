@@ -10,4 +10,4 @@ data class GetStartedUiState(
     val password: String = "",
     val userName:String = "",
     val doNotShowRational: Boolean = false
-)
+    )

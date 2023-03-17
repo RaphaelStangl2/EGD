@@ -10,20 +10,61 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.egd.ui.EGDViewModel
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.PermissionRequired
-import com.google.accompanist.permissions.rememberPermissionState
+import com.example.egd.ui.permissions.PermissionUtils
+import com.google.accompanist.permissions.*
 
 @ExperimentalPermissionsApi
 @Composable
-fun ConnectScreen(viewModel:EGDViewModel) {
+fun ConnectScreen(viewModel:EGDViewModel, showBluetoothDialogue:()->Unit,
+) {
 
     val viewModelValue = viewModel.getStartedUiState.collectAsState().value
 
     var doNotShowRationale = viewModelValue.doNotShowRational
-    val bluetoothPermission = rememberPermissionState(android.Manifest.permission.ACCESS_FINE_LOCATION)
+    val bluetoothPermission = rememberMultiplePermissionsState(permissions = PermissionUtils.permissions)
 
-    PermissionRequired(
+    PermissionsRequired(
+        multiplePermissionsState = bluetoothPermission,
+        permissionsNotGrantedContent = { if (doNotShowRationale) {
+            Text("Feature not available")
+        } else {
+            Column {
+                Text("Bluetooth has to activated for you to connect to your EGD-Device. Please grant the permission.")
+                Spacer(modifier = Modifier.height(8.dp))
+                Row {
+                    Button(onClick = { bluetoothPermission.launchMultiplePermissionRequest() }) {
+                        Text("OK")
+                    }
+                }
+            }
+        } },
+        permissionsNotAvailableContent = { Column {
+            Text(
+                "Bluetooth permission denied. See this FAQ with information about why we " +
+                        "need this permission. Please, grant us access on the Settings screen."
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(onClick = {}) {
+                Text("Open Settings")
+            }
+        } }) {
+
+        showBluetoothDialogue()
+
+        Row(){
+            Text(text="Connect to your EGD Device")
+        }
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier
+            .fillMaxWidth()
+            .height(500.dp)){
+
+            Button(onClick = {}, modifier = Modifier.size(150.dp, 150.dp), shape = RoundedCornerShape(75.dp)){
+                Text(text="CONNECT")
+            }
+        }
+    }
+
+    /*PermissionRequired(
         permissionState = bluetoothPermission,
         permissionNotGrantedContent = {
             if (doNotShowRationale) {
@@ -53,16 +94,6 @@ fun ConnectScreen(viewModel:EGDViewModel) {
             }
         }
     ) {
-        Row(){
-            Text(text="Connect to your EGD Device")
-        }
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier
-            .fillMaxWidth()
-            .height(500.dp)){
 
-            Button(onClick = {}, modifier = Modifier.size(150.dp, 150.dp), shape = RoundedCornerShape(75.dp)){
-                Text(text="CONNECT")
-            }
-        }
-    }
+    }*/
 }

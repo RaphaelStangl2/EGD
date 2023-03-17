@@ -2,6 +2,7 @@ package com.example.egd
 
 import android.bluetooth.BluetoothAdapter
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -9,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.*
 import androidx.navigation.NavHostController
@@ -19,9 +21,13 @@ import androidx.navigation.compose.rememberNavController
 import com.example.egd.data.BottomNavItem
 import com.example.egd.data.StartItem
 import com.example.egd.ui.*
+import com.example.egd.ui.bottomNav.home.AddCarDialogue
+import com.example.egd.ui.bottomNav.home.CarEditScreen
 import com.example.egd.ui.getStarted.GetStarted
 import com.example.egd.ui.internet.NoInternetScreen
+import com.example.egd.ui.permissions.PermissionUtils
 import com.example.egd.ui.permissions.SystemBroadcastReceiver
+import com.google.accompanist.permissions.*
 
 /*@Composable
 fun TopAppBar(
@@ -36,6 +42,17 @@ fun TopAppBar(
 ){
 
 }*/
+
+@Composable
+fun FLoatingAddButton(viewModel:EGDViewModel, navigateToAddCarScreen: () -> Unit,
+){
+    FloatingActionButton(onClick = { navigateToAddCarScreen() },
+        shape = RoundedCornerShape(16.dp),
+    ) {
+        Icon(contentDescription = "AddActionButton", painter = painterResource(id = R.drawable.ic_baseline_add_24))
+
+    }
+}
 
 @Composable
 fun TopAppBarProfile(viewModel: EGDViewModel){
@@ -104,16 +121,20 @@ fun BottomAppBar(navController: NavHostController,
                 alwaysShowLabel = true,
                 selected = currentRoute == item.screen_route,
                 onClick = {
-                    navController.navigate(item.screen_route) {
 
-                        navController.graph.startDestinationRoute?.let { screen_route ->
-                            popUpTo(screen_route) {
-                                saveState = true
+                    if (currentRoute != item.screen_route){
+                        navController.navigate(item.screen_route) {
+
+                            navController.graph.startDestinationRoute?.let { screen_route ->
+                                popUpTo(screen_route) {
+                                    saveState = true
+                                }
                             }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
                     }
+
                 }
             )
         }
@@ -121,19 +142,27 @@ fun BottomAppBar(navController: NavHostController,
 }
 
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun EGDApp(modifier: Modifier = Modifier,
            viewModel: EGDViewModel = viewModel(),
            onBluetoothStateChanged:()->Unit,
+           onGPSRequired:() -> Unit,
            onNoInternetConnection:()->Boolean
 ){
 
     val navController = rememberNavController()
+    val bluetoothPermission = rememberMultiplePermissionsState(permissions = PermissionUtils.permissions)
 
-    SystemBroadcastReceiver(systemAction = BluetoothAdapter.ACTION_STATE_CHANGED){ bluetoothState ->
-        val action = bluetoothState?.action ?: return@SystemBroadcastReceiver
-        if(action == BluetoothAdapter.ACTION_STATE_CHANGED){
-            onBluetoothStateChanged()
+    PermissionsRequired(
+        multiplePermissionsState = bluetoothPermission,
+        permissionsNotGrantedContent = { /*TODO*/ },
+        permissionsNotAvailableContent = { /*TODO*/ }) {
+        SystemBroadcastReceiver(systemAction = BluetoothAdapter.ACTION_STATE_CHANGED){ bluetoothState ->
+            val action = bluetoothState?.action ?: return@SystemBroadcastReceiver
+            if(action == BluetoothAdapter.ACTION_STATE_CHANGED){
+                onBluetoothStateChanged()
+            }
         }
     }
 
@@ -156,6 +185,8 @@ fun EGDApp(modifier: Modifier = Modifier,
                                     StartItem.NoConnectionScreen.screen_route,
             //modifier = modifier.padding(innerPadding)
         ){
+
+            //Startscreen
             composable(route = StartItem.StartScreen.screen_route){
                     StartScreen(
                         onGetStartedButtonClicked = {
@@ -165,12 +196,11 @@ fun EGDApp(modifier: Modifier = Modifier,
                             navController.navigate(StartItem.LoginScreen.screen_route)
                         })
                 }
-
-
-
+            //NoConnectionScreen
             composable(route = StartItem.NoConnectionScreen.screen_route){
                 NoInternetScreen({onNoInternetConnection()}) { navController.navigate(StartItem.StartScreen.screen_route) }
             }
+            //LoginScreen
             composable(route = StartItem.LoginScreen.screen_route) {
                 Scaffold(
                     topBar = { TopAppBarBackButton(navController, {Text("Sign In")}, onBackButtonClick = {navController.navigateUp()}) }
@@ -178,7 +208,7 @@ fun EGDApp(modifier: Modifier = Modifier,
                     LoginScreen(viewModel, modifier = Modifier.padding(innerPadding))
                 }
             }
-
+            //GetStartedScreen
             composable(route = StartItem.GetStartedScreen.screen_route){
                 Scaffold(
                     topBar = { TopAppBarBackButton(navController, {Text("Get Started")}, onBackButtonClick = {
@@ -192,11 +222,40 @@ fun EGDApp(modifier: Modifier = Modifier,
                     })
                 { innerPadding ->
                     GetStarted(viewModel, { navController.navigate(BottomNavItem.Home.screen_route){ popUpTo(0) } },
+                        onBluetoothStateChanged = {onBluetoothStateChanged()},
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
             }
+            //AddCarScreen
+            composable(route = BottomNavItem.AddCarScreen.screen_route){
+                Scaffold(
+                    topBar = { TopAppBarBackButton(navController, {Text("Add Car")}, onBackButtonClick = {
+                        navController.navigateUp()
 
+                    })
+                    })
+                { innerPadding ->
+                    AddCarDialogue(viewModel, { navController.navigate(BottomNavItem.Home.screen_route){ popUpTo(0) } },
+                        onBluetoothStateChanged = {onBluetoothStateChanged()},
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                }
+            }
+            //EditCarScreen
+            composable(route = BottomNavItem.EditCarScreen.screen_route){
+                Scaffold(
+                    topBar = { TopAppBarBackButton(navController, {Text("Edit Car")}, onBackButtonClick = {
+                        navController.navigateUp()
+                    })
+                    })
+                { innerPadding ->
+                    CarEditScreen(viewModel = viewModel, onUpdate = { navController.navigate(BottomNavItem.Home.screen_route){ popUpTo(0) } },
+                        modifier = Modifier.padding(innerPadding))
+                }
+            }
+
+            //HomeScreen
             composable(route = BottomNavItem.Home.screen_route) {
                 Scaffold(
                     bottomBar = {
@@ -204,20 +263,31 @@ fun EGDApp(modifier: Modifier = Modifier,
                     },
                     topBar = {
                         TopAppBarProfile(viewModel)
-                    }
+                    },
+                    floatingActionButton = {
+                        FLoatingAddButton(viewModel = viewModel
+                        ) {
+                            viewModel.setStep(1)
+
+                            navController.navigate(BottomNavItem.AddCarScreen.screen_route)
+                        }
+                    },
+                    floatingActionButtonPosition = FabPosition.Center
                 ) { innerPadding ->
-                    HomeScreen(viewModel = viewModel, modifier = Modifier.padding(innerPadding))
+                    HomeScreen(viewModel = viewModel, modifier = Modifier.padding(innerPadding), goToEditScreen = {navController.navigate(BottomNavItem.EditCarScreen.screen_route)}, goToMap = {navController.navigate(BottomNavItem.Map.screen_route)})
                 }
             }
+            //MapScreen
             composable(route = BottomNavItem.Map.screen_route) {
                 Scaffold(
                     bottomBar = {
                         BottomAppBar(navController)
                     }
                 ) { innerPadding ->
-                    MapScreen(viewModel = viewModel, modifier = Modifier.padding(innerPadding))
+                    MapScreen(viewModel = viewModel, modifier = Modifier.padding(innerPadding)) { onGPSRequired() }
                 }
             }
+            //StatisticsScreen
             composable(route = BottomNavItem.Statistics.screen_route) {
                 Scaffold(
                     bottomBar = {

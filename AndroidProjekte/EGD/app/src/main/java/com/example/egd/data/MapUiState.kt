@@ -1,9 +1,12 @@
 package com.example.egd.data
 
-import com.google.android.gms.maps.model.LatLng
+import android.location.Location
+import com.google.android.gms.maps.model.CameraPosition
 
 data class MapUiState(
-    val showMap: Boolean = false,
-    //val userLocation: LatLng,
-    val searchBarContent: String = ""
+    val startLocation: Location? = null,
+    val searchBarContent: String = "",
+    val doNotShowRational: Boolean = false,
+
+
 )

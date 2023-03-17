@@ -28,7 +28,8 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modifier) {
+fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modifier, onBluetoothStateChanged:()->Unit,
+) {
     val configuration = LocalConfiguration.current
 
     val screenWidth = configuration.screenWidthDp.dp
@@ -73,7 +74,7 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
             DeviceSelectionFields(viewModel, egdDevice)
         } else if (numberOfSteps == 5) {
             if (step == 2){
-                ConnectScreen(viewModel)
+                ConnectScreen(viewModel, onBluetoothStateChanged)
             }
             else if(step == 3) {
                 CarInfoScreen(carName, fuelConsumption, viewModel)
@@ -97,6 +98,8 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
                 Button(
                     onClick = {
                         if (step + 1 > numberOfSteps){
+                            viewModel.setCarName("")
+                            viewModel.setFuelConsumption("")
                             onRegistered()
                         }else{
                             viewModel.setStep(step + 1)

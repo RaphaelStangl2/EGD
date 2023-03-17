@@ -4,10 +4,12 @@ import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
+import android.media.audiofx.BassBoost
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -22,7 +24,12 @@ import com.example.egd.ui.LoginScreen
 import com.example.egd.ui.StartScreen
 import com.example.egd.ui.getStarted.ConnectScreen
 import com.example.egd.ui.internet.NoInternetScreen
+import com.example.egd.ui.permissions.PermissionUtils
+import com.example.egd.ui.permissions.SystemBroadcastReceiver
 import com.example.egd.ui.theme.EGDTheme
+import com.google.accompanist.permissions.PermissionsRequired
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -32,7 +39,10 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var bluetoothAdapter: BluetoothAdapter
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContent {
             EGDTheme {
@@ -41,7 +51,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                 ) {
 
-                        EGDApp(onNoInternetConnection = {isInternetAvailable(this)}, onBluetoothStateChanged = {showBluetoothDialog()})
+                        EGDApp(onNoInternetConnection = {isInternetAvailable(this)}, onBluetoothStateChanged = {showBluetoothDialog()}, onGPSRequired = {showGPSDialog()})
                 }
             }
         }
@@ -49,10 +59,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        showBluetoothDialog()
+
+        //showGPSDialog()
+        //showBluetoothDialog()
     }
 
     private var isBluetootDialogAlreadyShown = false
+    private var isGPSDialogAlreadyShown = false
     private fun showBluetoothDialog(){
         if(!bluetoothAdapter.isEnabled){
             if(!isBluetootDialogAlreadyShown){
@@ -62,6 +75,22 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    private fun showGPSDialog(){
+        val enableGPSIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        //val enableGPSIntent = Intent(Intent.ACTION_VIEW);
+
+        startGPSIntentForResult.launch(enableGPSIntent)
+        isGPSDialogAlreadyShown = true
+    }
+
+    private val startGPSIntentForResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result ->
+            isGPSDialogAlreadyShown = false
+            if(result.resultCode != Activity.RESULT_OK){
+                showGPSDialog()
+            }
+        }
 
     private val startBluetoothIntentForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result ->

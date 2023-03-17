@@ -1,7 +1,6 @@
 package at.htl.resource;
 
 import at.htl.model.Car;
-import at.htl.model.User;
 import at.htl.repository.CarRepository;
 
 import javax.inject.Inject;

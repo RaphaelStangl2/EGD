@@ -1,5 +1,6 @@
 package at.htl.model;
 
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -14,8 +15,8 @@ public class UserCar {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "users_id")
+    private Users user;
 
     @ManyToOne
     @JoinColumn(name = "car_id")
@@ -24,4 +25,3 @@ public class UserCar {
     @OneToMany(mappedBy = "userCar")
     private List<Drive> drives;
 }
-

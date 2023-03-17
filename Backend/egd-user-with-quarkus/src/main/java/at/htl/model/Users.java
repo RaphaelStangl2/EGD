@@ -1,13 +1,8 @@
 package at.htl.model;
 
-import at.htl.repository.UserRepository;
-import at.htl.resource.UserResource;
 import lombok.*;
 
-import javax.inject.Inject;
 import javax.persistence.*;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 
 @Getter
@@ -20,13 +15,13 @@ import java.util.List;
 
 
 @Entity
-public class User {
+public class Users {
 
 
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     private String userName;
 
@@ -35,12 +30,16 @@ public class User {
 
     private String password;
 
+    private String resetPassword;
 
-
-    @OneToMany(cascade = CascadeType.ALL)
+   /* @OneToMany(cascade = CascadeType.ALL)
     private List<Car> cars;
 
 
+    */
+    @ManyToOne
+    @JoinColumn(name = "place_id")
+    private Place place;
 
 
 

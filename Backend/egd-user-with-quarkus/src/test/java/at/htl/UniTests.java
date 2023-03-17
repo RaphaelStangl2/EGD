@@ -1,6 +1,6 @@
 package at.htl;
 
-import at.htl.model.User;
+import at.htl.model.Users;
 import at.htl.repository.UserRepository;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import javax.inject.Inject;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @QuarkusTest
@@ -19,11 +18,11 @@ class UniTests {
 
     @Test
     void addUser() {
-        User user = new User();
+        Users user = new Users();
         user.setUserName("john12");
         user.setEmail("johndoe@example.com");
 
-        User addedUser = userRepository.addUser(user);
+        Users addedUser = userRepository.addUser(user);
 
         assertNotNull(addedUser.getId());
         assertEquals("john12", addedUser.getUserName());
@@ -32,25 +31,25 @@ class UniTests {
 
     @Test
     void removeUser() {
-        User user = new User();
+        Users user = new Users();
         user.setUserName("Jan2");
         user.setEmail("janedoe@example.com");
 
-        User addedUser = userRepository.addUser(user);
+        Users addedUser = userRepository.addUser(user);
         userRepository.removeUser(addedUser.getId());
 
-        User removedUser = userRepository.findById(addedUser.getId());
+        Users removedUser = userRepository.findById(addedUser.getId());
         assertNull(removedUser);
     }
 
     @Test
     void findById() {
-        User user = new User();
+        Users user = new Users();
         user.setUserName("Johnss");
         user.setEmail("johndoe@example.com");
 
-        User addedUser = userRepository.addUser(user);
-        User foundUser = userRepository.findById(addedUser.getId());
+        Users addedUser = userRepository.addUser(user);
+        Users foundUser = userRepository.findById(addedUser.getId());
 
         assertNotNull(foundUser);
         assertEquals(addedUser.getId(), foundUser.getId());

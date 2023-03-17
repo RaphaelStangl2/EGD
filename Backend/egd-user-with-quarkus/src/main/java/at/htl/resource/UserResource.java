@@ -1,21 +1,23 @@
 package at.htl.resource;
 
-import at.htl.model.User;
-import at.htl.repository.CarRepository;
+import at.htl.Classes.Account;
+import at.htl.model.Users;
 import at.htl.repository.UserRepository;
+import io.quarkus.mailer.Mail;
+import io.quarkus.mailer.Mailer;
+import io.quarkus.security.User;
+import io.smallrye.common.annotation.Blocking;
 
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.NoResultException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 
-import java.util.UUID;
-import javax.inject.Inject;
 /*
 import javax.mail.*;
 
@@ -30,7 +32,6 @@ import javax.mail.internet.MimeMessage;
  */
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
 
 
 @Path("egd/users/")
@@ -39,45 +40,106 @@ public class UserResource {
     @Inject
     UserRepository userRepository;
 
-/*
+
+    @Inject
+    Mailer mailer;
 
     @POST
-    public Response sendTemporaryPassword(String email) throws MessagingException {
-        // Generate a temporary password
-        String temporaryPassword = UUID.randomUUID().toString().substring(0, 8);
+    @Path("/forgotPassword")
+    @Blocking
+    public Response forgotPassword(Account account) throws NoSuchAlgorithmException, InvalidKeySpecException {
 
-        // Create the email message
-        MimeMessage message = new MimeMessage(session);
-        message.setFrom(new InternetAddress("noreply@example.com"));
-        message.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
-        message.setSubject("Temporary Password");
-        message.setText("Your temporary password is: " + temporaryPassword);
+        Users user = (Users) userRepository.findByEmail(account.getEmail());
 
-        // Send the email
-        Transport.send(message);
+        if (user!=null){
 
-        return Response.ok("Temporary password sent to " + email).build();
+           String tempPassword = userRepository.generateTempPassword();
+           user.setResetPassword(UserRepository.getSaltedHash(tempPassword));
+
+           userRepository.update(user);
+
+           mailer.send(Mail.withText("berdankadir12@gmail.com", "Password", "Ihr temporäres Passwort lautet: " + tempPassword));
+
+            return Response.ok("Temporary password sent to " + account.getEmail()).build();
+        }
+        else{
+            return Response.ok("A User with this email does not exist" + account.getEmail()).build();
+        }
+
     }
-   */
+
+
+    @POST
+    @Path("/changePassword")
+    @Blocking
+    public Response changePassword(Account account) throws NoSuchAlgorithmException, InvalidKeySpecException {
+
+        Users user = (Users) userRepository.findByEmail(account.getEmail());
+
+        if (user!=null && userRepository.check(account.getPassword(),user.getResetPassword())){
+
+            user.setPassword(UserRepository.getSaltedHash(account.getNewPassword()));
+            userRepository.update( user);
+
+            mailer.send(Mail.withText("berdankadir12@gmail.com", "Password",  user.getPassword()));
+
+            return Response.ok("Temporary password sent to " + account.getEmail()).build();
+        }
+        else{
+            return Response.ok("A User with this email does not exist" + account.getEmail()).build();
+        }
+
+    }
+
+
+    @GET
+    @Path("/email")
+    @Blocking
+    public Response hello(){
+        mailer.send(Mail.withText("berdankadir12@gmail.com", "A sivcvlcmple emkjdkfjdkfjfkdjail from quarkus", "SOSOS"));
+        return Response.ok("Erfolgreich eingeloggt").build();
+    }
 
 
     @POST
     @Path("registration/")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response addUser(final User user) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public Response addUser(final Users user) throws NoSuchAlgorithmException, InvalidKeySpecException {
+
+
+
         if (user == null) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Response.Status.NO_CONTENT).build();
         }
-        user.setPassword(UserRepository.getSaltedHash(user.getPassword()));
-        final User createdUser = userRepository.addUser(user);
-        return Response.created(URI.create("/api/users/" + createdUser.getId())).build();
+
+        try {
+            Users u = userRepository.findByEmail(user.getEmail());
+
+                return Response.status(Response.Status.NOT_FOUND).build();
+        } catch ( NoResultException exception) {
+            user.setPassword(UserRepository.getSaltedHash(user.getPassword()));
+            final Users createdUser = userRepository.addUser(user);
+            return Response.created(URI.create("/api/users/" + createdUser.getId())).build();
+        }
+
     }
 
     @POST
     @Path("login/")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response login(final User user) {
-        final User existingUser = userRepository.findByEmail(user.getEmail());
+    public Response login(final Users user) {
+
+
+        Users existingUser;
+        try {
+             existingUser = userRepository.findByEmail(user.getEmail());
+        }
+        catch (Exception e){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+
+
         if (existingUser != null) {
             try {
                 String storedPassword = user.getPassword();

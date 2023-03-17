@@ -1,11 +1,13 @@
 package at.htl.testenMitMain;
 
-import at.htl.model.User;
+import at.htl.model.Users;
 import at.htl.repository.UserRepository;
-import at.htl.resource.UserResource;
+import io.quarkus.mailer.Mail;
+import io.quarkus.mailer.Mailer;
 import io.quarkus.runtime.Quarkus;
 import io.quarkus.runtime.QuarkusApplication;
 import io.quarkus.runtime.annotations.QuarkusMain;
+import io.smallrye.common.annotation.Blocking;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -17,11 +19,9 @@ import java.util.Scanner;
 @QuarkusMain
 @Transactional
 public class Main {
-
     public static void main(String... args) {
-        Quarkus.run(MyMain.class, "addUser");
+        Quarkus.run(MyMain.class, "logIn");
     }
-
 
     public static class MyMain implements QuarkusApplication {
         @Inject
@@ -49,9 +49,11 @@ public class Main {
 
             } else {
                 System.out.println("Sie müssen was eingeben");
+
             }
             return 0;
         }
+
 
 
         private  void changePassword() throws NoSuchAlgorithmException, InvalidKeySpecException {
@@ -61,7 +63,7 @@ public class Main {
             System.out.println("Bitte geben Sie Ihr altes Passwort ein:");
             String oldPassword = sc.nextLine();
 
-            User user = userRepository.findByEmail(email);
+            Users user = userRepository.findByEmail(email);
 
             if (user != null && userRepository.check(oldPassword, user.getPassword())) {
                 System.out.println("Bitte geben Sie Ihr neues Passwort ein:");
@@ -84,7 +86,7 @@ public class Main {
             System.out.println("Bitte geben Sie Ihre Email-Adresse ein:");
             String email = sc.nextLine();
 
-            User user = userRepository.findByEmail(email);
+            Users user = userRepository.findByEmail(email);
             if (user == null) {
                 System.out.println("Es wurde kein Benutzer mit dieser Email-Adresse gefunden.");
                 return;
@@ -105,13 +107,26 @@ public class Main {
             String email = sc.nextLine();
             System.out.println("Bitte geben Sie Ihr Passwort ein:");
             String password = sc.nextLine();
+//
+            Users user = null;
 
-            User user = userRepository.findByEmail(email);
-            String storedPassword = user.getPassword();
-            if (user != null && UserRepository.check(password, storedPassword)) {
-                System.out.println("Login erfolgreich!");
-            } else {
-                System.out.println("Login fehlgeschlagen. Bitte überprüfen Sie Ihre E-Mail-Adresse und das Passwort.");
+            try {
+                 user = userRepository.findByEmail(email);
+            }
+            catch (Exception e){
+
+            }
+//
+            try {
+                String storedPassword = user.getPassword();
+                if (user != null && UserRepository.check(password, storedPassword)) {
+                    System.out.println("Login erfolgreich!");
+                } else {
+                    System.out.println("Login fehlgeschlagen. Bitte überprüfen Sie Ihre E-Mail-Adresse und das Passwort.");
+                }
+            }
+            catch (Exception e){
+
             }
         }
 
@@ -124,7 +139,7 @@ public class Main {
             System.out.println("Bitte geben Sie ein Passwort ein:");
             String password = sc.nextLine();
 
-            User user = new User();
+            Users user = new Users();
             user.setUserName(username);
             user.setEmail(email);
             user.setPassword(UserRepository.getSaltedHash(password));

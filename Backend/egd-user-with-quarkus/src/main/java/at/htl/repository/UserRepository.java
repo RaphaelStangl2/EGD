@@ -1,7 +1,6 @@
 package at.htl.repository;
 
-import at.htl.model.Car;
-import at.htl.model.User;
+import at.htl.model.Users;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -14,7 +13,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 @Transactional
@@ -26,19 +24,19 @@ public class  UserRepository {
 
 
     //USERS
-    public User addUser(User user) {
+    public Users addUser(Users user) {
         entityManager.persist(user);
         return user;
     }
 
     public void removeUser(final long reservationId) {
-        final User user = findById(reservationId);
+        final Users user = findById(reservationId);
         entityManager.remove(user);
     }
 
 
-    public User findById(long id) {
-        return entityManager.find(User.class, id);
+    public Users findById(long id) {
+        return entityManager.find(Users.class, id);
     }
 
 
@@ -146,6 +144,7 @@ public class  UserRepository {
         }
         return bytes;
     }
+
     //toHex(byte[] array) wandelt ein Byte-Array in eine hexadezimale Zeichenfolge um.
     //Hierfür wird eine BigInteger-Instanz mit dem Array erstellt und die toString-Methode
     //mit dem Radix 16 aufgerufen. Der resultierende String wird dann formatiert, um sicherzustellen,
@@ -162,14 +161,14 @@ public class  UserRepository {
     }
 
 
-    public User findByEmail(String email) {
+    public Users findByEmail(String email) {
 
-            return entityManager.createQuery("SELECT u FROM User u where u.email = : email", User.class)
+            return entityManager.createQuery("SELECT u FROM Users u where u.email = : email", Users.class)
                     .setParameter("email", email)
                     .getSingleResult();
 
     }
-    public void update(User user) {
+    public void update(Users user) {
         entityManager.merge(user);
     }
 

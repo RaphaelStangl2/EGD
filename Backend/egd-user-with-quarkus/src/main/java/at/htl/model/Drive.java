@@ -1,10 +1,14 @@
 package at.htl.model;
 
+
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Entity
+@Table(name = "drive")
 public class Drive {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,7 +21,5 @@ public class Drive {
     private Double kilometers;
     private Date date;
 
-    @OneToMany(mappedBy = "drive")
-    private List<Costs> costs;
 
 }

@@ -49,7 +49,15 @@ public class UserResource {
     @Blocking
     public Response forgotPassword(Account account) throws NoSuchAlgorithmException, InvalidKeySpecException {
 
-        Users user = (Users) userRepository.findByEmail(account.getEmail());
+
+        Users user;
+        try {
+             user = (Users) userRepository.findByEmail(account.getEmail());
+        }
+        catch (Exception e){
+            return Response.ok("A User with this email does not exist: " + account.getEmail()).build();
+        }
+
 
         if (user!=null){
 
@@ -63,7 +71,7 @@ public class UserResource {
             return Response.ok("Temporary password sent to " + account.getEmail()).build();
         }
         else{
-            return Response.ok("A User with this email does not exist" + account.getEmail()).build();
+            return Response.ok("A User with this email does not exist: " + account.getEmail()).build();
         }
 
     }
@@ -76,7 +84,7 @@ public class UserResource {
 
         Users user = (Users) userRepository.findByEmail(account.getEmail());
 
-        if (user!=null && userRepository.check(account.getPassword(),user.getResetPassword())){
+        if (user!=null && userRepository.check(account.getResetPassword(),user.getResetPassword())){
 
             user.setPassword(UserRepository.getSaltedHash(account.getNewPassword()));
             userRepository.update( user);
@@ -143,7 +151,7 @@ public class UserResource {
         if (existingUser != null) {
             try {
                 String storedPassword = user.getPassword();
-                if (user != null && UserRepository.check(existingUser.getPassword(), storedPassword)) {
+                if (user != null && UserRepository.check(storedPassword,existingUser.getPassword())) {
                     return Response.ok().build();
                 } else {
                     return Response.status(Response.Status.UNAUTHORIZED).build();

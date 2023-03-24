@@ -1,4 +1,3 @@
-/*
 package at.htl;
 
 import at.htl.model.Users;
@@ -14,8 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @QuarkusTest
 class UniTests {
     @Inject
-    private UserRepository  userRepository ;
-
+    private UserRepository userRepository;
 
     @Test
     void addUser() {
@@ -85,4 +83,3 @@ class UniTests {
         assertTrue(result);
     }
 }
-*/

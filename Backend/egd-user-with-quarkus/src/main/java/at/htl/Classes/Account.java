@@ -8,6 +8,6 @@ import lombok.Setter;
 public class Account {
 
     String email;
-    String password;
+    String resetPassword;
     String newPassword;
 }

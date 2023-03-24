@@ -5,6 +5,7 @@ import at.htl.model.Drive;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "costs")
 public class Costs {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,9 +14,9 @@ public class Costs {
     private String description;
     private Double costs;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
+    @JoinColumn(name = "drive_id", nullable = true)
     private Drive drive;
 
 
 }
-

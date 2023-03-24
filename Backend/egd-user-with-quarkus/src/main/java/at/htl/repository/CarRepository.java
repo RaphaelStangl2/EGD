@@ -1,7 +1,7 @@
 package at.htl.repository;
 
 import at.htl.model.Car;
-import at.htl.model.User;
+import at.htl.model.Users;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -29,7 +29,7 @@ public class CarRepository {
     }
 
     @Transactional
-    public User addUser(User user) {
+    public Users addUser(Users user) {
         entityManager.persist(user);
         return user;
     }

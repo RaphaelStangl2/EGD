@@ -14,20 +14,14 @@ import javax.persistence.*;
 
 
 @Entity
-@Table(name = "car")
-public class Car {
-
+@Table(name = "place")
+public class Place {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-    private String model;
-    private Double consumption;
+    private String city;
+    private String zipCode;
 
 
-   /* @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-*/
 }

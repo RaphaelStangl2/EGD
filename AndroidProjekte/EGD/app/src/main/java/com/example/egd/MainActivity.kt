@@ -4,7 +4,7 @@ import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
-import android.media.audiofx.BassBoost
+import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
@@ -14,22 +14,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.egd.ui.LoginScreen
-import com.example.egd.ui.StartScreen
-import com.example.egd.ui.getStarted.ConnectScreen
-import com.example.egd.ui.internet.NoInternetScreen
-import com.example.egd.ui.permissions.PermissionUtils
-import com.example.egd.ui.permissions.SystemBroadcastReceiver
 import com.example.egd.ui.theme.EGDTheme
-import com.google.accompanist.permissions.PermissionsRequired
-import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -38,6 +25,8 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var bluetoothAdapter: BluetoothAdapter
+
+
 
 
 
@@ -51,7 +40,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                 ) {
 
-                        EGDApp(onNoInternetConnection = {isInternetAvailable(this)}, onBluetoothStateChanged = {showBluetoothDialog()}, onGPSRequired = {showGPSDialog()})
+                    EGDApp(onNoInternetConnection = {isInternetAvailable(this)}, onBluetoothStateChanged = {showBluetoothDialog()}, onGPSRequired = {showGPSDialog()}) { getEmailSharedPreferences() }
                 }
             }
         }
@@ -74,6 +63,13 @@ class MainActivity : ComponentActivity() {
                 isBluetootDialogAlreadyShown = true
             }
         }
+    }
+
+    private fun getEmailSharedPreferences(): SharedPreferences? {
+        val sharedPreference =  this.getSharedPreferences(
+            getString(R.string.egdEmailReference), Context.MODE_PRIVATE)
+        return sharedPreference
+
     }
 
     private fun showGPSDialog(){

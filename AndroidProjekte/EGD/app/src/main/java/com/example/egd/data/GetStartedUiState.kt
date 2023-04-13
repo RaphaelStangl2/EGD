@@ -1,5 +1,7 @@
 package com.example.egd.data
 
+import com.example.egd.data.entities.User
+
 data class GetStartedUiState(
     val step: Int = 1,
     val numberOfSteps: Int = 5,
@@ -9,5 +11,10 @@ data class GetStartedUiState(
     val email: String = "",
     val password: String = "",
     val userName:String = "",
-    val doNotShowRational: Boolean = false
-    )
+    val doNotShowRational: Boolean = false,
+    val response:String = "",
+    val friendSearchBarContent:String = "",
+    val assignedFriendsList: Array<User>? = null,
+    val searchFriendsList: Array<User>? = null
+
+)

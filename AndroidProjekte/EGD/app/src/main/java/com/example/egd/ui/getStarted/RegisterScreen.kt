@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -14,7 +16,12 @@ import androidx.compose.ui.unit.dp
 import com.example.egd.ui.EGDViewModel
 
 @Composable
-fun RegisterScreen(viewModel: EGDViewModel, userName:String, email: String, password: String, passwordVisibility: Boolean, icon: Painter) {
+fun RegisterScreen(viewModel: EGDViewModel, userName:String, email: String, password: String,response:String, passwordVisibility: Boolean, icon: Painter) {
+
+    Row(){
+        Text(text = response, color = Color.Red)
+    }
+    Spacer(modifier = Modifier.height(7.dp))
 
     Row(){
         TextField(
@@ -24,7 +31,6 @@ fun RegisterScreen(viewModel: EGDViewModel, userName:String, email: String, pass
             label = { Text(text="User Name") }
         )
     }
-    Spacer(modifier = Modifier.height(7.dp))
 
 
     Row(){

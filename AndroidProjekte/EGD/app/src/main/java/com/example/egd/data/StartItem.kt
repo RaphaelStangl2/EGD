@@ -5,5 +5,6 @@ sealed class StartItem (var screen_route:String){
     object LoginScreen :StartItem("login")
     object GetStartedScreen :StartItem("getStarted")
     object NoConnectionScreen: StartItem("noConnection")
+    object ProfileScreen: StartItem("profile")
 
 }

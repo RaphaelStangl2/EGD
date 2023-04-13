@@ -1,6 +1,7 @@
 package com.example.egd.ui
 
 import android.annotation.SuppressLint
+import android.content.SharedPreferences
 import android.location.Location
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,7 +22,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import okhttp3.Response
+import okhttp3.ResponseBody
 import java.io.InputStream
 import javax.inject.Inject
 
@@ -59,6 +60,8 @@ class EGDViewModel @Inject constructor(
         }
     }
 
+
+
     fun setCurrentLocation(location: Location?) {
         _mapUiState.update { currentState ->
             currentState.copy(
@@ -87,6 +90,31 @@ class EGDViewModel @Inject constructor(
         _getStartedUiState.update { currentState ->
             currentState.copy(
                 userName = userName
+            )
+        }
+    }
+
+    fun setResponse(response: String){
+        _getStartedUiState.update { currentState ->
+            currentState.copy(
+                response = response
+            )
+        }
+    }
+
+    fun setResponseLogin(response: String){
+        _loginUiState.update { currentState ->
+            currentState.copy(
+                response = response
+            )
+        }
+    }
+
+
+    fun setFriendSearchBarContent(content: String) {
+        _getStartedUiState.update { currentState ->
+            currentState.copy(
+                friendSearchBarContent = content
             )
         }
     }
@@ -199,29 +227,77 @@ class EGDViewModel @Inject constructor(
         }
     }
 
-    suspend fun sendLoginRequest(){
+    suspend fun sendLoginRequest(onLogin: () -> Unit, sharedPreference: () -> SharedPreferences?) {
         val value = loginUiState.value
-        var response: Response
+        var response: ResponseBody
+        var sharedPreference = sharedPreference()
 
         //HttpService.loginRequest(User("", value.email, value.password))
 
         try{
             response = HttpService.retrofitService.postLogin(User("", value.email, value.password))
+            _getStartedUiState.update { currentState ->
+                currentState.copy(
+                    response = response.string()
+                )
+            }
+            onLogin()
+
+            var editor = sharedPreference?.edit()
+            editor?.putString("email", value.email)
+            editor?.putBoolean("isLoggedIn", true)
+            editor?.apply()
+
         }catch (e: Exception) {
-        }
-    }
-
-    fun sendRegisterRequest(){
-        var response: Response
-        val value = loginUiState.value
-
-        viewModelScope.launch {
-            try{
-                response = HttpService.retrofitService.postRegistration(User("", value.email, value.password))
-            }catch (e: Exception) {
+            if (e.localizedMessage == "HTTP 404 "){
+                setResponseLogin("Email address doesn't exist")
+            }
+            if (e.localizedMessage == "HTTP 401 "){
+                setResponseLogin("Wrong password or email")
+            }
+            if (e.localizedMessage == "HTTP 500 "){
+                setResponseLogin("Wrong password or email")
             }
         }
-        //httpService.registerRequest(User(value.userName, value.email, value.password))
+
+    }
+
+    @SuppressLint("SuspiciousIndentation")
+    suspend fun sendRegisterRequest(onRegistered: () -> Unit, sharedPreference: () -> SharedPreferences?) {
+        var response: ResponseBody
+        val value = getStartedUiState.value
+        var sharedPreference = sharedPreference()
+
+
+        if (value.password.length < 8){
+            setResponse("Password needs at least 8 characters")
+        }
+        else if (value.userName.length <4){
+            setResponse("Username needs at least 4 characters")
+        }
+        else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(value.email).matches()){
+            setResponse("Wrong email format")
+        }
+        else{
+            try{
+                response = HttpService.retrofitService.postRegistration(User(value.userName, value.email, value.password))
+                _loginUiState.update { currentState ->
+                    currentState.copy(
+                        response = response.string()
+                    )
+                }
+                onRegistered()
+
+                var editor = sharedPreference?.edit()
+                editor?.putString("email", value.email)
+                editor?.putBoolean("isLoggedIn", true)
+                editor?.apply()
+            }catch (e: Exception) {
+                if (e.localizedMessage == "HTTP 404 "){
+                    setResponse("Email address already exists")
+                }
+            }
+        }
     }
 
 
@@ -272,5 +348,27 @@ class EGDViewModel @Inject constructor(
             callback(null)
         }
     }
+
+    fun checkLogin(onLogin: () -> Unit, sharedPreference: () -> SharedPreferences?) {
+        viewModelScope.launch {
+            sendLoginRequest(onLogin, sharedPreference)
+        }
+    }
+
+    fun checkRegister(onRegistered: () -> Unit, sharedPreference: () -> SharedPreferences?) {
+        viewModelScope.launch {
+            sendRegisterRequest(onRegistered, sharedPreference)
+        }
+    }
+
+    fun logout(sharedPreference: () -> SharedPreferences?){
+        val sharedPreference = sharedPreference()
+
+        var editor = sharedPreference?.edit()
+        editor?.putString("email", "")
+        editor?.putBoolean("isLoggedIn", false)
+        editor?.apply()
+    }
+
 
 }

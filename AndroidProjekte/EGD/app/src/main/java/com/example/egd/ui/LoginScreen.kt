@@ -1,7 +1,10 @@
 package com.example.egd.ui
 
+import android.content.SharedPreferences
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -10,26 +13,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
-import androidx.lifecycle.viewmodel.compose.*
-import androidx.compose.ui.text.android.animation.SegmentType
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import com.example.egd.R
 
 @Composable
 fun LoginScreen(
     viewModel: EGDViewModel,
-    modifier: Modifier
+    modifier: Modifier,
+    onLogin: () -> Unit,
+    sharedPreference: () -> SharedPreferences?
 ){
     val uiState = viewModel.loginUiState.collectAsState().value
 
     var passwordVisibility = uiState.passwordVisibility
     var email = uiState.email
     var password = uiState.password
+    var response = uiState.response
 
     val icon = if (passwordVisibility)
         painterResource(id = R.drawable.ic_baseline_visibility_24)
@@ -49,13 +53,17 @@ fun LoginScreen(
                 fontSize = 30.sp
                 )
         }
-        Spacer(modifier = Modifier.height(35.dp))
 
+        Spacer(modifier = Modifier.height(35.dp))
+        Row(){
+            Text(text = response, color = Color.Red)
+        }
         Row(){
             OutlinedTextField(
                 value = email,
                 onValueChange = {viewModel.setEmailLogin(it)},
                 placeholder = { Text(text = "Email")},
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = Color.White
@@ -67,6 +75,7 @@ fun LoginScreen(
             OutlinedTextField(
                 value = password,
                 onValueChange = {viewModel.setPasswordLogin(it)},
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 placeholder = { Text(text = "Password")},
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.textFieldColors(
@@ -89,7 +98,9 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(12.dp))
         Row(){
             Button(
-                onClick = {},
+
+                onClick = {
+                    viewModel.checkLogin(onLogin, sharedPreference) },
                 modifier = Modifier.fillMaxWidth()){
                 Text(text = "Log in")
             }

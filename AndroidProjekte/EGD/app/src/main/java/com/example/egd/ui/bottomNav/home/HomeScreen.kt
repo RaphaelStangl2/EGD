@@ -9,6 +9,8 @@ import androidx.compose.ui.platform.LocalContext
 
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -17,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.example.egd.R
 import com.example.egd.data.entities.Car
@@ -26,7 +29,8 @@ fun HomeScreen(
     viewModel: EGDViewModel,
     modifier: Modifier = Modifier,
     goToMap: () -> Unit,
-    goToEditScreen: () -> Unit
+    goToEditScreen: () -> Unit,
+    goToProfile: () -> Unit
 ){
     val homeUiState = viewModel.homeUiState.collectAsState().value
 
@@ -44,7 +48,7 @@ fun HomeScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ){
 
-        SearchBarHome(searchBarContent = searchBarContent, viewModel)
+        SearchBarHome(searchBarContent = searchBarContent, viewModel, goToProfile)
 
         Spacer(modifier = Modifier.height(20.dp))
         Column(modifier = Modifier
@@ -63,14 +67,16 @@ fun HomeScreen(
 }
 
 @Composable
-fun SearchBarHome(searchBarContent: String, viewModel: EGDViewModel){
+fun SearchBarHome(searchBarContent: String, viewModel: EGDViewModel, goToProfile: () -> Unit){
 
     OutlinedTextField(
         value = searchBarContent,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+        keyboardActions = KeyboardActions(onSearch = {}),
         onValueChange = {viewModel.setHomeSearchBarContent(it)},
         leadingIcon = { Icon(painter = painterResource(id = R.drawable.ic_baseline_search_24), contentDescription = "Search Bar") },
         trailingIcon = {
-            IconButton(onClick = {}){
+            IconButton(onClick = { goToProfile() }){
                 Icon(
                     painter = painterResource(id = R.drawable.ic_baseline_account_circle_24),
                     contentDescription = "Person Icon",
@@ -82,7 +88,6 @@ fun SearchBarHome(searchBarContent: String, viewModel: EGDViewModel){
             backgroundColor = MaterialTheme.colors.background,
             focusedBorderColor = MaterialTheme.colors.background,
             unfocusedBorderColor = MaterialTheme.colors.background
-
         ),
         modifier = Modifier
             .fillMaxWidth()

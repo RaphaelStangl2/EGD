@@ -31,23 +31,23 @@ public class CarRepository {
         entityManager.remove(car);
     }
 
-    @Transactional
-    public Users addUser(Users user) {
-        entityManager.persist(user);
-        return user;
-    }
+
+
 
     public Car findById(long id) {
         return entityManager.find(Car.class, id);
     }
 
+    public List<Car> getCarsForUser(long id){
+        var cars =  entityManager.createQuery("SELECT c FROM Car c WHERE c.id in (Select u.car.id from UserCar u Where u.user.id = :userId)")
+                .setParameter("userId", id).getResultList();
 
-    public List<Users> filterByName(String filter) {
-
-        var users =  entityManager.createQuery("SELECT u FROM Users u where u.userName = : filter", Users.class)
-                .setParameter("filter", filter).
-                getResultList();
-
-        return users;
+        return cars;
     }
+
+    @Transactional
+    public void updateCar(Car car) {
+        entityManager.merge(car);
+    }
+
 }

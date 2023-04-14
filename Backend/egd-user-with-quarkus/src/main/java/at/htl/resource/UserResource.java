@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.List;
 
 /*
 import javax.mail.*;
@@ -164,4 +165,16 @@ public class UserResource {
         }
     }
 
+
+    @GET
+    @Path("{filter}/")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public List<Users> getUsersByFilter(@PathParam("filter") String username) {
+        if (username == null) {
+            return null;
+        }
+
+        List<Users> usersList = (List<Users>) userRepository.filterByName(username);
+        return usersList;
+    }
 }

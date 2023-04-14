@@ -1,6 +1,5 @@
 package at.htl.resource;
 
-import at.htl.Classes.GetUserByFilterDTO;
 import at.htl.model.Car;
 import at.htl.model.Users;
 import at.htl.repository.CarRepository;
@@ -25,16 +24,16 @@ public class CarResource {
 
 
     @DELETE
-    @Path("remove/")
-    public Response removeCar(final String reservationId) {
-        carRepository.removeCar(Long.parseLong(reservationId));
+    @Path("{carId}/")
+    public Response removeCar(@PathParam("carId") Long carId) {
+        carRepository.removeCar(carId);
         return Response.noContent().build();
     }
 
 
 
     @POST
-    @Path("registration/")
+    @Path("")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addCar(final Car car) {
         if (car == null) {
@@ -44,19 +43,32 @@ public class CarResource {
         return Response.created(URI.create("/api/cars/" + createdCar.getId())).build();
     }
 
-    @POST
-    @Path("filter")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public List<Users> getUsersByFilter( GetUserByFilterDTO username) {
-        if (username == null) {
-            return null;
-        }
-        String x = username.getName();
 
-         List<Users> usersList = (List<Users>) carRepository.filterByName(x);
-        return usersList;
+    @GET
+    @Path("{userId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCarsForUser(@PathParam("userId") Long id){
+        List<Car> cars = carRepository.getCarsForUser(id);
+
+        if (cars == null){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.ok(cars).build();
     }
 
+    @PUT
+    @Path("")
+    public Response updateCar(Car car){
 
+        if (car == null){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        else {
+            carRepository.updateCar(car);
+        }
+
+        return Response.ok(car).build();
+    }
 
 }

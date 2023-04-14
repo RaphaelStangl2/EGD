@@ -22,7 +22,6 @@ public class Car {
     private Long id;
 
     private String name;
-    private String model;
     private Double consumption;
 
     private Double longitude;

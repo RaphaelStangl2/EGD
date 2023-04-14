@@ -13,6 +13,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 @Transactional
@@ -160,6 +161,14 @@ public class  UserRepository {
         }
     }
 
+    public List<Users> filterByName(String filter) {
+
+        var users =  entityManager.createQuery("SELECT u FROM Users u where u.userName LIKE :filter", Users.class)
+                .setParameter("filter", filter + "%") // fügt das Wildcard-Zeichen "%" hinzu
+                .getResultList();
+
+        return users;
+    }
 
     public Users findByEmail(String email) {
 

@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: egd-user-with-quarkus
-  namespace: student-r-alo
+  namespace: student-b-kadir
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: "/$1"
 spec:
@@ -10,7 +10,7 @@ spec:
     - host: student.cloud.htl-leonding.ac.at
       http:
         paths:
-          - path: /r.alo/egd-user-with-quarkus/(.*)$
+          - path: /b.kadir/egd-user-with-quarkus/(.*)$
             backend:
               serviceName: egd-user-with-quarkus
               servicePort: 80

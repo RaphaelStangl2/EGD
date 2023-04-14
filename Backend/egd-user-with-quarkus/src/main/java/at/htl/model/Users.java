@@ -30,7 +30,7 @@ public class Users {
 
     private String password;
 
-    private String resetPassword;
+    private String resetCode;
 
    /* @OneToMany(cascade = CascadeType.ALL)
     private List<Car> cars;

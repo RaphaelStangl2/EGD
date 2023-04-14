@@ -25,6 +25,9 @@ public class Car {
     private String model;
     private Double consumption;
 
+    private Double longitude;
+    private Double latitude;
+
 
    /* @ManyToOne
     @JoinColumn(name = "user_id")

@@ -62,7 +62,7 @@ public class UserResource {
         if (user!=null){
 
            String tempPassword = userRepository.generateTempPassword();
-           user.setResetPassword(UserRepository.getSaltedHash(tempPassword));
+           user.setResetCode(UserRepository.getSaltedHash(tempPassword));
 
            userRepository.update(user);
 
@@ -84,7 +84,7 @@ public class UserResource {
 
         Users user = (Users) userRepository.findByEmail(account.getEmail());
 
-        if (user!=null && userRepository.check(account.getResetPassword(),user.getResetPassword())){
+        if (user!=null && userRepository.check(account.getResetPassword(),user.getResetCode())){
 
             user.setPassword(UserRepository.getSaltedHash(account.getNewPassword()));
             userRepository.update( user);

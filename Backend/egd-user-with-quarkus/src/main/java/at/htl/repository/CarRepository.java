@@ -6,7 +6,10 @@ import at.htl.model.Users;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.transaction.Transactional;
+import java.util.List;
 
 @ApplicationScoped
 public class CarRepository {
@@ -36,5 +39,15 @@ public class CarRepository {
 
     public Car findById(long id) {
         return entityManager.find(Car.class, id);
+    }
+
+
+    public List<Users> filterByName(String filter) {
+
+        var users =  entityManager.createQuery("SELECT u FROM Users u where u.userName = : filter", Users.class)
+                .setParameter("filter", filter).
+                getResultList();
+
+        return users;
     }
 }

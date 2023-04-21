@@ -18,11 +18,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.example.egd.R
 import com.example.egd.data.entities.Car
+import kotlinx.coroutines.flow.update
+
+
 
 @Composable
 fun HomeScreen(
@@ -36,9 +42,27 @@ fun HomeScreen(
 
     val scrollState = rememberScrollState()
     var searchBarContent = homeUiState.searchBarContent
-    viewModel.readCarsFromJson(LocalContext.current.resources.openRawResource(R.raw.car))
+    //viewModel.readCarsFromJson(LocalContext.current.resources.openRawResource(R.raw.car))
 
     var listCars = homeUiState.cars
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(
+        key1 = lifecycleOwner,
+        effect = {
+            val observer = LifecycleEventObserver{_,event ->
+                if(event == Lifecycle.Event.ON_RESUME){
+                    viewModel.getCarsForUserId(1)
+                }
+            }
+            lifecycleOwner.lifecycle.addObserver(observer)
+
+            onDispose {
+                lifecycleOwner.lifecycle.removeObserver(observer)
+            }
+        }
+    )
 
 
     Column (
@@ -61,9 +85,6 @@ fun HomeScreen(
             }
         }
     }
-
-
-
 }
 
 @Composable
@@ -193,4 +214,6 @@ fun CarCard(car: Car, name: String, latitude: Double, longitude: Double, viewMod
 
     }
 }
+
+
 

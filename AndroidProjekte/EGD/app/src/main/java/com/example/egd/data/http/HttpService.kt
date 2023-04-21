@@ -1,5 +1,6 @@
 package com.example.egd.data.http
 
+import com.example.egd.data.entities.Car
 import com.example.egd.data.entities.User
 import com.google.gson.Gson
 import com.squareup.moshi.Moshi
@@ -8,10 +9,7 @@ import okhttp3.Response
 import okhttp3.ResponseBody
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.Headers
-import retrofit2.http.POST
+import retrofit2.http.*
 import javax.inject.Inject
 
 private const val BASE_URL =
@@ -35,6 +33,14 @@ interface HttpApiService {
     @Headers("Content-Type: application/json")
     @POST("egd/users/login/")
     suspend fun postLogin(@Body user: User): ResponseBody
+
+    @Headers("Content-Type: application/json")
+    @GET("egd/cars/{userId}")
+    suspend fun getCarsForUser(@Path("userId") userId: Long): ResponseBody
+
+    @Headers("Content-Type: application/json")
+    @GET("egd/users/{filter}")
+    suspend fun getUserForFilter(@Path("filter") userId: String): ResponseBody
 }
 
 object HttpService {

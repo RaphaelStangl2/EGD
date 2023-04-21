@@ -13,6 +13,7 @@ import com.example.egd.data.ble.BLEReceiveManager
 import com.example.egd.data.entities.Car
 import com.example.egd.data.entities.User
 import com.example.egd.data.http.HttpService
+import com.example.egd.ui.validation.ValidationService
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -24,7 +25,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 import java.io.InputStream
+import java.util.*
 import javax.inject.Inject
+import kotlin.concurrent.timerTask
 
 @HiltViewModel
 class EGDViewModel @Inject constructor(
@@ -60,6 +63,75 @@ class EGDViewModel @Inject constructor(
         }
     }
 
+    fun setTriedToSubmit(triedToSubmit:Boolean){
+        _getStartedUiState.update { currentState ->
+            currentState.copy(
+                triedToSubmit = triedToSubmit
+            )
+        }
+    }
+
+    fun addUserToAssignedList(user:User){
+        val assignedFriendsList = _homeUiState.value.assignedFriendsList
+        var assignedListToAdd: Array<User>
+        var list: MutableList<User>
+        if (assignedFriendsList == null){
+            assignedListToAdd = arrayOf(user)
+            setAssignedFriendsList(assignedListToAdd)
+        } else {
+            list = assignedFriendsList?.toMutableList()
+            list?.add(user)
+            setAssignedFriendsList(list.toTypedArray())
+        }
+    }
+
+    fun removeUserFromAssignedFriendList(user:User){
+        val assignedFriendsList = _homeUiState.value.assignedFriendsList
+        if (assignedFriendsList != null){
+            var list = assignedFriendsList.toMutableList()
+            list.remove(user)
+            setAssignedFriendsList(list.toTypedArray())
+        }
+    }
+
+    fun setAssignedFriendsList(list: Array<User>){
+        _homeUiState.update { currentState ->
+            currentState.copy(
+                assignedFriendsList = list
+            )
+        }
+    }
+
+    fun addUserToSearchList(user:User){
+        val searchFriendList = _homeUiState.value.searchFriendList
+        var searchListToAdd: Array<User>
+        var list: MutableList<User>
+        if (searchFriendList == null){
+            searchListToAdd = arrayOf(user)
+            setSearchFriendList(searchListToAdd)
+        } else {
+            list = searchFriendList?.toMutableList()
+            list?.add(user)
+            setSearchFriendList(list.toTypedArray())
+        }
+    }
+
+    fun removeUserFromSearchFriendList(user:User){
+        val searchFriendList = _homeUiState.value.searchFriendList
+        if (searchFriendList != null){
+            var list = searchFriendList.toMutableList()
+            list.remove(user)
+            setSearchFriendList((list.toTypedArray()))
+        }
+    }
+
+    fun setSearchFriendList(list:Array<User>){
+        _homeUiState.update { currentState ->
+            currentState.copy(
+                searchFriendList = list
+            )
+        }
+    }
 
 
     fun setCurrentLocation(location: Location?) {
@@ -211,19 +283,53 @@ class EGDViewModel @Inject constructor(
         }
     }
 
-    fun readCarsFromJson(inputStream:InputStream){
+    //fun readUsersFromJson
 
+    fun readCarsFromJson(inputStream:InputStream){
         var jsonStringVar = inputStream.bufferedReader()
             .use { it.readText() }
 
         val listCarType = object : TypeToken<Array<Car>>() {}.type
-        //Gson().fromJson(jsonString, listCountryType)
         var carList = Gson().fromJson(jsonStringVar, Array<Car>::class.java)
 
         _homeUiState.update { currentState ->
             currentState.copy(
                 cars = carList
             )
+        }
+    }
+
+    fun readUsersFromJson(inputStream:InputStream){
+        var jsonStringVar = inputStream.bufferedReader()
+            .use { it.readText() }
+
+        val listCarType = object : TypeToken<Array<User>>() {}.type
+        var userList = Gson().fromJson(jsonStringVar, Array<User>::class.java)
+
+        setSearchFriendList(userList)
+    }
+
+    suspend fun getCars(userId: Long){
+        var response: ResponseBody
+
+        try{
+            response = HttpService.retrofitService.getCarsForUser(1)
+            readCarsFromJson(response.byteStream())
+
+        } catch(e:Exception){
+            e.message
+        }
+    }
+
+    private suspend fun getUsersForFilterAsync(filter: String) {
+        var response: ResponseBody
+
+        try{
+            response = HttpService.retrofitService.getUserForFilter(filter)
+            readUsersFromJson(response.byteStream())
+
+        } catch(e:Exception){
+            e.message
         }
     }
 
@@ -235,7 +341,7 @@ class EGDViewModel @Inject constructor(
         //HttpService.loginRequest(User("", value.email, value.password))
 
         try{
-            response = HttpService.retrofitService.postLogin(User("", value.email, value.password))
+            response = HttpService.retrofitService.postLogin(User(id = null, userName= "",email=  value.email, password= value.password))
             _getStartedUiState.update { currentState ->
                 currentState.copy(
                     response = response.string()
@@ -262,30 +368,24 @@ class EGDViewModel @Inject constructor(
 
     }
 
+
+
     @SuppressLint("SuspiciousIndentation")
     suspend fun sendRegisterRequest(onRegistered: () -> Unit, sharedPreference: () -> SharedPreferences?) {
+        val service = ValidationService()
         var response: ResponseBody
         val value = getStartedUiState.value
         var sharedPreference = sharedPreference()
 
-
-        if (value.password.length < 8){
-            setResponse("Password needs at least 8 characters")
-        }
-        else if (value.userName.length <4){
-            setResponse("Username needs at least 4 characters")
-        }
-        else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(value.email).matches()){
-            setResponse("Wrong email format")
-        }
-        else{
+        if (service.validateRegisterForm(value.userName, value.email, value.password)){
             try{
-                response = HttpService.retrofitService.postRegistration(User(value.userName, value.email, value.password))
+                response = HttpService.retrofitService.postRegistration(User(id = null, userName = value.userName, email= value.email, password= value.password))
                 _loginUiState.update { currentState ->
                     currentState.copy(
                         response = response.string()
                     )
                 }
+                setTriedToSubmit(false)
                 onRegistered()
 
                 var editor = sharedPreference?.edit()
@@ -361,6 +461,32 @@ class EGDViewModel @Inject constructor(
         }
     }
 
+    fun getCarsForUserId(userId: Long) {
+        viewModelScope.launch {
+            getCars(userId)
+        }
+    }
+
+     val timer: Timer = Timer()
+
+    fun startGettingCars(userId:Long){
+        viewModelScope.launch {
+            timer.schedule(timerTask {
+                getCarsForUserId(userId)
+            }, 4000)
+        }
+    }
+
+    fun stopGettingCars(){
+        timer.cancel()
+    }
+
+    fun getUsersForFilter(filter: String){
+        viewModelScope.launch {
+            getUsersForFilterAsync(filter)
+        }
+    }
+
     fun logout(sharedPreference: () -> SharedPreferences?){
         val sharedPreference = sharedPreference()
 
@@ -369,6 +495,7 @@ class EGDViewModel @Inject constructor(
         editor?.putBoolean("isLoggedIn", false)
         editor?.apply()
     }
+
 
 
 }

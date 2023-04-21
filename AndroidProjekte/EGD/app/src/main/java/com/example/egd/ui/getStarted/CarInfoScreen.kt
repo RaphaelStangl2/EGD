@@ -15,9 +15,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.egd.ui.EGDViewModel
+import com.example.egd.ui.validation.ErrorText
+import com.example.egd.ui.validation.ValidationService
 
 @Composable
-fun CarInfoScreen(carName:String, fuelConsumption: String, viewModel: EGDViewModel) {
+fun CarInfoScreen(carName:String, fuelConsumption: String, viewModel: EGDViewModel, triedToSubmit: Boolean) {
+    val validationService = ValidationService()
+
+    val validationCarName = validationService.validateCarName(carName)
+    val validationFuelConsumption = validationService.validateFuelConsumption(fuelConsumption)
+
     Row(){
         Text(text="Car Name:")
     }
@@ -26,12 +33,18 @@ fun CarInfoScreen(carName:String, fuelConsumption: String, viewModel: EGDViewMod
             value = carName,
             onValueChange = {viewModel.setCarName(it)},
             placeholder = { Text(text="My Car") },
-            colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
+            colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background),
+            isError = !validationCarName.valid && triedToSubmit
         )
+    }
+    Row(){
+        if (!validationCarName.valid && triedToSubmit){
+            ErrorText(message = validationCarName.message)
+        }
     }
     Spacer(modifier = Modifier.height(7.dp))
 
-    Row(){
+    Row{
         Text(text="Average fuel consumption per 100 km:")
     }
     Row(
@@ -43,8 +56,14 @@ fun CarInfoScreen(carName:String, fuelConsumption: String, viewModel: EGDViewMod
             placeholder = { Text(text= "7") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background),
-            modifier = Modifier.width(77.dp)
+            modifier = Modifier.width(77.dp),
+            isError = !validationFuelConsumption.valid && triedToSubmit
         )
         Text(text="liters")
+    }
+    Row{
+        if (!validationCarName.valid && triedToSubmit){
+            ErrorText(message = validationFuelConsumption.message)
+        }
     }
 }

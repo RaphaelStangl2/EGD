@@ -23,6 +23,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.example.egd.R
 import com.example.egd.ui.permissions.PermissionUtils
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -44,7 +46,29 @@ fun MapScreen(
     onGpsRequired: () -> Unit,
 ){
 
-    val coroutineScope = CoroutineScope(Dispatchers.Default)
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(
+        key1 = lifecycleOwner,
+        effect = {
+            val observer = LifecycleEventObserver{_,event ->
+                if(event == Lifecycle.Event.ON_RESUME){
+                    viewModel.startGettingCars(1)
+                }
+                if(event == Lifecycle.Event.ON_STOP){
+                    viewModel.stopGettingCars()
+                }
+
+            }
+            lifecycleOwner.lifecycle.addObserver(observer)
+
+            onDispose {
+                lifecycleOwner.lifecycle.removeObserver(observer)
+            }
+        }
+    )
+
+    //val coroutineScope = CoroutineScope(Dispatchers.Default)
 
     val mapUiState = viewModel.mapUiState.collectAsState().value
     var searchBarContent = mapUiState.searchBarContent
@@ -74,7 +98,6 @@ fun MapScreen(
 
     val mapPermission = rememberMultiplePermissionsState(permissions = PermissionUtils.mapsPermissions)
     var doNotShowRationale = mapUiState.doNotShowRational
-    val lifecycleOwner = LocalLifecycleOwner.current
 
     PermissionsRequired(
         multiplePermissionsState = mapPermission,

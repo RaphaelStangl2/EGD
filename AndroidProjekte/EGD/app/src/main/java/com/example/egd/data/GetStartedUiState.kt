@@ -14,7 +14,5 @@ data class GetStartedUiState(
     val doNotShowRational: Boolean = false,
     val response:String = "",
     val friendSearchBarContent:String = "",
-    val assignedFriendsList: Array<User>? = null,
-    val searchFriendsList: Array<User>? = null
-
+    val triedToSubmit:Boolean = false
 )

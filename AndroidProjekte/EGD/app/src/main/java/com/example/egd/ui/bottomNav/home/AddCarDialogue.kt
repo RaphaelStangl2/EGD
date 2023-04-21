@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModel
 import com.example.egd.R
 import com.example.egd.ui.EGDViewModel
 import com.example.egd.ui.ProgressBar
+import com.example.egd.ui.getStarted.AddUserScreen
 import com.example.egd.ui.getStarted.CarInfoScreen
 import com.example.egd.ui.getStarted.ConnectScreen
 import com.example.egd.ui.getStarted.RegisterScreen
@@ -27,6 +28,10 @@ fun AddCarDialogue(viewModel: EGDViewModel, onAdded: () -> Unit,modifier: Modifi
     val screenWidth = configuration.screenWidthDp.dp
     val progressBarWidth = screenWidth - (screenWidth.times(0.12F))
 
+    val homeUiState = viewModel.homeUiState.collectAsState().value
+    val searchedList = homeUiState.searchFriendList
+
+
     val loginUiState = viewModel.loginUiState.collectAsState().value
     val carUiState = viewModel.getStartedUiState.collectAsState().value
     viewModel.setNumberOfSteps(3)
@@ -38,6 +43,7 @@ fun AddCarDialogue(viewModel: EGDViewModel, onAdded: () -> Unit,modifier: Modifi
     var userName = carUiState.userName
     var email = carUiState.email
     var password = carUiState.password
+    var triedToSubmit = carUiState.triedToSubmit
 
     var passwordVisibility = loginUiState.passwordVisibility
 
@@ -65,9 +71,15 @@ fun AddCarDialogue(viewModel: EGDViewModel, onAdded: () -> Unit,modifier: Modifi
             ConnectScreen(viewModel, onBluetoothStateChanged)
         }
         else if(step == 2) {
-            CarInfoScreen(carName, fuelConsumption, viewModel)
+            CarInfoScreen(carName, fuelConsumption, viewModel, triedToSubmit)
         }
         else if(step == 3) {
+           /* AddUserScreen(
+                viewModel = viewModel,
+                friendSearchBarContent = ,
+                assignedFriendsList = ,
+                searchedFriendsList =
+            )*/
         }
 
         Row(verticalAlignment = Alignment.CenterVertically) {

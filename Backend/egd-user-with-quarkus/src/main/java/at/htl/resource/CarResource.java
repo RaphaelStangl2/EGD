@@ -61,7 +61,7 @@ public class CarResource {
     @Path("")
     public Response updateCar(Car car){
 
-        if (car == null){
+        if (carRepository.findById(car.getId()) == null){
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         else {

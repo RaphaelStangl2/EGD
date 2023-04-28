@@ -1,6 +1,7 @@
 package at.htl.resource;
 
 import at.htl.Classes.Account;
+import at.htl.model.Car;
 import at.htl.model.Users;
 import at.htl.repository.UserRepository;
 import io.quarkus.mailer.Mail;
@@ -114,9 +115,6 @@ public class UserResource {
     @Path("registration/")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addUser(final Users user) throws NoSuchAlgorithmException, InvalidKeySpecException {
-
-
-
         if (user == null) {
             return Response.status(Response.Status.NO_CONTENT).build();
         }
@@ -197,5 +195,18 @@ public class UserResource {
             return null;
         }
 
+    }
+
+    @GET
+    @Path("getUsersForCar/{carId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUsersForCar(@PathParam("carId") Long id){
+        List<Users> users = userRepository.getCarUsersById(id);
+
+        if (users == null){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.ok(users).build();
     }
 }

@@ -1,6 +1,7 @@
 package at.htl.repository;
 
 
+import at.htl.model.Car;
 import at.htl.model.UserCar;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -13,6 +14,15 @@ public class UserCarRepository {
     @Inject
     EntityManager entityManager;
 
+    @Transactional
+    public void removeUserCar(final long userCarId) {
+        final UserCar userCar = findById(userCarId);
+        entityManager.remove(userCar);
+    }
+
+    private UserCar findById(long userCarId) {
+        return entityManager.find(UserCar.class, userCarId);
+    }
 
     @Transactional
     public UserCar addUserCar(UserCar userCar) {

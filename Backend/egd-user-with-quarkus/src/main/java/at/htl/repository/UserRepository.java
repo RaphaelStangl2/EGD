@@ -1,5 +1,6 @@
 package at.htl.repository;
 
+import at.htl.model.Car;
 import at.htl.model.Users;
 
 import javax.crypto.SecretKeyFactory;
@@ -177,6 +178,14 @@ public class  UserRepository {
                     .getSingleResult();
 
     }
+
+    public List<Users> getCarUsersById(long carId){//"select u from Users u where u.id in (select userCars.user.id from UserCar userCars where userCars.car.id =:carId)"
+        var users =  entityManager.createQuery("select u from Users u where u.id in (select userCars.user.id from UserCar userCars where userCars.car.id =:carId)")
+                .setParameter("carId", carId).getResultList();
+
+        return users;
+    }
+
     public void update(Users user) {
         entityManager.merge(user);
     }

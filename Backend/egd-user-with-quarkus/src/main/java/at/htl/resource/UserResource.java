@@ -177,4 +177,25 @@ public class UserResource {
         List<Users> usersList = (List<Users>) userRepository.filterByName(username);
         return usersList;
     }
+
+
+    @GET
+    @Path("email/{filter}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Users getUserByEmail(@PathParam("filter") String email) {
+        if (email == null) {
+            return null;
+        }
+
+
+        Users users;
+        try {
+            users = (Users) userRepository.findByEmail(email);
+            return users;
+        }
+        catch (Exception e){
+            return null;
+        }
+
+    }
 }

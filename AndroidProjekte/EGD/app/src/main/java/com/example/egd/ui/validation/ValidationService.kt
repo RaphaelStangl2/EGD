@@ -26,7 +26,7 @@ class ValidationService () {
         if (fuelConsumption == ""){
             return ValidationObject(false, "Field is required")
         }
-        if (fuelConsumption.toInt() <= 0){
+        if (fuelConsumption != "" && fuelConsumption.toDouble() <= 0){
             return ValidationObject(false, "Must be greater 0")
         }
         return ValidationObject(true, "")
@@ -58,5 +58,19 @@ class ValidationService () {
             return true
         }
         return false
+    }
+
+    fun validateLoginForm(email: String, password: String): Boolean{
+        if (validatePassword(password).valid && validateEmail(email).valid){
+            return true
+        }
+        return false
+    }
+
+    fun validateConnectionScreen(connectionSuccessful: Boolean): ValidationObject{
+        if (!connectionSuccessful){
+            return ValidationObject(false, "Connection wasn't successful")
+        }
+        return ValidationObject(true, "")
     }
 }

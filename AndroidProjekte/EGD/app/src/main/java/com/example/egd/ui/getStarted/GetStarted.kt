@@ -47,6 +47,7 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
     var assignedFriendsList = homeUiState.assignedFriendsList
     var searchedFriendsList = homeUiState.searchFriendList
     var triedToSubmit = uiState.triedToSubmit
+    var connectionSuccessful = uiState.connectionSuccessful
 
 
     var passwordVisibility = loginUiState.passwordVisibility
@@ -76,7 +77,7 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
             DeviceSelectionFields(viewModel, egdDevice)
         } else if (numberOfSteps == 5) {
             if (step == 2){
-                ConnectScreen(viewModel, onBluetoothStateChanged)
+                ConnectScreen(viewModel, onBluetoothStateChanged,validationService, triedToSubmit)
             }
             else if(step == 3) {
                 CarInfoScreen(carName, fuelConsumption, viewModel, triedToSubmit)
@@ -103,8 +104,6 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
                 Button(
                     onClick = {
                         if (step + 1 > numberOfSteps){
-                            viewModel.setCarName("")
-                            viewModel.setFuelConsumption("")
 
                             viewModel.setTriedToSubmit(true)
                             viewModel.checkRegister(onRegistered, sharedPreference)
@@ -112,7 +111,13 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
 
                         }else {
                             if (step == 2) {
-                                viewModel.setStep(step + 1)
+                                if (validationService.validateConnectionScreen(connectionSuccessful).valid)
+                                {
+                                    viewModel.setStep(step + 1)
+                                    viewModel.setTriedToSubmit(false)
+                                } else{
+                                    viewModel.setTriedToSubmit(true)
+                                }
                             } else if (step == 3) {
                                 if (validationService.validateCarInfoScreen(
                                         carName,
@@ -130,7 +135,8 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
 
                         }
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+
                 ) {
                     Text(text = "NEXT")
                 }

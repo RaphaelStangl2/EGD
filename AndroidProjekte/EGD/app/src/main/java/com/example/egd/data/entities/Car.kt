@@ -6,13 +6,10 @@ import com.google.gson.annotations.SerializedName
 data class Car(
     @SerializedName("id")
     @Expose
-    var id:Long,
+    var id:Long?,
     @SerializedName("name")
     @Expose
     var name:String,
-    @SerializedName("model")
-    @Expose
-    var model:String,
     @SerializedName("consumption")
     @Expose
     var consumption:Double,

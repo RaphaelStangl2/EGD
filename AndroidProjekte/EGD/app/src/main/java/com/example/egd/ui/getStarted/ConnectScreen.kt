@@ -11,17 +11,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.egd.ui.EGDViewModel
 import com.example.egd.ui.permissions.PermissionUtils
+import com.example.egd.ui.validation.ErrorText
+import com.example.egd.ui.validation.ValidationService
 import com.google.accompanist.permissions.*
 
 @ExperimentalPermissionsApi
 @Composable
-fun ConnectScreen(viewModel:EGDViewModel, showBluetoothDialogue:()->Unit,
+fun ConnectScreen(viewModel:EGDViewModel, showBluetoothDialogue:()->Unit, validationService: ValidationService, triedToSubmit:Boolean
 ) {
 
     val viewModelValue = viewModel.getStartedUiState.collectAsState().value
 
     var doNotShowRationale = viewModelValue.doNotShowRational
     val bluetoothPermission = rememberMultiplePermissionsState(permissions = PermissionUtils.permissions)
+
+    val validationConnection = validationService.validateConnectionScreen(viewModelValue.connectionSuccessful)
 
     PermissionsRequired(
         multiplePermissionsState = bluetoothPermission,
@@ -58,9 +62,17 @@ fun ConnectScreen(viewModel:EGDViewModel, showBluetoothDialogue:()->Unit,
             .fillMaxWidth()
             .height(500.dp)){
 
-            Button(onClick = {}, modifier = Modifier.size(150.dp, 150.dp), shape = RoundedCornerShape(75.dp)){
+            Button(onClick = {
+                             viewModel.initializeConnection()
+            }, modifier = Modifier.size(150.dp, 150.dp), shape = RoundedCornerShape(75.dp)){
                 Text(text="CONNECT")
             }
+        }
+    }
+
+    Row(){
+        if (!validationConnection.valid && triedToSubmit){
+            ErrorText(message = validationConnection.message)
         }
     }
 

@@ -6,8 +6,9 @@ import com.example.egd.data.entities.User
 
 data class HomeScreenState(
     val searchBarContent: String = "",
-    val cars: Array<Car>? = null,
-    val searchFriendList: Array<User>? = null,
+    var cars: Array<Car>? = null,
+    var searchFriendList: Array<User>? = null,
     val friendSearchBarContent:String = "",
-    val assignedFriendsList: Array<User>? = null
+    var assignedFriendsList: Array<User>? = null,
+    val user: User? = null
 )

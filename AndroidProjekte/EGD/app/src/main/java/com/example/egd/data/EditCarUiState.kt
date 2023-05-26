@@ -5,5 +5,7 @@ import com.example.egd.data.entities.Car
 data class EditCarUiState(
     val car: Car? = null,
     val name: String = "",
-    val consumption: String = ""
+    val consumption: String = "",
+    val id: Long? = null,
+    val triedToSubmit: Boolean = false
 )

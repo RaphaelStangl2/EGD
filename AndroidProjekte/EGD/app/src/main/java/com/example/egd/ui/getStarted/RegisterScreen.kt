@@ -27,7 +27,7 @@ fun RegisterScreen(viewModel: EGDViewModel, userName:String, email: String, pass
     var validateUserName = validationService.validateUserName(userName)
 
     Row(){
-        Text(text = response, color = Color.Red)
+        Text(text = response, color = MaterialTheme.colors.error)
     }
     Spacer(modifier = Modifier.height(7.dp))
 

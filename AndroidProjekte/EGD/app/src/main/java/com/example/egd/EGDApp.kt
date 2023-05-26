@@ -86,7 +86,7 @@ fun EGDApp(
             navController = navController,
             startDestination =  if(!onNoInternetConnection())
                                     StartItem.NoConnectionScreen.screen_route
-                                else if (sharedPreference()?.getBoolean("isLoggedIn", false) == true)
+                                else if (viewModel.checkLogin(sharedPreference))
                                     BottomNavItem.Home.screen_route
                                 else
                                     StartItem.StartScreen.screen_route,
@@ -101,7 +101,7 @@ fun EGDApp(
                     Profile (modifier = Modifier.padding(innerPadding), logout =
                     {
                         viewModel.logout(sharedPreference)
-                        navController.navigate(StartItem.StartScreen.screen_route)
+                        navController.navigate(StartItem.StartScreen.screen_route) {popUpTo(0)}
                     })
                 }
             }
@@ -118,7 +118,12 @@ fun EGDApp(
                 }
             //NoConnectionScreen
             composable(route = StartItem.NoConnectionScreen.screen_route){
-                NoInternetScreen({onNoInternetConnection()}) { navController.navigate(StartItem.StartScreen.screen_route) }
+                NoInternetScreen({onNoInternetConnection()})
+                {
+                    if(!navController.navigateUp()){
+                        navController.navigate(StartItem.StartScreen.screen_route)
+                    }
+                }
             }
             //LoginScreen
             composable(route = StartItem.LoginScreen.screen_route) {
@@ -200,7 +205,7 @@ fun EGDApp(
                     },
                     floatingActionButtonPosition = FabPosition.Center
                 ) { innerPadding ->
-                    HomeScreen(viewModel = viewModel, modifier = Modifier.padding(innerPadding), goToEditScreen = {navController.navigate(BottomNavItem.EditCarScreen.screen_route)}, goToMap = {navController.navigate(BottomNavItem.Map.screen_route)}, goToProfile = {navController.navigate(StartItem.ProfileScreen.screen_route)})
+                    HomeScreen(viewModel = viewModel, modifier = Modifier.padding(innerPadding), goToEditScreen = {navController.navigate(BottomNavItem.EditCarScreen.screen_route)}, goToMap = {navController.navigate(BottomNavItem.Map.screen_route)}, goToProfile = {navController.navigate(StartItem.ProfileScreen.screen_route)}, sharedPreference = sharedPreference)
                 }
             }
             //MapScreen
@@ -210,7 +215,11 @@ fun EGDApp(
                         BottomAppBar(navController)
                     }
                 ) { innerPadding ->
-                    MapScreen(viewModel = viewModel, modifier = Modifier.padding(innerPadding)) { onGPSRequired() }
+                    MapScreen(viewModel = viewModel,
+                        modifier = Modifier.padding(innerPadding),
+                        onNoInternetConnection = { onNoInternetConnection() },
+                        onGpsRequired = { onGPSRequired() },
+                        goToNoInternetConnection = {navController.navigate(StartItem.NoConnectionScreen.screen_route)})
                 }
             }
             //StatisticsScreen

@@ -1,6 +1,7 @@
 package com.example.egd.data.ble
 
 import android.annotation.SuppressLint
+import android.app.Service
 import android.bluetooth.*
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
@@ -9,6 +10,7 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import com.example.egd.data.EGDUiState
+import com.example.egd.data.GetStartedUiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -24,7 +26,7 @@ class BLEReceiveManager @Inject constructor(
 
     private val DEVICE_NAME = "EGD-SOS"
     private val SERVICE_UIID = "1688a0c8-6cc9-11ed-a1eb-0242ac120002"
-    private val CHARACTERISTICS_UUID = "533cb516-77bb-11ed-a1eb-0242ac120002"
+    private val CHARACTERISTICS_UUID = "1688a0c8-6cc9-11ed-a1eb-0242ac120002"
     private val CCCD_DESCRIPTOR_UUID = "00002902-0000-1000-8000-00805F9B34FB"
 
     val data: MutableSharedFlow<EGDUiState> = MutableSharedFlow()
@@ -103,8 +105,9 @@ class BLEReceiveManager @Inject constructor(
                 //when(uuid){
                     //UUID.fromString(CHARACTERISTICS_UUID) -> {
                         //XX XX XX XX XX XX
-                        val test: String = value.decodeToString()
+                        //val test: String = value.decodeToString()
 
+                        val boolean: Boolean = true
                         /*val multiplicator = if(value.first().toInt()> 0) -1 else 1
                         val temperature = value[1].toInt() + value[2].toInt() / 10f
                         val humidity = value[4].toInt() + value[5].toInt() / 10f
@@ -121,7 +124,7 @@ class BLEReceiveManager @Inject constructor(
 
                         coroutineScope.launch {
                             data.emit(
-                                EGDUiState(test)
+                                EGDUiState(boolean)
                             )
                         }
 

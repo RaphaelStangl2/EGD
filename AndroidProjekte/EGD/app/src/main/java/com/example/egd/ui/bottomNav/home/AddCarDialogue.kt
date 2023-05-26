@@ -10,14 +10,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
 import com.example.egd.R
 import com.example.egd.ui.EGDViewModel
 import com.example.egd.ui.ProgressBar
 import com.example.egd.ui.getStarted.AddUserScreen
 import com.example.egd.ui.getStarted.CarInfoScreen
 import com.example.egd.ui.getStarted.ConnectScreen
-import com.example.egd.ui.getStarted.RegisterScreen
+import com.example.egd.ui.validation.ValidationService
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -29,12 +28,17 @@ fun AddCarDialogue(viewModel: EGDViewModel, onAdded: () -> Unit,modifier: Modifi
     val progressBarWidth = screenWidth - (screenWidth.times(0.12F))
 
     val homeUiState = viewModel.homeUiState.collectAsState().value
-    val searchedList = homeUiState.searchFriendList
+    val searchFriendList = homeUiState.searchFriendList
+    var assignedFriendList = homeUiState.assignedFriendsList
+
 
 
     val loginUiState = viewModel.loginUiState.collectAsState().value
     val carUiState = viewModel.getStartedUiState.collectAsState().value
+
     viewModel.setNumberOfSteps(3)
+
+    val validationService = ValidationService()
 
     val step = carUiState.step
     val numberOfSteps = carUiState.numberOfSteps
@@ -44,6 +48,8 @@ fun AddCarDialogue(viewModel: EGDViewModel, onAdded: () -> Unit,modifier: Modifi
     var email = carUiState.email
     var password = carUiState.password
     var triedToSubmit = carUiState.triedToSubmit
+    var searchBarContent = carUiState.friendSearchBarContent
+
 
     var passwordVisibility = loginUiState.passwordVisibility
 
@@ -68,29 +74,37 @@ fun AddCarDialogue(viewModel: EGDViewModel, onAdded: () -> Unit,modifier: Modifi
         }
 
         if (step == 1){
-            ConnectScreen(viewModel, onBluetoothStateChanged)
+            ConnectScreen(viewModel, onBluetoothStateChanged, validationService, triedToSubmit)
         }
         else if(step == 2) {
             CarInfoScreen(carName, fuelConsumption, viewModel, triedToSubmit)
         }
         else if(step == 3) {
-           /* AddUserScreen(
+           AddUserScreen(
                 viewModel = viewModel,
-                friendSearchBarContent = ,
-                assignedFriendsList = ,
-                searchedFriendsList =
-            )*/
+                friendSearchBarContent = searchBarContent,
+                assignedFriendsList = assignedFriendList,
+                searchedFriendsList = searchFriendList
+            )
         }
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Button(
                 onClick = {
                     if (step + 1 > numberOfSteps){
-                        viewModel.setCarName("")
-                        viewModel.setFuelConsumption("")
+
+                        viewModel.addCar(onAdded = onAdded)
 
                         onAdded()
-                    }else{
+                    } else if (step == 2){
+                        if (validationService.validateCarInfoScreen(carName, fuelConsumption)){
+                            viewModel.setStep(step + 1)
+                            viewModel.setTriedToSubmit(false)
+                        }else{
+                            viewModel.setTriedToSubmit(true)
+                        }
+                    }
+                    else{
                         viewModel.setStep(step + 1)
                     }
 

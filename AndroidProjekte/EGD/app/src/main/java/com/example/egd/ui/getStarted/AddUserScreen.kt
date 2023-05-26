@@ -77,7 +77,7 @@ fun AddUserScreen(
     }
     Row(){
         if (searchedFriendsList != null) {
-            Column(modifier=Modifier.verticalScroll(scrollState)){
+            Column(modifier=Modifier.verticalScroll(scrollState).height(IntrinsicSize.Min)){
                 for (user in searchedFriendsList)
                 {
                     UserLabel(user = user, viewModel = viewModel, assignedFriendsList = assignedFriendsList, isAssigned = false)

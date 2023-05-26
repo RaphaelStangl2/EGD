@@ -1,11 +1,9 @@
 package com.example.egd.ui
 
+import android.content.SharedPreferences
 import android.location.Location
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-
-import androidx.compose.ui.platform.LocalContext
 
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,8 +24,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.example.egd.R
 import com.example.egd.data.entities.Car
-import kotlinx.coroutines.flow.update
-
+import com.example.egd.data.http.HttpService
 
 
 @Composable
@@ -36,7 +33,8 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     goToMap: () -> Unit,
     goToEditScreen: () -> Unit,
-    goToProfile: () -> Unit
+    goToProfile: () -> Unit,
+    sharedPreference: () -> SharedPreferences?
 ){
     val homeUiState = viewModel.homeUiState.collectAsState().value
 
@@ -48,13 +46,26 @@ fun HomeScreen(
 
     val lifecycleOwner = LocalLifecycleOwner.current
 
+
+    if (homeUiState.user?.id != null){
+        viewModel.getCarsForUserId(homeUiState.user.id)
+    }
+
+
     DisposableEffect(
         key1 = lifecycleOwner,
         effect = {
             val observer = LifecycleEventObserver{_,event ->
                 if(event == Lifecycle.Event.ON_RESUME){
-                    viewModel.getCarsForUserId(1)
+                    if (homeUiState.user?.id != null){
+                        viewModel.getCarsForUserId(homeUiState.user.id)
+                    } else
+                        viewModel.getUserForEmail(sharedPreference)
+
                 }
+                /*if (event == Lifecycle.Event.ON_START) {
+                    viewModel.getUserForEmail(sharedPreference)
+                }*/
             }
             lifecycleOwner.lifecycle.addObserver(observer)
 
@@ -145,7 +156,7 @@ fun CarCard(car: Car, name: String, latitude: Double, longitude: Double, viewMod
 
                 IconButton(onClick =
                 {
-                    viewModel.setCar(car)
+                    viewModel.setCar(car, car.consumption.toString())
                     goToEditScreen()
 
                 }) {

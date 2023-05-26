@@ -37,6 +37,7 @@ fun CarInfoScreen(carName:String, fuelConsumption: String, viewModel: EGDViewMod
             isError = !validationCarName.valid && triedToSubmit
         )
     }
+
     Row(){
         if (!validationCarName.valid && triedToSubmit){
             ErrorText(message = validationCarName.message)
@@ -62,7 +63,7 @@ fun CarInfoScreen(carName:String, fuelConsumption: String, viewModel: EGDViewMod
         Text(text="liters")
     }
     Row{
-        if (!validationCarName.valid && triedToSubmit){
+        if (!validationFuelConsumption.valid && triedToSubmit){
             ErrorText(message = validationFuelConsumption.message)
         }
     }

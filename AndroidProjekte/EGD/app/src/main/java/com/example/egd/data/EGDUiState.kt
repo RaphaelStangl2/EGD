@@ -1,5 +1,5 @@
 package com.example.egd.data
 
 data class EGDUiState (
-    val test: String = ""
+    val test: Boolean = false
 )

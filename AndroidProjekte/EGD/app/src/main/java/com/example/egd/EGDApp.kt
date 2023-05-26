@@ -114,7 +114,7 @@ fun EGDApp(
                         },
                         onLoginButtonClicked = {
                             navController.navigate(StartItem.LoginScreen.screen_route)
-                        })
+                        }, viewModel = viewModel)
                 }
             //NoConnectionScreen
             composable(route = StartItem.NoConnectionScreen.screen_route){

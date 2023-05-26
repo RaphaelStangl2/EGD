@@ -63,6 +63,9 @@ fun HomeScreen(
                         viewModel.getUserForEmail(sharedPreference)
 
                 }
+                if (event == Lifecycle.Event.ON_START){
+                    viewModel.initializeConnection()
+                }
                 /*if (event == Lifecycle.Event.ON_START) {
                     viewModel.getUserForEmail(sharedPreference)
                 }*/

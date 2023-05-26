@@ -13,9 +13,14 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
+import com.example.egd.data.ble.BLEService
+import com.example.egd.data.ble.BLEWorker
 import com.example.egd.ui.theme.EGDTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -25,6 +30,7 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var bluetoothAdapter: BluetoothAdapter
+    val workManager = WorkManager.getInstance(application)
 
 
 
@@ -46,7 +52,24 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onDestroy() {
+        //val workManager = WorkManager.getInstance(application)
+        //workManager.enqueue(OneTimeWorkRequest.from(BLEWorker::class.java))
+
+        super.onDestroy()
+    }
+
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onStart() {
+
+        BLEService.startService(this, "Foreground Service is running...")
+
+
+        //val intent = Intent(this, BLEService::class.java) // Build the intent for the service
+        //applicationContext.startForegroundService(intent)
+
         super.onStart()
 
         //showGPSDialog()

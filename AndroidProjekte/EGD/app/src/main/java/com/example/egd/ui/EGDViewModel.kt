@@ -512,7 +512,8 @@ class EGDViewModel @Inject constructor(
         bleReceiveManager.startReceiving()
     }
 
-    override fun onCleared() {
+    public override fun onCleared() {
+        connectionState
         super.onCleared()
         bleReceiveManager.closeConnection()
     }
@@ -586,6 +587,17 @@ class EGDViewModel @Inject constructor(
         editor?.putString("email", "")
         editor?.putBoolean("isLoggedIn", false)
         editor?.apply()
+
+        onCleared()
+        setConnectionSuccessful(false)
+    }
+
+    fun setConnectionSuccessful(connectionSuccessful: Boolean) {
+        _getStartedUiState.update { currentState ->
+            currentState.copy(
+                connectionSuccessful = connectionSuccessful
+            )
+        }
     }
 
     fun getUserForEmail(sharedPreference: () -> SharedPreferences?) {

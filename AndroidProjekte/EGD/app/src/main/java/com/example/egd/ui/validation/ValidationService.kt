@@ -72,5 +72,6 @@ class ValidationService () {
             return ValidationObject(false, "Connection wasn't successful")
         }
         return ValidationObject(true, "")
+
     }
 }

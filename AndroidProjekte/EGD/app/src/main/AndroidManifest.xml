@@ -31,7 +31,8 @@
 
         <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyBzdzVWCdsxOGDXDpFx71mtdlhXnQeVdDk"/>
 
-        <service android:name=".data.ble.BLEService"></service>
+        <service android:name=".data.ble.BLEService" android:debuggable="true"
+            tools:ignore="HardcodedDebugMode"></service>
 
         <activity
             android:name=".MainActivity"

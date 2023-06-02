@@ -52,7 +52,9 @@ fun EGDApp(
     onBluetoothStateChanged: () -> Unit,
     onGPSRequired: () -> Unit,
     onNoInternetConnection: () -> Boolean,
-    sharedPreference: () -> SharedPreferences?
+    sharedPreference: () -> SharedPreferences?,
+    startForegroundService: () -> Unit,
+    stopForegroundService: () -> Unit
 ){
 
     val navController = rememberNavController()
@@ -100,7 +102,7 @@ fun EGDApp(
                 ) { innerPadding ->
                     Profile (modifier = Modifier.padding(innerPadding), logout =
                     {
-                        viewModel.logout(sharedPreference)
+                        viewModel.logout(sharedPreference, stopForegroundService)
                         navController.navigate(StartItem.StartScreen.screen_route) {popUpTo(0)}
                     })
                 }
@@ -205,7 +207,15 @@ fun EGDApp(
                     },
                     floatingActionButtonPosition = FabPosition.Center
                 ) { innerPadding ->
-                    HomeScreen(viewModel = viewModel, modifier = Modifier.padding(innerPadding), goToEditScreen = {navController.navigate(BottomNavItem.EditCarScreen.screen_route)}, goToMap = {navController.navigate(BottomNavItem.Map.screen_route)}, goToProfile = {navController.navigate(StartItem.ProfileScreen.screen_route)}, sharedPreference = sharedPreference)
+                    HomeScreen(viewModel = viewModel,
+                        modifier = Modifier.padding(innerPadding),
+                        goToEditScreen = {navController.navigate(BottomNavItem.EditCarScreen.screen_route)},
+                        goToMap = {navController.navigate(BottomNavItem.Map.screen_route)},
+                        goToProfile = {navController.navigate(StartItem.ProfileScreen.screen_route)},
+                        sharedPreference = sharedPreference,
+                        stopForegroundService = {stopForegroundService()},
+                        startForeground = { startForegroundService() }
+                    )
                 }
             }
             //MapScreen

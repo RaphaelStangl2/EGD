@@ -10,6 +10,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.egd.data.*
 import com.example.egd.data.ble.BLEReceiveManager
+import com.example.egd.data.ble.BLEService
+import com.example.egd.data.ble.GPSService
 import com.example.egd.data.entities.Car
 import com.example.egd.data.entities.User
 import com.example.egd.data.entities.UserCar
@@ -19,6 +21,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,6 +32,7 @@ import java.io.InputStream
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
+import kotlin.concurrent.thread
 import kotlin.concurrent.timerTask
 
 @HiltViewModel
@@ -36,6 +40,8 @@ class EGDViewModel @Inject constructor(
     private val bleReceiveManager: BLEReceiveManager,
     val fusedLocationClient: FusedLocationProviderClient
 ) : ViewModel() {
+
+
 
     private val _editCarUiState = MutableStateFlow(EditCarUiState())
     val editCarUiState: StateFlow<EditCarUiState> = _editCarUiState.asStateFlow()
@@ -480,6 +486,7 @@ class EGDViewModel @Inject constructor(
     }
 
 
+
     private fun subscribeToChanges(){
         viewModelScope.launch {
             bleReceiveManager.data.collect{ result ->
@@ -490,7 +497,6 @@ class EGDViewModel @Inject constructor(
                 }
             }
         }
-
         /*_uiState.update { currentState ->
             currentState.copy(
                 test = "Test"
@@ -507,9 +513,36 @@ class EGDViewModel @Inject constructor(
         bleReceiveManager.reconnect()
     }
 
-    fun initializeConnection(){
-        subscribeToChanges()
+    fun initializeConnection(startForeground: () -> Unit) {
+        //BLEService.startService(this, "BLE Service is running")
+        //startForeground()
         bleReceiveManager.startReceiving()
+        subscribeToChanges()
+
+        var gpsService: GPSService = GPSService(viewModel = this, {})
+        //gpsService.run()
+        var cars = homeUiState.value.cars
+
+
+        viewModelScope.launch {
+            while(true){
+                delay(3000)
+                getUserPosition(){ location ->
+                    if (cars!= null && location!= null){
+
+                        var bool:Boolean= true
+                        var car = cars?.get(0)
+                        car.latitude = location.latitude
+                        car.longitude = location.longitude
+                        viewModelScope.launch {
+                            HttpService.retrofitService.putCar(car)
+                        }
+                    }
+                }
+            }
+        }
+
+
     }
 
     public override fun onCleared() {
@@ -555,9 +588,12 @@ class EGDViewModel @Inject constructor(
         timer = Timer()
         if (timer != null) {
             viewModelScope.launch {
-                timer!!.schedule(timerTask {
+                getCarsForUserId(userId)
+                delay(4000)
+
+                /*timer!!.schedule(timerTask {
                     getCarsForUserId(userId)
-                }, 4000)
+                }, 4000)*/
             }
         }
     }
@@ -572,7 +608,7 @@ class EGDViewModel @Inject constructor(
         }
     }
 
-    fun logout(sharedPreference: () -> SharedPreferences?) {
+    fun logout(sharedPreference: () -> SharedPreferences?, stopForegroundService: () -> Unit) {
         val sharedPreference = sharedPreference()
 
         var editor = sharedPreference?.edit()
@@ -587,6 +623,9 @@ class EGDViewModel @Inject constructor(
         editor?.putString("email", "")
         editor?.putBoolean("isLoggedIn", false)
         editor?.apply()
+
+        //stopForegroundService()
+        bleReceiveManager.closeConnection()
 
         onCleared()
         setConnectionSuccessful(false)

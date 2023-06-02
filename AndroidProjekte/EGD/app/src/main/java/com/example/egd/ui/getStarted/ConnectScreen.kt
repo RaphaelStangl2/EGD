@@ -63,7 +63,7 @@ fun ConnectScreen(viewModel:EGDViewModel, showBluetoothDialogue:()->Unit, valida
             .height(500.dp)){
 
             Button(onClick = {
-                             viewModel.initializeConnection()
+                             viewModel.initializeConnection { /*TODO*/ }
             }, modifier = Modifier.size(150.dp, 150.dp), shape = RoundedCornerShape(75.dp)){
                 Text(text="CONNECT")
             }

@@ -24,7 +24,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.example.egd.R
 import com.example.egd.data.entities.Car
-import com.example.egd.data.http.HttpService
 
 
 @Composable
@@ -34,7 +33,9 @@ fun HomeScreen(
     goToMap: () -> Unit,
     goToEditScreen: () -> Unit,
     goToProfile: () -> Unit,
-    sharedPreference: () -> SharedPreferences?
+    sharedPreference: () -> SharedPreferences?,
+    startForeground: () -> Unit,
+    stopForegroundService: () -> Unit
 ){
     val homeUiState = viewModel.homeUiState.collectAsState().value
 
@@ -63,8 +64,9 @@ fun HomeScreen(
                         viewModel.getUserForEmail(sharedPreference)
 
                 }
-                if (event == Lifecycle.Event.ON_START){
-                    viewModel.initializeConnection()
+                if (event == Lifecycle.Event.ON_CREATE){
+                    viewModel.initializeConnection { startForeground() }
+
                 }
                 /*if (event == Lifecycle.Event.ON_START) {
                     viewModel.getUserForEmail(sharedPreference)

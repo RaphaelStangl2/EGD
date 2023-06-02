@@ -5,30 +5,25 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
-import androidx.annotation.RequiresApi
-import androidx.compose.ui.graphics.Color
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.work.WorkManager
 import com.example.egd.MainActivity
 import com.example.egd.R
-import kotlinx.coroutines.CoroutineScope
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class BLEService () : Service() {
     private val CHANNEL_ID = "ForegroundService Kotlin"
     val workManager = WorkManager.getInstance(application)
 
-    var bleReceiveManager: BLEReceiveManager? = null
-
-
-    @Inject constructor(bleReceiveManager: BLEReceiveManager) : this() {
-        this.bleReceiveManager = bleReceiveManager
-    }
+    @Inject
+    lateinit var bleReceiveManager: BLEReceiveManager
 
     companion object {
-        fun startService(context: Context, message: String) {
+        fun startService(context: MainActivity, message: String) {
             val startIntent = Intent(context, BLEService::class.java)
             startIntent.putExtra("inputExtra", message)
             ContextCompat.startForegroundService(context, startIntent)
@@ -56,9 +51,9 @@ class BLEService () : Service() {
             0, notificationIntent, PendingIntent.FLAG_IMMUTABLE
         )
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Foreground Service Kotlin Example")
+            .setContentTitle("EGD BLE Service")
             .setContentText(input)
-            .setSmallIcon(R.drawable.ic_baseline_person_24)
+            .setSmallIcon(R.drawable.ic_baseline_directions_car_24)
             .setContentIntent(pendingIntent)
             .build()
         startForeground(1, notification)
@@ -76,4 +71,5 @@ class BLEService () : Service() {
             manager!!.createNotificationChannel(serviceChannel)
         }
     }
+
 }

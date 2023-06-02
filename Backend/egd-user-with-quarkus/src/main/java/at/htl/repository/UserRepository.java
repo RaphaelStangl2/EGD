@@ -213,13 +213,17 @@ public class  UserRepository {
 
 
     public byte[] getDefaultImage() throws IOException {
-
+        //default image holen und speichern
         Path imagePath = Path.of("src/main/resources/userDefaultImage.png");
 
-
-
-        byte[] picture = Files.readAllBytes(imagePath);
+        if(Files.exists(imagePath)){
+            byte[] picture = Files.readAllBytes(imagePath);
             return  picture;
+        }
+        else{
+            return null;
+
+        }
 
     }
 

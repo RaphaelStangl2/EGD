@@ -134,7 +134,7 @@ public class UserResource {
                 return Response.status(Response.Status.NOT_FOUND).build();
         } catch ( NoResultException exception) {
             user.setPassword(UserRepository.getSaltedHash(user.getPassword()));
-            
+
             final Users createdUser = userRepository.addUser(user);
             return Response.created(URI.create("/api/users/" + createdUser.getId())).build();
         }

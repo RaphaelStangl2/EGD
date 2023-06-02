@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "../../BLE"
+		},
+		{
+			"name": "BLE-SENSOR-THREADS-CLEAN",
+			"path": ".."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"iostream": "cpp"
+		}
+	}
+}

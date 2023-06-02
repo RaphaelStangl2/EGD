@@ -9,12 +9,17 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 import java.util.UUID;
 
 @Transactional
@@ -205,4 +210,19 @@ public class  UserRepository {
     public String generateTempPassword() {
         return UUID.randomUUID().toString().substring(0, 8);
     }
+
+
+    public byte[] getDefaultImage() throws IOException {
+
+        Path imagePath = Path.of("src/main/resources/userDefaultImage.png");
+
+
+
+        byte[] picture = Files.readAllBytes(imagePath);
+            return  picture;
+
+    }
+
+
+
 }

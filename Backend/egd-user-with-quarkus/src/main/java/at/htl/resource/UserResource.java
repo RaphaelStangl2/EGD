@@ -123,7 +123,7 @@ public class UserResource {
     @POST
     @Path("registration/")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response addUser(final Users user) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public Response addUser(final Users user) throws NoSuchAlgorithmException, InvalidKeySpecException, IOException {
         if (user == null) {
             return Response.status(Response.Status.NO_CONTENT).build();
         }
@@ -134,7 +134,7 @@ public class UserResource {
                 return Response.status(Response.Status.NOT_FOUND).build();
         } catch ( NoResultException exception) {
             user.setPassword(UserRepository.getSaltedHash(user.getPassword()));
-
+            user.setImage(userRepository.getDefaultImage());
             final Users createdUser = userRepository.addUser(user);
             return Response.created(URI.create("/api/users/" + createdUser.getId())).build();
         }

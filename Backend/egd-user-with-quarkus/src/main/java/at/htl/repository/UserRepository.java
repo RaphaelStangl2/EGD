@@ -36,6 +36,9 @@ public class  UserRepository {
         entityManager.remove(user);
     }
 
+    public void updateUser(Users user){
+        entityManager.merge(user);
+    }
 
     public Users findById(long id) {
         return entityManager.find(Users.class, id);
@@ -179,6 +182,14 @@ public class  UserRepository {
 
     }
 
+    public Users findById(Long id) {
+
+        return entityManager.createQuery("SELECT u FROM Users u where u.id = : id", Users.class)
+                .setParameter("id", id)
+                .getSingleResult();
+
+    }
+
     public List<Users> getCarUsersById(long carId){//"select u from Users u where u.id in (select userCars.user.id from UserCar userCars where userCars.car.id =:carId)"
         var users =  entityManager.createQuery("select u from Users u where u.id in (select userCars.user.id from UserCar userCars where userCars.car.id =:carId)")
                 .setParameter("carId", carId).getResultList();
@@ -186,6 +197,7 @@ public class  UserRepository {
         return users;
     }
 
+    @Transactional
     public void update(Users user) {
         entityManager.merge(user);
     }

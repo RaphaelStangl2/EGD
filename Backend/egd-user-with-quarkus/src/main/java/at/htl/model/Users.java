@@ -41,6 +41,7 @@ public class Users {
     @JoinColumn(name = "place_id")
     private Place place;
 
-
+    @Lob
+    private   byte[] image;
 
 }

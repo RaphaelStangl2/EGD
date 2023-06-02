@@ -11,6 +11,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 
 
@@ -35,7 +37,7 @@ public class UserCarResource {
     @POST
     @Path("/addUserCarsList")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response addUserCarsList(List<UserCar> userCarsToAdd) {
+    public Response addUserCarsList(List<UserCar> userCarsToAdd) throws NoSuchAlgorithmException, InvalidKeySpecException {
 
         Car newCar = carRepository.addCar(userCarsToAdd.get(0).getCar());
 
@@ -46,9 +48,11 @@ public class UserCarResource {
             }
 
             if (userCar.getUser().getId() == null){
+                userCar.getUser().setPassword(UserRepository.getSaltedHash(userCar.getUser().getPassword()));
                 userRepository.addUser(userCar.getUser());
             }
             else if (userRepository.findById(userCar.getUser().getId()) == null){
+                userCar.getUser().setPassword(UserRepository.getSaltedHash(userCar.getUser().getPassword()));
                 userRepository.addUser(userCar.getUser());
             }
 

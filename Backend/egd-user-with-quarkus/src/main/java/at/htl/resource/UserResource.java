@@ -8,14 +8,23 @@ import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
 import io.quarkus.security.User;
 import io.smallrye.common.annotation.Blocking;
+import org.jboss.logging.annotations.Pos;
 
+import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.List;
@@ -125,6 +134,7 @@ public class UserResource {
                 return Response.status(Response.Status.NOT_FOUND).build();
         } catch ( NoResultException exception) {
             user.setPassword(UserRepository.getSaltedHash(user.getPassword()));
+            
             final Users createdUser = userRepository.addUser(user);
             return Response.created(URI.create("/api/users/" + createdUser.getId())).build();
         }
@@ -209,4 +219,40 @@ public class UserResource {
 
         return Response.ok(users).build();
     }
+
+
+        @POST
+        @Path("/updateImage")
+        @Consumes(MediaType.MULTIPART_FORM_DATA)
+        @Produces(MediaType.APPLICATION_JSON)
+        public Response addPicture(@FormParam("userId") Long userId,
+                                   @FormParam("profilePicture") File file) throws IOException {
+            if (file == null && userId==null) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+
+            Users user;
+
+            try {
+                 user = userRepository.findById(userId);
+            }
+            catch (Exception e){
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+
+            if (user!=null){
+                byte[] imageBytes;
+
+
+                imageBytes = Files.readAllBytes(file.toPath());
+                user.setImage(imageBytes);
+                userRepository.update(user);
+                return Response.status(Response.Status.OK).build();
+            }
+            return Response.status(Response.Status.BAD_REQUEST).build();
+
+        }
+
+
+
 }

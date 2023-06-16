@@ -3,12 +3,18 @@ package com.example.egd.ui.getStarted
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.egd.ui.EGDViewModel
 import com.example.egd.ui.permissions.PermissionUtils
 import com.example.egd.ui.validation.ErrorText
@@ -22,10 +28,14 @@ fun ConnectScreen(viewModel:EGDViewModel, showBluetoothDialogue:()->Unit, valida
 
     val viewModelValue = viewModel.getStartedUiState.collectAsState().value
 
+    val buttonClicked = viewModelValue.buttonClicked
+
     var doNotShowRationale = viewModelValue.doNotShowRational
     val bluetoothPermission = rememberMultiplePermissionsState(permissions = PermissionUtils.permissions)
 
     val validationConnection = validationService.validateConnectionScreen(viewModelValue.connectionSuccessful)
+
+
 
     PermissionsRequired(
         multiplePermissionsState = bluetoothPermission,
@@ -62,11 +72,35 @@ fun ConnectScreen(viewModel:EGDViewModel, showBluetoothDialogue:()->Unit, valida
             .fillMaxWidth()
             .height(500.dp)){
 
-            Button(onClick = {
-                             viewModel.initializeConnection { /*TODO*/ }
-            }, modifier = Modifier.size(150.dp, 150.dp), shape = RoundedCornerShape(75.dp)){
-                Text(text="CONNECT")
+            if (!buttonClicked){
+                Button(onClick = {
+                    viewModel.setButtonClicked(true)
+                    viewModel.initializeConnection { /*TODO*/ }
+                }, modifier = Modifier.size(150.dp, 150.dp), shape = RoundedCornerShape(75.dp)){
+                    Text(text="CONNECT")
+                }
             }
+            else if (buttonClicked && !validationConnection.valid){
+                val strokeWidth = 10.dp
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .size(120.dp,120.dp)
+                        .drawBehind {
+                            drawCircle(
+                                Color(0xFF3399ff),
+                                radius = size.width / 2 - strokeWidth.toPx() / 2,
+                                style = Stroke(strokeWidth.toPx())
+                            )
+                        },
+                    color = Color.LightGray,
+                    strokeWidth = strokeWidth
+                )
+            } else {
+                Text(text ="Successfull", color = com.example.egd.ui.theme.ProgressBar, fontSize = 20.sp)
+            }
+
+
+
         }
     }
 

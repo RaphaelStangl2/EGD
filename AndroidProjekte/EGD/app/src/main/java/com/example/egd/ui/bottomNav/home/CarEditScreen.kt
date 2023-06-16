@@ -1,30 +1,52 @@
 package com.example.egd.ui.bottomNav.home
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.example.egd.ui.EGDViewModel
 import com.example.egd.ui.validation.ErrorText
 import com.example.egd.ui.validation.ValidationService
 
 @Composable
-fun CarEditScreen(onUpdate: () -> Unit, viewModel: EGDViewModel, modifier: Modifier){
+fun CarEditScreen(onUpdate: () -> Unit, viewModel: EGDViewModel, goToFriendsAddScreen: ()-> Unit, modifier: Modifier){
 
     val carUiState = viewModel.editCarUiState.collectAsState().value
     val homeUiState = viewModel.homeUiState.collectAsState().value
     val car = carUiState.car
-    val assignedFriendsList = homeUiState.assignedFriendsList
+    val assignedEditFriendsList = carUiState.assignedFriendList
     val searchFriendList = homeUiState.searchFriendList
 
-    viewModel.getUsersForCar()
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(
+        key1 = lifecycleOwner,
+        effect = {
+            val observer = LifecycleEventObserver{_,event ->
+                if (event == Lifecycle.Event.ON_CREATE){
+                    if (assignedEditFriendsList == null){
+                        viewModel.getUsersForCar()
+                    }
+                }
+            }
+            lifecycleOwner.lifecycle.addObserver(observer)
+
+            onDispose {
+                lifecycleOwner.lifecycle.removeObserver(observer)
+            }
+        }
+    )
+
 
     if (car != null)
     {
@@ -44,7 +66,7 @@ fun CarEditScreen(onUpdate: () -> Unit, viewModel: EGDViewModel, modifier: Modif
             //horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(){
-                Text(text="Car Name:")
+                Text(text="Car Name:", fontWeight = FontWeight.Bold )
             }
             Row(){
                 TextField(
@@ -68,7 +90,7 @@ fun CarEditScreen(onUpdate: () -> Unit, viewModel: EGDViewModel, modifier: Modif
             Spacer(modifier = Modifier.height(7.dp))
 
             Row(){
-                Text(text="Average fuel consumption per 100 km:")
+                Text(text="Average fuel consumption per 100 km:", fontWeight = FontWeight.Bold)
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -98,16 +120,17 @@ fun CarEditScreen(onUpdate: () -> Unit, viewModel: EGDViewModel, modifier: Modif
 
 
             Row(){
-                Text(text="Friends:")
+                Text(text="Friends:", fontWeight = FontWeight.Bold)
             }
 
-            AssignedFriendList(assignedFriendsList = assignedFriendsList)
+            AssignedFriendList(assignedFriendsList = assignedEditFriendsList, viewModel, goToFriendsAddScreen)
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Button(
                     onClick = {
                         viewModel.setTriedToSubmitEdit(true)
                         viewModel.updateCar(onUpdate)
+                        viewModel.setAssignedEditFriendsList(null)
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {

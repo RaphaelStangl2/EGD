@@ -1,6 +1,5 @@
 package com.example.egd.ui.bottomNav.home
 
-import android.location.Location
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -11,10 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.egd.data.entities.User
 
 @Composable
-fun AddUserCard(){
+fun AddUserCard(goToFriendsAddScreen: () -> Unit) {
         Card(
             modifier = Modifier
                 .fillMaxWidth(0.9f)
@@ -27,6 +25,7 @@ fun AddUserCard(){
             Column(){
                 Button(
                     onClick = {
+                        goToFriendsAddScreen()
                     },
                     colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background, contentColor = MaterialTheme.colors.primaryVariant),
                     modifier = Modifier.shadow(0.dp),
@@ -36,7 +35,7 @@ fun AddUserCard(){
                     ),
                     shape= MaterialTheme.shapes.large
                 ){
-                    Text("Add Friend", color = MaterialTheme.colors.primaryVariant, fontWeight = MaterialTheme.typography.body2.fontWeight)
+                    Text("Add Friends", color = MaterialTheme.colors.primaryVariant, fontWeight = MaterialTheme.typography.body2.fontWeight)
                 }
             }
         }

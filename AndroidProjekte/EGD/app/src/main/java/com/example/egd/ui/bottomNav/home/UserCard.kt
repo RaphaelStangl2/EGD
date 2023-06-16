@@ -10,10 +10,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.egd.R
 import com.example.egd.data.entities.User
+import com.example.egd.ui.EGDViewModel
 
 
 @Composable
-fun UserCard(user: User){
+fun UserCard(user: User, viewModel:EGDViewModel){
     Card(
         modifier = Modifier
             .fillMaxWidth(0.9f)
@@ -30,7 +31,11 @@ fun UserCard(user: User){
                     Text(text =user.userName)
                 }
                 Row(modifier = Modifier.fillMaxWidth(1f), horizontalArrangement = Arrangement.End){
-                    Button(modifier = Modifier.padding(end=4.dp),onClick = {}, colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.error), shape = MaterialTheme.shapes.large){
+                    Button(modifier = Modifier.padding(end=4.dp),
+                        onClick = {
+                            viewModel.removeUserFromAssignedEditFriendsList(user)
+                            viewModel.addUserToRemovedFriendsList(user)},
+                        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.error), shape = MaterialTheme.shapes.large){
                         Text("Remove")
                     }
                 }

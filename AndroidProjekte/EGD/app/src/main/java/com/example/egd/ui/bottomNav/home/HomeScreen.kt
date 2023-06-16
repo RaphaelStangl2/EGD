@@ -45,12 +45,13 @@ fun HomeScreen(
 
     var listCars = homeUiState.cars
 
-    val lifecycleOwner = LocalLifecycleOwner.current
 
 
     if (homeUiState.user?.id != null){
         viewModel.getCarsForUserId(homeUiState.user.id)
     }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
 
 
     DisposableEffect(

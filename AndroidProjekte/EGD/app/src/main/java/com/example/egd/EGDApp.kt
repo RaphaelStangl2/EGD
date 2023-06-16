@@ -2,12 +2,14 @@ package com.example.egd
 
 import android.bluetooth.BluetoothAdapter
 import android.content.SharedPreferences
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -17,6 +19,8 @@ import com.example.egd.data.StartItem
 import com.example.egd.ui.*
 import com.example.egd.ui.bottomNav.home.AddCarDialogue
 import com.example.egd.ui.bottomNav.home.CarEditScreen
+import com.example.egd.ui.dialogues.AccidentDialogue
+import com.example.egd.ui.getStarted.AddUserScreen
 import com.example.egd.ui.getStarted.GetStarted
 import com.example.egd.ui.internet.NoInternetScreen
 import com.example.egd.ui.permissions.PermissionUtils
@@ -55,18 +59,19 @@ fun EGDApp(
     sharedPreference: () -> SharedPreferences?,
     startForegroundService: () -> Unit,
     stopForegroundService: () -> Unit
-){
+) {
 
     val navController = rememberNavController()
-    val bluetoothPermission = rememberMultiplePermissionsState(permissions = PermissionUtils.permissions)
+    val bluetoothPermission =
+        rememberMultiplePermissionsState(permissions = PermissionUtils.permissions)
 
     PermissionsRequired(
         multiplePermissionsState = bluetoothPermission,
         permissionsNotGrantedContent = { /*TODO*/ },
         permissionsNotAvailableContent = { /*TODO*/ }) {
-        SystemBroadcastReceiver(systemAction = BluetoothAdapter.ACTION_STATE_CHANGED){ bluetoothState ->
+        SystemBroadcastReceiver(systemAction = BluetoothAdapter.ACTION_STATE_CHANGED) { bluetoothState ->
             val action = bluetoothState?.action ?: return@SystemBroadcastReceiver
-            if(action == BluetoothAdapter.ACTION_STATE_CHANGED){
+            if (action == BluetoothAdapter.ACTION_STATE_CHANGED) {
                 onBluetoothStateChanged()
             }
         }
@@ -80,174 +85,265 @@ fun EGDApp(
 
 
     ) { innerPadding ->*/
-        val loginUiState by viewModel.loginUiState.collectAsState()
-        val getStartedUiState by viewModel.getStartedUiState.collectAsState()
+    val loginUiState by viewModel.loginUiState.collectAsState()
+    val getStartedUiState by viewModel.getStartedUiState.collectAsState()
+    val editCarUiState by viewModel.editCarUiState.collectAsState()
+    val homeUiState by viewModel.homeUiState.collectAsState()
 
 
-        NavHost(
-            navController = navController,
-            startDestination =  if(!onNoInternetConnection())
-                                    StartItem.NoConnectionScreen.screen_route
-                                else if (viewModel.checkLogin(sharedPreference))
-                                    BottomNavItem.Home.screen_route
-                                else
-                                    StartItem.StartScreen.screen_route,
-            //modifier = modifier.padding(innerPadding)
-        ){
+    if (getStartedUiState.connectionSuccessful && getStartedUiState.accidentCode == "1") {
+        AccidentDialogue(viewModel)
+    }
 
-            //Profile
-            composable(route = StartItem.ProfileScreen.screen_route){
-                Scaffold(
-                    topBar = { TopAppBarBackButton(navController, {Text("Profile")}, onBackButtonClick = {navController.navigateUp()}) }
-                ) { innerPadding ->
-                    Profile (modifier = Modifier.padding(innerPadding), logout =
-                    {
-                        viewModel.logout(sharedPreference, stopForegroundService)
-                        navController.navigate(StartItem.StartScreen.screen_route) {popUpTo(0)}
-                    })
+    NavHost(
+        navController = navController,
+        startDestination = if (!onNoInternetConnection())
+            StartItem.NoConnectionScreen.screen_route
+        else if (viewModel.checkLogin(sharedPreference))
+            BottomNavItem.Home.screen_route
+        else
+            StartItem.StartScreen.screen_route,
+        //modifier = modifier.padding(innerPadding)
+    ) {
+
+        //Profile
+        composable(route = StartItem.ProfileScreen.screen_route) {
+            Scaffold(
+                topBar = {
+                    TopAppBarBackButton(
+                        navController,
+                        { Text("Profile") },
+                        onBackButtonClick = { navController.navigateUp() })
                 }
-            }
-
-            //Startscreen
-            composable(route = StartItem.StartScreen.screen_route){
-                    StartScreen(
-                        onGetStartedButtonClicked = {
-                            navController.navigate(StartItem.GetStartedScreen.screen_route)
-                        },
-                        onLoginButtonClicked = {
-                            navController.navigate(StartItem.LoginScreen.screen_route)
-                        }, viewModel = viewModel)
-                }
-            //NoConnectionScreen
-            composable(route = StartItem.NoConnectionScreen.screen_route){
-                NoInternetScreen({onNoInternetConnection()})
+            ) { innerPadding ->
+                Profile(modifier = Modifier.padding(innerPadding), logout =
                 {
-                    if(!navController.navigateUp()){
-                        navController.navigate(StartItem.StartScreen.screen_route)
-                    }
+                    viewModel.logout(sharedPreference, stopForegroundService)
+                    navController.navigate(StartItem.StartScreen.screen_route) { popUpTo(0) }
+                })
+            }
+        }
+
+        //Startscreen
+        composable(route = StartItem.StartScreen.screen_route) {
+            StartScreen(
+                onGetStartedButtonClicked = {
+                    navController.navigate(StartItem.GetStartedScreen.screen_route)
+                },
+                onLoginButtonClicked = {
+                    navController.navigate(StartItem.LoginScreen.screen_route)
+                }, viewModel = viewModel
+            )
+        }
+        //NoConnectionScreen
+        composable(route = StartItem.NoConnectionScreen.screen_route) {
+            NoInternetScreen({ onNoInternetConnection() })
+            {
+                if (!navController.navigateUp()) {
+                    navController.navigate(StartItem.StartScreen.screen_route)
                 }
             }
-            //LoginScreen
-            composable(route = StartItem.LoginScreen.screen_route) {
-                Scaffold(
-                    topBar = { TopAppBarBackButton(navController, {Text("Sign In")}, onBackButtonClick = {navController.navigateUp()}) }
-                ) { innerPadding ->
-                    LoginScreen(viewModel, modifier = Modifier.padding(innerPadding), { navController.navigate(BottomNavItem.Home.screen_route) { popUpTo(0) } }, sharedPreference)
+        }
+        //LoginScreen
+        composable(route = StartItem.LoginScreen.screen_route) {
+            Scaffold(
+                topBar = {
+                    TopAppBarBackButton(
+                        navController,
+                        { Text("Sign In") },
+                        onBackButtonClick = { navController.navigateUp() })
                 }
+            ) { innerPadding ->
+                LoginScreen(
+                    viewModel,
+                    modifier = Modifier.padding(innerPadding),
+                    { navController.navigate(BottomNavItem.Home.screen_route) { popUpTo(0) } },
+                    sharedPreference
+                )
             }
-            //GetStartedScreen
-            composable(route = StartItem.GetStartedScreen.screen_route){
-                Scaffold(
-                    topBar = { TopAppBarBackButton(navController, {Text("Get Started")}, onBackButtonClick = {
-                        if ( getStartedUiState.step == 1 ){
+        }
+        //GetStartedScreen
+        composable(route = StartItem.GetStartedScreen.screen_route) {
+            Scaffold(
+                topBar = {
+                    TopAppBarBackButton(
+                        navController,
+                        { Text("Get Started") },
+                        onBackButtonClick = {
+                            if (getStartedUiState.step == 1) {
+                                navController.navigateUp()
+                            } else {
+                                viewModel.setStep(getStartedUiState.step - 1)
+                            }
+                        })
+                })
+            { innerPadding ->
+                GetStarted(viewModel,
+                    { navController.navigate(BottomNavItem.Home.screen_route) { popUpTo(0) } },
+                    onBluetoothStateChanged = { onBluetoothStateChanged() },
+                    modifier = Modifier.padding(innerPadding),
+                    sharedPreference = { sharedPreference() }
+                )
+            }
+        }
+        //AddCarScreen
+        composable(route = BottomNavItem.AddCarScreen.screen_route) {
+            Scaffold(
+                topBar = {
+                    TopAppBarBackButton(navController, { Text("Add Car") }, onBackButtonClick = {
+                        if (getStartedUiState.step == 1) {
                             navController.navigateUp()
+                        } else {
+                            viewModel.setStep(getStartedUiState.step - 1)
                         }
-                        else{
-                            viewModel.setStep(getStartedUiState.step-1)
-                        }
-                    })
-                    })
-                { innerPadding ->
-                    GetStarted(viewModel, { navController.navigate(BottomNavItem.Home.screen_route){ popUpTo(0) } },
-                        onBluetoothStateChanged = {onBluetoothStateChanged()},
-                        modifier = Modifier.padding(innerPadding),
-                        sharedPreference = {sharedPreference()}
-                    )
-                }
-            }
-            //AddCarScreen
-            composable(route = BottomNavItem.AddCarScreen.screen_route){
-                Scaffold(
-                    topBar = { TopAppBarBackButton(navController, {Text("Add Car")}, onBackButtonClick = {
-                        if ( getStartedUiState.step == 1 ){
-                            navController.navigateUp()
-                        }
-                        else{
-                        viewModel.setStep(getStartedUiState.step-1)
-                    }
 
                     })
-                    })
-                { innerPadding ->
-                    AddCarDialogue(viewModel, { navController.navigate(BottomNavItem.Home.screen_route){ popUpTo(0) } },
-                        onBluetoothStateChanged = {onBluetoothStateChanged()},
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                })
+            { innerPadding ->
+                AddCarDialogue(
+                    viewModel,
+                    { navController.navigate(BottomNavItem.Home.screen_route) { popUpTo(0) } },
+                    onBluetoothStateChanged = { onBluetoothStateChanged() },
+                    modifier = Modifier.padding(innerPadding)
+                )
             }
-            //EditCarScreen
-            composable(route = BottomNavItem.EditCarScreen.screen_route){
-                Scaffold(
-                    topBar = { TopAppBarBackButton(navController, {Text("Edit Car")}, onBackButtonClick = {
+        }
+        //EditCarScreen
+        composable(route = BottomNavItem.EditCarScreen.screen_route) {
+            Scaffold(
+                topBar = {
+                    TopAppBarBackButton(navController, { Text("Edit Car") }, onBackButtonClick = {
                         navController.navigateUp()
                     })
-                    })
-                { innerPadding ->
-                    CarEditScreen(viewModel = viewModel, onUpdate = { navController.navigate(BottomNavItem.Home.screen_route){ popUpTo(0) } },
-                        modifier = Modifier.padding(innerPadding))
-                }
-            }
+                })
+            { innerPadding ->
 
-            //HomeScreen
-            composable(route = BottomNavItem.Home.screen_route) {
-                Scaffold(
-                    bottomBar = {
-                        BottomAppBar(navController)
-                    },
-                    topBar = {
-                        TopAppBarProfile(viewModel)
-                    },
-                    floatingActionButton = {
-                        FLoatingAddButton(viewModel = viewModel
-                        ) {
-                            viewModel.setStep(1)
 
-                            navController.navigate(BottomNavItem.AddCarScreen.screen_route)
-                        }
-                    },
-                    floatingActionButtonPosition = FabPosition.Center
-                ) { innerPadding ->
-                    HomeScreen(viewModel = viewModel,
+                Column() {
+                    Spacer(modifier = Modifier.height(5.dp))
+                    CarEditScreen(viewModel = viewModel,
+                        onUpdate = {
+                            navController.navigate(BottomNavItem.Home.screen_route) {
+                                popUpTo(0)
+                            }
+                        },
                         modifier = Modifier.padding(innerPadding),
-                        goToEditScreen = {navController.navigate(BottomNavItem.EditCarScreen.screen_route)},
-                        goToMap = {navController.navigate(BottomNavItem.Map.screen_route)},
-                        goToProfile = {navController.navigate(StartItem.ProfileScreen.screen_route)},
-                        sharedPreference = sharedPreference,
-                        stopForegroundService = {stopForegroundService()},
-                        startForeground = { startForegroundService() }
-                    )
-                }
-            }
-            //MapScreen
-            composable(route = BottomNavItem.Map.screen_route) {
-                Scaffold(
-                    bottomBar = {
-                        BottomAppBar(navController)
-                    }
-                ) { innerPadding ->
-                    MapScreen(viewModel = viewModel,
-                        modifier = Modifier.padding(innerPadding),
-                        onNoInternetConnection = { onNoInternetConnection() },
-                        onGpsRequired = { onGPSRequired() },
-                        goToNoInternetConnection = {navController.navigate(StartItem.NoConnectionScreen.screen_route)})
-                }
-            }
-            //StatisticsScreen
-            composable(route = BottomNavItem.Statistics.screen_route) {
-                Scaffold(
-                    bottomBar = {
-                        BottomAppBar(navController)
-                    }
-                ) { innerPadding ->
+                        goToFriendsAddScreen = { navController.navigate(BottomNavItem.AddUserToCar.screen_route) })
 
-                    StatisticsScreen(
-                        viewModel = viewModel,
-                        modifier = Modifier.padding(innerPadding)
-                    )
                 }
             }
-
         }
+
+        //AddUserToCarScreen -- EditScreen Version
+
+        composable(route = BottomNavItem.AddUserToCar.screen_route) {
+            Scaffold(
+                topBar = {
+                    TopAppBarBackButton(navController, { Text("Add Users") }, onBackButtonClick = {
+                        navController.navigateUp()
+                    })
+                })
+            { innerPadding ->
+                val configuration = LocalConfiguration.current
+                val screenWidth = configuration.screenWidthDp.dp
+
+                Column(
+                    modifier = modifier
+                        .padding(screenWidth.times(0.06F))
+                        .fillMaxSize()
+                ) {
+                    AddUserScreen(
+                        modifier = Modifier.padding(innerPadding),
+                        viewModel = viewModel,
+                        friendSearchBarContent = getStartedUiState.friendSearchBarContent,
+                        assignedFriendsList = homeUiState.assignedFriendsList,
+                        searchedFriendsList = homeUiState.searchFriendList
+                    )
+
+                    if (homeUiState.assignedFriendsList != null){
+                        Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxHeight(0.2f)){
+                            Button(onClick = {
+                                if (homeUiState.assignedFriendsList != null){
+                                    for (user in homeUiState.assignedFriendsList!!){
+                                        if (!editCarUiState.assignedFriendList!!.contains(user)){
+                                            viewModel.addUserToAddedList(user)
+                                            viewModel.addUserToAssignedEditList(user)
+                                        }
+                                        navController.navigateUp()
+
+                                    }
+                                }
+
+                            }) {
+                                Text("Hinzufügen")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        //HomeScreen
+        composable(route = BottomNavItem.Home.screen_route) {
+            Scaffold(
+                bottomBar = {
+                    BottomAppBar(navController)
+                },
+                topBar = {
+                    TopAppBarProfile(viewModel)
+                },
+                floatingActionButton = {
+                    FLoatingAddButton(
+                        viewModel = viewModel
+                    ) {
+                        viewModel.setStep(1)
+
+                        navController.navigate(BottomNavItem.AddCarScreen.screen_route)
+                    }
+                },
+                floatingActionButtonPosition = FabPosition.Center
+            ) { innerPadding ->
+                HomeScreen(viewModel = viewModel,
+                    modifier = Modifier.padding(innerPadding),
+                    goToEditScreen = { navController.navigate(BottomNavItem.EditCarScreen.screen_route) },
+                    goToMap = { navController.navigate(BottomNavItem.Map.screen_route) },
+                    goToProfile = { navController.navigate(StartItem.ProfileScreen.screen_route) },
+                    sharedPreference = sharedPreference,
+                    stopForegroundService = { stopForegroundService() },
+                    startForeground = { startForegroundService() }
+                )
+            }
+        }
+        //MapScreen
+        composable(route = BottomNavItem.Map.screen_route) {
+            Scaffold(
+                bottomBar = {
+                    BottomAppBar(navController)
+                }
+            ) { innerPadding ->
+                MapScreen(viewModel = viewModel,
+                    modifier = Modifier.padding(innerPadding),
+                    onNoInternetConnection = { onNoInternetConnection() },
+                    onGpsRequired = { onGPSRequired() },
+                    goToNoInternetConnection = { navController.navigate(StartItem.NoConnectionScreen.screen_route) })
+            }
+        }
+        //StatisticsScreen
+        composable(route = BottomNavItem.Statistics.screen_route) {
+            Scaffold(
+                bottomBar = {
+                    BottomAppBar(navController)
+                }
+            ) { innerPadding ->
+
+                StatisticsScreen(
+                    viewModel = viewModel,
+                    modifier = Modifier.padding(innerPadding)
+                )
+            }
+        }
+
+    }
     //}
 
 }

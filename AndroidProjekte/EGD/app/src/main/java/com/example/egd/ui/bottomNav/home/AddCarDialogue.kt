@@ -81,11 +81,12 @@ fun AddCarDialogue(viewModel: EGDViewModel, onAdded: () -> Unit,modifier: Modifi
         }
         else if(step == 3) {
            AddUserScreen(
-                viewModel = viewModel,
-                friendSearchBarContent = searchBarContent,
-                assignedFriendsList = assignedFriendList,
-                searchedFriendsList = searchFriendList
-            )
+               viewModel = viewModel,
+               friendSearchBarContent = searchBarContent,
+               assignedFriendsList = assignedFriendList,
+               searchedFriendsList = searchFriendList,
+               modifier = Modifier
+           )
         }
 
         Row(verticalAlignment = Alignment.CenterVertically) {

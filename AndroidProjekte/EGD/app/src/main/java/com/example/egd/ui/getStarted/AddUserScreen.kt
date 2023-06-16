@@ -23,7 +23,8 @@ fun AddUserScreen(
     viewModel: EGDViewModel,
     friendSearchBarContent: String,
     assignedFriendsList: Array<User>?,
-    searchedFriendsList: Array<User>?
+    searchedFriendsList: Array<User>?,
+    modifier: Modifier?
 ){
     val scrollState = rememberScrollState()
 
@@ -77,7 +78,8 @@ fun AddUserScreen(
     }
     Row(){
         if (searchedFriendsList != null) {
-            Column(modifier=Modifier.verticalScroll(scrollState).height(IntrinsicSize.Min)){
+            Column(modifier=Modifier.verticalScroll(scrollState)
+            ){
                 for (user in searchedFriendsList)
                 {
                     UserLabel(user = user, viewModel = viewModel, assignedFriendsList = assignedFriendsList, isAssigned = false)

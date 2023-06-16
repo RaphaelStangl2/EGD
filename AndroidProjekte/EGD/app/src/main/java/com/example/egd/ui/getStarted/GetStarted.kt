@@ -83,7 +83,13 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
                 CarInfoScreen(carName, fuelConsumption, viewModel, triedToSubmit)
             }
             else if (step == 4){
-                AddUserScreen(viewModel = viewModel, friendSearchBarContent, assignedFriendsList, searchedFriendsList)
+                AddUserScreen(
+                    viewModel = viewModel,
+                    friendSearchBarContent,
+                    assignedFriendsList,
+                    searchedFriendsList,
+                    modifier = Modifier
+                )
             }
             else if(step == 5) {
                 RegisterScreen(viewModel = viewModel, userName = userName, email = email, password = password, passwordVisibility = passwordVisibility, icon = icon, response = response, triedToSubmit = triedToSubmit)
@@ -91,6 +97,7 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
 
 
         } else if (numberOfSteps == 3) {
+
             if (step == 3){
                 RegisterScreen(viewModel = viewModel, userName = userName, email = email, password = password, passwordVisibility = passwordVisibility, icon = icon, response = response, triedToSubmit = triedToSubmit)
             }
@@ -106,10 +113,12 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
                         if (step + 1 > numberOfSteps){
 
                             viewModel.setTriedToSubmit(true)
-                            viewModel.checkRegister(onRegistered, sharedPreference)
+                            if (validationService.validateRegisterForm(userName, email, password)){
+                                viewModel.checkRegister(onRegistered, sharedPreference)
+                            }
                             //onRegistered()
 
-                        }else {
+                        } else if (numberOfSteps == 5) {
                             if (step == 2) {
                                 if (validationService.validateConnectionScreen(connectionSuccessful).valid)
                                 {
@@ -133,6 +142,8 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
                                 viewModel.setStep(step + 1)
                             }
 
+                        } else if (numberOfSteps == 3){
+                            viewModel.setStep(step+1)
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),

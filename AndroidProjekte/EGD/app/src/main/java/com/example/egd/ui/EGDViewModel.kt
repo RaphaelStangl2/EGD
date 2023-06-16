@@ -112,6 +112,15 @@ class EGDViewModel @Inject constructor(
         }
     }
 
+    fun removeUserFromAssignedEditFriendsList(user:User){
+        val assignedFriendsList = _editCarUiState.value.assignedFriendList
+        if (assignedFriendsList != null) {
+            var list = assignedFriendsList.toMutableList()
+            list.remove(user)
+            setAssignedEditFriendsList(list.toTypedArray())
+        }
+    }
+
     fun setAssignedFriendsList(list: Array<User>?) {
         _homeUiState.update { currentState ->
             currentState.copy(
@@ -348,7 +357,11 @@ class EGDViewModel @Inject constructor(
         if (function == "search"){
             setSearchFriendList(userList)
         }
+        if (function == "assignEdit"){
+            setAssignedEditFriendsList(userList)
+        }
     }
+
 
     suspend fun getCars(userId: Long) {
         var response: ResponseBody
@@ -492,7 +505,8 @@ class EGDViewModel @Inject constructor(
             bleReceiveManager.data.collect{ result ->
                 _getStartedUiState.update { currentState ->
                     currentState.copy(
-                        connectionSuccessful = result.test
+                        connectionSuccessful = result.test,
+                        accidentCode = result.accidentCode
                     )
                 }
             }
@@ -744,6 +758,21 @@ class EGDViewModel @Inject constructor(
                     val car = Car(editCarValue.id, editCarValue.name, editCarValue.consumption.toDouble(), 0.0, 0.0)
                     response = HttpService.retrofitService.putCar(car)
 
+                    val addedFriendsList =  editCarValue.addFriendList
+                    val removedFriendsList = editCarValue.removeFriendList
+
+                    if (addedFriendsList != null) {
+                        for (user in addedFriendsList){
+                            HttpService.retrofitService.postUserCar(UserCar(user, car, false))
+                        }
+                    }
+
+                    /*if (removedFriendsList != null){
+                        for (user in removedFriendsList){
+                            HttpService.retrofitService.
+                        }
+                    }*/
+
                     setTriedToSubmitEdit(false)
                     onUpdated()
 
@@ -771,11 +800,122 @@ class EGDViewModel @Inject constructor(
             try {
                 response = HttpService.retrofitService.getUsersForCar(id)
 
-                readUsersFromJson(response.byteStream(), "assign")
+                readUsersFromJson(response.byteStream(), "assignEdit")
 
             } catch(e:Exception){
                 throw e
             }
         }
     }
+
+    fun setButtonClicked(b: Boolean) {
+        _getStartedUiState.update { currentState->
+            currentState.copy(
+                buttonClicked = b
+            )
+        }
+
+    }
+
+    fun setAccidentCode(s: String) {
+        _getStartedUiState.update { currentState->
+            currentState.copy(
+                accidentCode = s
+            )
+        }
+    }
+
+    fun addUserToRemovedFriendsList(user: User) {
+        var removedFriendsList = editCarUiState.value.removeFriendList
+
+        var removedListToAdd: Array<User>
+        var list: MutableList<User>
+
+        if (removedFriendsList == null) {
+            removedListToAdd = arrayOf(user)
+            setRemovedFriendsList(removedListToAdd)
+        } else {
+            list = removedFriendsList?.toMutableList()
+            list?.add(user)
+            setRemovedFriendsList(list.toTypedArray())
+        }
+    }
+    fun addUserToAddedList(user:User){
+        var addedList = editCarUiState.value.addFriendList
+
+        var addedListToAdd: Array<User>
+        var list: MutableList<User>
+
+        if (addedList == null) {
+            addedListToAdd = arrayOf(user)
+            setAddedFriendsList(addedListToAdd)
+        } else {
+            list = addedList.toMutableList()
+            list?.add(user)
+            setAddedFriendsList(list.toTypedArray())
+        }
+    }
+
+    fun setAddedFriendsList(addedListToAdd: Array<User>) {
+        _editCarUiState.update { currentState->
+            currentState.copy(
+                addFriendList = addedListToAdd
+            )
+        }
+    }
+
+    fun setAssignedEditFriendsList(userList: Array<User>?) {
+        _editCarUiState.update { currentState->
+            currentState.copy(
+                assignedFriendList = userList
+            )
+        }
+    }
+
+    fun setRemovedFriendsList(removedListToAdd: Array<User>) {
+        _editCarUiState.update { currentState->
+            currentState.copy(
+                removeFriendList = removedListToAdd
+            )
+        }
+    }
+
+    suspend fun editUsersOfCarSuspend() {
+        var removedCarsList = _editCarUiState.value.removeFriendList
+
+        if (removedCarsList != null) {
+
+            for(car in removedCarsList) {
+                HttpService.retrofitService.deleteUserCar(car.id)
+            }
+        }
+    }
+
+    fun editUsersOfCar(){
+        viewModelScope.launch {
+            editUsersOfCarSuspend()
+        }
+    }
+
+    fun applyChangedUsers(){
+        _homeUiState.value.assignedFriendsList
+
+    }
+
+    fun addUserToAssignedEditList(user: User) {
+        var assignedList = editCarUiState.value.assignedFriendList
+
+        var assignedListToAdd: Array<User>
+        var list: MutableList<User>
+
+        if (assignedList == null) {
+            assignedListToAdd = arrayOf(user)
+            setAddedFriendsList(assignedListToAdd)
+        } else {
+            list = assignedList.toMutableList()
+            list?.add(user)
+            setAssignedEditFriendsList(list.toTypedArray())
+        }
+    }
+
 }

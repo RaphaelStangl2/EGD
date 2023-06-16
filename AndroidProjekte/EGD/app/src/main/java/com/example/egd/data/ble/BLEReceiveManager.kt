@@ -1,16 +1,13 @@
 package com.example.egd.data.ble
 
 import android.annotation.SuppressLint
-import android.app.Service
 import android.bluetooth.*
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import com.example.egd.data.EGDUiState
-import com.example.egd.data.GetStartedUiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -105,7 +102,7 @@ class BLEReceiveManager @Inject constructor(
                 //when(uuid){
                     //UUID.fromString(CHARACTERISTICS_UUID) -> {
                         //XX XX XX XX XX XX
-                        //val test: String = value.decodeToString()
+                        val test: String = value.decodeToString()
 
                         val boolean: Boolean = true
                         /*val multiplicator = if(value.first().toInt()> 0) -1 else 1
@@ -122,9 +119,10 @@ class BLEReceiveManager @Inject constructor(
                             )
                         }*/
 
+
                         coroutineScope.launch {
                             data.emit(
-                                EGDUiState(boolean)
+                                EGDUiState(boolean, test)
                             )
                         }
 

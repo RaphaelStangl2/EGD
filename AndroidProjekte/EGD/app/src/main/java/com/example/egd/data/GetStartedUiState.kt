@@ -15,5 +15,7 @@ data class GetStartedUiState(
     val response:String = "",
     val friendSearchBarContent:String = "",
     val triedToSubmit:Boolean = false,
-    val connectionSuccessful:Boolean = false
+    val connectionSuccessful:Boolean = false,
+    val buttonClicked: Boolean = false,
+    val accidentCode: String = ""
 )

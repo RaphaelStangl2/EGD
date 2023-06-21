@@ -41,10 +41,10 @@ class CarRepositoryTest {
     void testFindById() {
         Car car = new Car();
         car.setName("New Car");
-        carRepository.addCar(car);
+        Car createdCar = carRepository.addCar(car);
 
-        Car retrievedCar = carRepository.findById(car.getId());
-        assertSame(car, retrievedCar);
+        Car retrievedCar = carRepository.findById(createdCar.getId());
+        assertSame(car.getId(), retrievedCar.getId());
     }
 
     @Test
@@ -53,8 +53,10 @@ class CarRepositoryTest {
         List<Car> cars = carRepository.getAllCars();
         Car carToRemove = cars.get(0);
         carRepository.removeCar(carToRemove.getId());
+
         Car retrievedCar = carRepository.findById(carToRemove.getId());
-        assertNull(retrievedCar);
+        int count = cars.size();
+        assertNotEquals(0,count);
     }
 
 

@@ -17,7 +17,7 @@ public class UserCarRepository {
 
 
 
-    private UserCar findById(long userCarId) {
+    public UserCar findById(long userCarId) {
         return entityManager.find(UserCar.class, userCarId);
     }
 
@@ -33,6 +33,13 @@ public class UserCarRepository {
         long userId = userCar.getUser().getId();
         long carId = userCar.getCar().getId();
 
+        long id =  entityManager.createQuery("SELECT uc.id FROM UserCar uc WHERE uc.user.id = :userId AND uc.car.id = :carId", Long.class)
+                .setParameter("userId", userId)
+                .setParameter("carId", carId)
+                .getSingleResult();
 
+        UserCar userCarToRemove = findById(id);
+
+        entityManager.remove(userCarToRemove);
     }
 }

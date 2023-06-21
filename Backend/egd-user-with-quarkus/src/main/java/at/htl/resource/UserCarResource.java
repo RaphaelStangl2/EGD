@@ -30,7 +30,9 @@ public class UserCarResource {
     @DELETE
     @Path("/removeUserCar")
     public Response removeUserCar(UserCar userCar) {
-        userCarRepository.removeUserCar(userCar);
+
+       userCarRepository.removeUserCar(userCar);
+
         return Response.noContent().build();
     }
 

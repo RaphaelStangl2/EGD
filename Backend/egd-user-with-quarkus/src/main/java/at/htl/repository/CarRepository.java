@@ -46,9 +46,16 @@ public class CarRepository {
         return cars;
     }
 
+
+
     @Transactional
     public void updateCar(Car car) {
         entityManager.merge(car);
+    }
+
+    public List<Car> getAllCars() {
+        return entityManager.createQuery("SELECT c FROM Car c", Car.class)
+                .getResultList();
     }
 
 }

@@ -28,9 +28,9 @@ public class UserCarResource {
     CarRepository carRepository;
 
     @DELETE
-    @Path("{userCarId}/")
-    public Response removeCar(@PathParam("userCarId") Long userCarId) {
-        userCarRepository.removeUserCar(userCarId);
+    @Path("/removeUserCar")
+    public Response removeUserCar(UserCar userCar) {
+        userCarRepository.removeUserCar(userCar);
         return Response.noContent().build();
     }
 

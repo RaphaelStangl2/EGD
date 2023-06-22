@@ -31,6 +31,11 @@ public class UserCarResource {
     @Path("/removeUserCar")
     public Response removeUserCar(UserCar userCar) {
 
+        if (userCar==null){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+
        userCarRepository.removeUserCar(userCar);
 
         return Response.noContent().build();

@@ -140,11 +140,11 @@ class BLEReceiveManager @Inject constructor(
     }
 
     private fun findCharacteristics(serviceUUID: String, characteristicsUUID:String):BluetoothGattCharacteristic?{
-        /*return gatt?.services?.find { service ->
+        return gatt?.services?.find { service ->
             service.uuid.toString() == serviceUUID
         }?.characteristics?.find { characteristics ->
             characteristics.uuid.toString() == characteristicsUUID
-        }*/
+        }
 
         return gatt?.services?.get(2)?.characteristics?.get(0)
     }

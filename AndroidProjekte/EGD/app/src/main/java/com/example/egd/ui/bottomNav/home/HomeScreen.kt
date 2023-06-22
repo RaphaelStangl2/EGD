@@ -1,11 +1,9 @@
 package com.example.egd.ui
 
+import android.content.SharedPreferences
 import android.location.Location
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-
-import androidx.compose.ui.platform.LocalContext
 
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,11 +16,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.example.egd.R
 import com.example.egd.data.entities.Car
+
 
 @Composable
 fun HomeScreen(
@@ -30,15 +32,54 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     goToMap: () -> Unit,
     goToEditScreen: () -> Unit,
-    goToProfile: () -> Unit
+    goToProfile: () -> Unit,
+    sharedPreference: () -> SharedPreferences?,
+    startForeground: () -> Unit,
+    stopForegroundService: () -> Unit
 ){
     val homeUiState = viewModel.homeUiState.collectAsState().value
 
     val scrollState = rememberScrollState()
     var searchBarContent = homeUiState.searchBarContent
-    viewModel.readCarsFromJson(LocalContext.current.resources.openRawResource(R.raw.car))
+    //viewModel.readCarsFromJson(LocalContext.current.resources.openRawResource(R.raw.car))
 
     var listCars = homeUiState.cars
+
+
+
+    if (homeUiState.user?.id != null){
+        viewModel.getCarsForUserId(homeUiState.user.id)
+    }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+
+    DisposableEffect(
+        key1 = lifecycleOwner,
+        effect = {
+            val observer = LifecycleEventObserver{_,event ->
+                if(event == Lifecycle.Event.ON_RESUME){
+                    if (homeUiState.user?.id != null){
+                        viewModel.getCarsForUserId(homeUiState.user.id)
+                    } else
+                        viewModel.getUserForEmail(sharedPreference)
+
+                }
+                if (event == Lifecycle.Event.ON_CREATE){
+                    viewModel.initializeConnection { startForeground() }
+
+                }
+                /*if (event == Lifecycle.Event.ON_START) {
+                    viewModel.getUserForEmail(sharedPreference)
+                }*/
+            }
+            lifecycleOwner.lifecycle.addObserver(observer)
+
+            onDispose {
+                lifecycleOwner.lifecycle.removeObserver(observer)
+            }
+        }
+    )
 
 
     Column (
@@ -61,9 +102,6 @@ fun HomeScreen(
             }
         }
     }
-
-
-
 }
 
 @Composable
@@ -124,7 +162,7 @@ fun CarCard(car: Car, name: String, latitude: Double, longitude: Double, viewMod
 
                 IconButton(onClick =
                 {
-                    viewModel.setCar(car)
+                    viewModel.setCar(car, car.consumption.toString())
                     goToEditScreen()
 
                 }) {
@@ -193,4 +231,6 @@ fun CarCard(car: Car, name: String, latitude: Double, longitude: Double, viewMod
 
     }
 }
+
+
 

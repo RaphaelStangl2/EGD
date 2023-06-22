@@ -3,8 +3,8 @@ package com.example.egd.data
 import com.example.egd.data.entities.User
 
 data class GetStartedUiState(
-    val step: Int = 1,
-    val numberOfSteps: Int = 5,
+    var step: Int = 1,
+    var numberOfSteps: Int = 5,
     val EGDDevice: Boolean = true,
     val carName: String = "",
     val averageCarConsumption: String = "",
@@ -14,7 +14,8 @@ data class GetStartedUiState(
     val doNotShowRational: Boolean = false,
     val response:String = "",
     val friendSearchBarContent:String = "",
-    val assignedFriendsList: Array<User>? = null,
-    val searchFriendsList: Array<User>? = null
-
+    val triedToSubmit:Boolean = false,
+    val connectionSuccessful:Boolean = false,
+    val buttonClicked: Boolean = false,
+    val accidentCode: String = ""
 )

@@ -7,6 +7,5 @@ data class MapUiState(
     val startLocation: Location? = null,
     val searchBarContent: String = "",
     val doNotShowRational: Boolean = false,
-
-
+    val getCars: Boolean = false
 )

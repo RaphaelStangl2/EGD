@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.example.egd.R
 import com.example.egd.ui.EGDViewModel
 import com.example.egd.ui.ProgressBar
+import com.example.egd.ui.validation.ValidationService
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -24,11 +25,14 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
 ) {
     val configuration = LocalConfiguration.current
 
+    val validationService = ValidationService()
+
     val screenWidth = configuration.screenWidthDp.dp
     val progressBarWidth = screenWidth - (screenWidth.times(0.12F))
 
     val uiState = viewModel.getStartedUiState.collectAsState().value
     val loginUiState = viewModel.loginUiState.collectAsState().value
+    val homeUiState = viewModel.homeUiState.collectAsState().value
 
     var step = uiState.step
     var numberOfSteps = uiState.numberOfSteps
@@ -40,8 +44,10 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
     var password = uiState.password
     var response = uiState.response
     var friendSearchBarContent = uiState.friendSearchBarContent
-    var assignedFriendsList = uiState.assignedFriendsList
-    var searchedFriendsList = uiState.searchFriendsList
+    var assignedFriendsList = homeUiState.assignedFriendsList
+    var searchedFriendsList = homeUiState.searchFriendList
+    var triedToSubmit = uiState.triedToSubmit
+    var connectionSuccessful = uiState.connectionSuccessful
 
 
     var passwordVisibility = loginUiState.passwordVisibility
@@ -71,22 +77,29 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
             DeviceSelectionFields(viewModel, egdDevice)
         } else if (numberOfSteps == 5) {
             if (step == 2){
-                ConnectScreen(viewModel, onBluetoothStateChanged)
+                ConnectScreen(viewModel, onBluetoothStateChanged,validationService, triedToSubmit)
             }
             else if(step == 3) {
-                CarInfoScreen(carName, fuelConsumption, viewModel)
+                CarInfoScreen(carName, fuelConsumption, viewModel, triedToSubmit)
             }
             else if (step == 4){
-                AddUserScreen(viewModel = viewModel, friendSearchBarContent, assignedFriendsList, searchedFriendsList)
+                AddUserScreen(
+                    viewModel = viewModel,
+                    friendSearchBarContent,
+                    assignedFriendsList,
+                    searchedFriendsList,
+                    modifier = Modifier
+                )
             }
             else if(step == 5) {
-                RegisterScreen(viewModel = viewModel, userName = userName, email = email, password = password, passwordVisibility = passwordVisibility, icon = icon, response = response)
+                RegisterScreen(viewModel = viewModel, userName = userName, email = email, password = password, passwordVisibility = passwordVisibility, icon = icon, response = response, triedToSubmit = triedToSubmit)
             }
 
 
         } else if (numberOfSteps == 3) {
+
             if (step == 3){
-                RegisterScreen(viewModel = viewModel, userName = userName, email = email, password = password, passwordVisibility = passwordVisibility, icon = icon, response = response)
+                RegisterScreen(viewModel = viewModel, userName = userName, email = email, password = password, passwordVisibility = passwordVisibility, icon = icon, response = response, triedToSubmit = triedToSubmit)
             }
         }
 
@@ -98,18 +111,43 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
                 Button(
                     onClick = {
                         if (step + 1 > numberOfSteps){
-                            viewModel.setCarName("")
-                            viewModel.setFuelConsumption("")
-                            viewModel.checkRegister(onRegistered, sharedPreference)
 
+                            viewModel.setTriedToSubmit(true)
+                            if (validationService.validateRegisterForm(userName, email, password)){
+                                viewModel.checkRegister(onRegistered, sharedPreference)
+                            }
                             //onRegistered()
 
-                        }else{
-                            viewModel.setStep(step + 1)
-                        }
+                        } else if (numberOfSteps == 5) {
+                            if (step == 2) {
+                                if (validationService.validateConnectionScreen(connectionSuccessful).valid)
+                                {
+                                    viewModel.setStep(step + 1)
+                                    viewModel.setTriedToSubmit(false)
+                                } else{
+                                    viewModel.setTriedToSubmit(true)
+                                }
+                            } else if (step == 3) {
+                                if (validationService.validateCarInfoScreen(
+                                        carName,
+                                        fuelConsumption
+                                    )
+                                ) {
+                                    viewModel.setStep(step + 1)
+                                    viewModel.setTriedToSubmit(false)
+                                } else {
+                                    viewModel.setTriedToSubmit(true)
+                                }
+                            } else {
+                                viewModel.setStep(step + 1)
+                            }
 
+                        } else if (numberOfSteps == 3){
+                            viewModel.setStep(step+1)
+                        }
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+
                 ) {
                     Text(text = "NEXT")
                 }

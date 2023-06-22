@@ -20,6 +20,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.egd.R
+import com.example.egd.ui.validation.ErrorText
+import com.example.egd.ui.validation.ValidationService
 
 @Composable
 fun LoginScreen(
@@ -30,10 +32,16 @@ fun LoginScreen(
 ){
     val uiState = viewModel.loginUiState.collectAsState().value
 
+    var validationService = ValidationService()
+
     var passwordVisibility = uiState.passwordVisibility
     var email = uiState.email
     var password = uiState.password
     var response = uiState.response
+    var isTriedToSubmit = uiState.triedToSubmit
+
+    var emailValidationObject = validationService.validateEmail(email)
+    var passwordValidationObject = validationService.validatePassword(password)
 
     val icon = if (passwordVisibility)
         painterResource(id = R.drawable.ic_baseline_visibility_24)
@@ -56,7 +64,7 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(35.dp))
         Row(){
-            Text(text = response, color = Color.Red)
+            Text(text = response, color = MaterialTheme.colors.error)
         }
         Row(){
             OutlinedTextField(
@@ -68,7 +76,13 @@ fun LoginScreen(
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = Color.White
                 ),
+                isError = !emailValidationObject.valid && isTriedToSubmit
             )
+        }
+        Row(){
+            if (!emailValidationObject.valid && isTriedToSubmit){
+                ErrorText(message = emailValidationObject.message)
+            }
         }
         Spacer(modifier = Modifier.height(12.dp))
         Row(){
@@ -91,16 +105,28 @@ fun LoginScreen(
                     }
                 },
                 visualTransformation = if (passwordVisibility) VisualTransformation.None
-                else PasswordVisualTransformation()
+                else PasswordVisualTransformation(),
+                isError = !passwordValidationObject.valid && isTriedToSubmit
             )
 
+        }
+        Row(){
+            if (!passwordValidationObject.valid && isTriedToSubmit){
+                ErrorText(message = passwordValidationObject.message)
+            }
         }
         Spacer(modifier = Modifier.height(12.dp))
         Row(){
             Button(
 
                 onClick = {
-                    viewModel.checkLogin(onLogin, sharedPreference) },
+                    if (validationService.validateLoginForm(email, password)){
+                        viewModel.checkLogin(onLogin, sharedPreference)
+                        viewModel.getUserForEmail { sharedPreference() }
+                    } else{
+                        viewModel.setTriedToSubmitLogin(true)
+                    }
+                          },
                 modifier = Modifier.fillMaxWidth()){
                 Text(text = "Log in")
             }

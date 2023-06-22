@@ -4,5 +4,6 @@ data class LoginUiState (
     val email: String = "",
     val password: String = "",
     val passwordVisibility: Boolean = false,
-    val response:String = ""
+    val response:String = "",
+    val triedToSubmit:Boolean = false
 )

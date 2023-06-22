@@ -1,9 +1,11 @@
 package com.example.egd.ui.getStarted
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,8 +23,11 @@ fun AddUserScreen(
     viewModel: EGDViewModel,
     friendSearchBarContent: String,
     assignedFriendsList: Array<User>?,
-    searchedFriendsList: Array<User>?
+    searchedFriendsList: Array<User>?,
+    modifier: Modifier?
 ){
+    val scrollState = rememberScrollState()
+
     Text(text="Assign Friends to your Car, so they have access to it's location and route tracking features")
     Spacer(modifier = Modifier.height(10.dp))
 
@@ -30,7 +35,7 @@ fun AddUserScreen(
         OutlinedTextField(
             value = friendSearchBarContent,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(onSearch = {}),
+            keyboardActions = KeyboardActions(onSearch = { viewModel.getUsersForFilter(friendSearchBarContent) }),
             onValueChange = {viewModel.setFriendSearchBarContent(it)},
             leadingIcon = { Icon(painter = painterResource(id = R.drawable.ic_baseline_search_24), contentDescription = "Search Bar") },
             colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -45,22 +50,41 @@ fun AddUserScreen(
         )
     }
     Row(){
-        if (assignedFriendsList != null) {
-            for (user in assignedFriendsList)
-            {
-                UserLabel(userName = user.userName)
-            }
-
+        if (assignedFriendsList != null && assignedFriendsList.size != 0 ){
+            Text("Assigned")
         }
+    }
+    Row(){
+        if (assignedFriendsList != null) {
+            Column() {
+                for (user in assignedFriendsList) {
+                    UserLabel(
+                        user = user,
+                        viewModel = viewModel,
+                        assignedFriendsList = assignedFriendsList,
+                        isAssigned = true
+                    )
+                }
+            }
+        }
+    }
+    Row(){
+        if (searchedFriendsList != null ){
+            Text("Search Results")
+        }
+    }
+    if (assignedFriendsList != null || assignedFriendsList?.size != 0){
         Divider(thickness = 1.dp)
     }
     Row(){
         if (searchedFriendsList != null) {
-            for (user in searchedFriendsList)
-            {
-                UserLabel(userName = user.userName)
+            Column(modifier=Modifier.verticalScroll(scrollState)
+            ){
+                for (user in searchedFriendsList)
+                {
+                    UserLabel(user = user, viewModel = viewModel, assignedFriendsList = assignedFriendsList, isAssigned = false)
+                }
             }
-
         }
     }
 
@@ -68,7 +92,12 @@ fun AddUserScreen(
 
 
 @Composable
-fun UserLabel (userName:String){
+fun UserLabel (user: User, viewModel: EGDViewModel, assignedFriendsList: Array<User>?, isAssigned: Boolean){
+    val text = if (isAssigned)
+                    "Remove"
+                else
+                    "Assign"
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -86,21 +115,31 @@ fun UserLabel (userName:String){
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text=userName)
+                Text(text=user.userName)
 
-                Button(
-                    onClick = {},
-                    colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background, contentColor = MaterialTheme.colors.primaryVariant),
-                    modifier = Modifier.shadow(0.dp),
-                    elevation = ButtonDefaults.elevation(
-                        defaultElevation = 0.dp,
-                        pressedElevation = 0.dp
-                    ),
-                    shape= MaterialTheme.shapes.large
+                    Button(
+                        onClick = {
+                            if (!isAssigned){
+                                viewModel.addUserToAssignedList(user)
+                                viewModel.removeUserFromSearchFriendList(user)
+                            }else{
+                                viewModel.addUserToSearchList(user)
+                                viewModel.removeUserFromAssignedFriendList(user)
+                            }
 
-                ) {
-                    Text(text="Assign",color = MaterialTheme.colors.primaryVariant, fontWeight = MaterialTheme.typography.body2.fontWeight)
-                }
+                        },
+                        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background, contentColor = MaterialTheme.colors.primaryVariant),
+                        modifier = Modifier.shadow(0.dp),
+                        elevation = ButtonDefaults.elevation(
+                            defaultElevation = 0.dp,
+                            pressedElevation = 0.dp
+                        ),
+                        shape= MaterialTheme.shapes.large
+
+                    ) {
+                        Text(text=text,color = MaterialTheme.colors.primaryVariant, fontWeight = MaterialTheme.typography.body2.fontWeight)
+                    }
+
             }
 
         }

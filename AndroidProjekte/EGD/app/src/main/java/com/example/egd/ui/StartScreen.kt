@@ -83,14 +83,16 @@ fun StartScreen(
             Spacer(modifier = Modifier.height(150.dp))
 
             Row(){
+                Image(painter = painterResource(id = R.drawable.egd_high_resolution_logo_white_on_transparent_background), contentDescription = "EGD Logo",  modifier = Modifier.fillMaxWidth(0.5f),
+                )
 
-                Text(
+                /*Text(
                     text = "EGD",
                     fontSize = 50.sp,
                     color = textColor
-                )
+                )*/
             }
-            Spacer(modifier = Modifier.height(300.dp))
+            Spacer(modifier = Modifier.height(200.dp))
 
             Spacer(modifier = Modifier.height(35.dp))
             Row(){

@@ -46,6 +46,14 @@ fun MapScreen(
     goToNoInternetConnection: () -> Unit
 ){
 
+    val homeUiState = viewModel.homeUiState.collectAsState().value
+    val cameraPositionState = rememberCameraPositionState {}
+    val mapUiState = viewModel.mapUiState.collectAsState().value
+    var searchBarContent = mapUiState.searchBarContent
+    val cars = viewModel.homeUiState.collectAsState().value.cars
+
+    var startLocation: Location? = mapUiState.startLocation
+
     if (!onNoInternetConnection()){
         Button(onClick = {         goToNoInternetConnection()
         }) {
@@ -60,7 +68,41 @@ fun MapScreen(
             effect = {
                 val observer = LifecycleEventObserver { _, event ->
                     if (event == Lifecycle.Event.ON_RESUME) {
-                        viewModel.startGettingCars(1)
+                        viewModel.startGettingCars(homeUiState.user?.id!!)
+                        getUserPosition(viewModel) { location ->
+                            try {
+                                if (startLocation == null && location == null) {
+                                    cameraPositionState.move(
+                                        CameraUpdateFactory.newCameraPosition(
+                                            CameraPosition.fromLatLngZoom(
+                                                LatLng(
+                                                    cars?.get(0)?.latitude ?: 0.0, cars?.get(0)?.longitude ?: 0.0
+                                                ), 12f
+                                            )
+                                        )
+                                    )
+                                } else if (startLocation == null) {
+                                    cameraPositionState.move(
+                                        CameraUpdateFactory.newCameraPosition(
+                                            CameraPosition.fromLatLngZoom(
+                                                LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0),
+                                                12f
+                                            )
+                                        )
+                                    )
+                                } else if (startLocation.latitude != 1.0) {
+                                    cameraPositionState.move(
+                                        CameraUpdateFactory.newCameraPosition(
+                                            CameraPosition.fromLatLngZoom(
+                                                LatLng(startLocation.latitude, startLocation.longitude),
+                                                12f
+                                            )
+                                        )
+                                    )
+                                }
+                            } catch (e: Exception) {
+                            }
+                        }
                     }
                     if (event == Lifecycle.Event.ON_STOP) {
                         viewModel.stopGettingCars()
@@ -77,50 +119,10 @@ fun MapScreen(
 
         //val coroutineScope = CoroutineScope(Dispatchers.Default)
 
-        val mapUiState = viewModel.mapUiState.collectAsState().value
-        var searchBarContent = mapUiState.searchBarContent
-        var startLocation: Location? = mapUiState.startLocation
-        val cars = viewModel.homeUiState.collectAsState().value.cars
-
 
         //var cameraPositionState: CameraPositionState? = null
         //cameraPositionState = rememberCameraPositionState()
-        val cameraPositionState = rememberCameraPositionState {}
 
-        getUserPosition(viewModel) { location ->
-            try {
-                if (startLocation == null && location == null) {
-                    cameraPositionState.move(
-                        CameraUpdateFactory.newCameraPosition(
-                            CameraPosition.fromLatLngZoom(
-                                LatLng(
-                                    cars?.get(0)?.latitude ?: 0.0, cars?.get(0)?.longitude ?: 0.0
-                                ), 12f
-                            )
-                        )
-                    )
-                } else if (startLocation == null) {
-                    cameraPositionState.move(
-                        CameraUpdateFactory.newCameraPosition(
-                            CameraPosition.fromLatLngZoom(
-                                LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0),
-                                12f
-                            )
-                        )
-                    )
-                } else if (startLocation.latitude != 1.0) {
-                    cameraPositionState.move(
-                        CameraUpdateFactory.newCameraPosition(
-                            CameraPosition.fromLatLngZoom(
-                                LatLng(startLocation.latitude, startLocation.longitude),
-                                12f
-                            )
-                        )
-                    )
-                }
-            } catch (e: Exception) {
-            }
-        }
 
 
         val mapPermission =

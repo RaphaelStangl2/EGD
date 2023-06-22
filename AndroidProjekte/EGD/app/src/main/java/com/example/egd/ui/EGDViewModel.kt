@@ -535,21 +535,25 @@ class EGDViewModel @Inject constructor(
 
         var gpsService: GPSService = GPSService(viewModel = this, {})
         //gpsService.run()
-        var cars = homeUiState.value.cars
 
+        var homeUiState = homeUiState.value
 
         viewModelScope.launch {
             while(true){
+
+
                 delay(3000)
                 getUserPosition(){ location ->
-                    if (cars!= null && location!= null){
+                    if (homeUiState.cars!= null && location!= null){
 
                         var bool:Boolean= true
-                        var car = cars?.get(0)
-                        car.latitude = location.latitude
-                        car.longitude = location.longitude
+                        var car = homeUiState.cars?.get(0)
+                        car?.latitude = location.latitude
+                        car?.longitude = location.longitude
                         viewModelScope.launch {
+                        if (car != null) {
                             HttpService.retrofitService.putCar(car)
+                        }
                         }
                     }
                 }
@@ -595,25 +599,35 @@ class EGDViewModel @Inject constructor(
     }
 
 
-    var timer: Timer? = null
 
     fun startGettingCars(userId: Long) {
+        setGetCars(true)
 
-        timer = Timer()
-        if (timer != null) {
-            viewModelScope.launch {
+        val mapUiState = mapUiState.value
+
+
+        viewModelScope.launch {
+            while (mapUiState.getCars){
                 getCarsForUserId(userId)
                 delay(4000)
-
-                /*timer!!.schedule(timerTask {
-                    getCarsForUserId(userId)
-                }, 4000)*/
             }
+            /*timer!!.schedule(timerTask {
+                getCarsForUserId(userId)
+            }, 4000)*/
         }
+
     }
 
     fun stopGettingCars() {
-        timer?.cancel()
+        setGetCars(false)
+    }
+
+    fun setGetCars(getCars:Boolean){
+        _mapUiState.update { currentState ->
+            currentState.copy(
+                getCars = getCars
+            )
+        }
     }
 
     fun getUsersForFilter(filter: String) {

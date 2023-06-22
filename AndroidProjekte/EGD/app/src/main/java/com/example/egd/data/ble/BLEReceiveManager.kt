@@ -92,6 +92,12 @@ class BLEReceiveManager @Inject constructor(
                 return
             }
             enableNotification(characteristic)
+
+            coroutineScope.launch {
+                data.emit(
+                    EGDUiState(true, "0")
+                )
+            }
         }
 
         override fun onCharacteristicChanged(
@@ -119,12 +125,14 @@ class BLEReceiveManager @Inject constructor(
                             )
                         }*/
 
+                            coroutineScope.launch {
+                                data.emit(
+                                    EGDUiState(boolean, test)
+                                )
+                            }
 
-                        coroutineScope.launch {
-                            data.emit(
-                                EGDUiState(boolean, test)
-                            )
-                        }
+
+
 
                     //}
                     //else -> Unit

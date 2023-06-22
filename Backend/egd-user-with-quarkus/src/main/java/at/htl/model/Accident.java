@@ -19,6 +19,11 @@ public class Accident {
     @JoinColumn(name = "car_id")
     private Car car;
 
+    @ManyToOne
+    @JoinColumn(name = "users_id")
+    private Users user;
+
+
     @OneToMany
     @JoinColumn(name = "costs_id")
     private List<Costs> costs;

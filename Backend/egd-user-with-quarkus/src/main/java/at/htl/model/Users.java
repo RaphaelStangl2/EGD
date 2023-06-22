@@ -30,7 +30,7 @@ public class Users {
 
     private String password;
 
-    private String resetPassword;
+    private String resetCode;
 
    /* @OneToMany(cascade = CascadeType.ALL)
     private List<Car> cars;
@@ -41,6 +41,7 @@ public class Users {
     @JoinColumn(name = "place_id")
     private Place place;
 
-
+    @Lob
+    private   byte[] image;
 
 }

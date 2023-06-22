@@ -1,9 +1,16 @@
 package at.htl.model;
 
 
+import lombok.*;
+
 import javax.persistence.*;
 import java.util.List;
-
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@EqualsAndHashCode
 
 
 @Entity
@@ -24,4 +31,6 @@ public class UserCar {
 
     @OneToMany(mappedBy = "userCar")
     private List<Drive> drives;
+
+    private Boolean isAdmin;
 }

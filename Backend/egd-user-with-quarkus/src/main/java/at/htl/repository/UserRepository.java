@@ -1,5 +1,6 @@
 package at.htl.repository;
 
+import at.htl.model.Car;
 import at.htl.model.Users;
 
 import javax.crypto.SecretKeyFactory;
@@ -8,11 +9,17 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
 import java.util.UUID;
 
 @Transactional
@@ -34,6 +41,9 @@ public class  UserRepository {
         entityManager.remove(user);
     }
 
+    public void updateUser(Users user){
+        entityManager.merge(user);
+    }
 
     public Users findById(long id) {
         return entityManager.find(Users.class, id);
@@ -160,6 +170,14 @@ public class  UserRepository {
         }
     }
 
+    public List<Users> filterByName(String filter) {
+
+        var users =  entityManager.createQuery("SELECT u FROM Users u where u.userName LIKE :filter", Users.class)
+                .setParameter("filter", filter + "%") // fügt das Wildcard-Zeichen "%" hinzu
+                .getResultList();
+
+        return users;
+    }
 
     public Users findByEmail(String email) {
 
@@ -168,6 +186,23 @@ public class  UserRepository {
                     .getSingleResult();
 
     }
+
+    public Users findById(Long id) {
+
+        return entityManager.createQuery("SELECT u FROM Users u where u.id = : id", Users.class)
+                .setParameter("id", id)
+                .getSingleResult();
+
+    }
+
+    public List<Users> getCarUsersById(long carId){//"select u from Users u where u.id in (select userCars.user.id from UserCar userCars where userCars.car.id =:carId)"
+        var users =  entityManager.createQuery("select u from Users u where u.id in (select userCars.user.id from UserCar userCars where userCars.car.id =:carId)")
+                .setParameter("carId", carId).getResultList();
+
+        return users;
+    }
+
+    @Transactional
     public void update(Users user) {
         entityManager.merge(user);
     }
@@ -175,4 +210,23 @@ public class  UserRepository {
     public String generateTempPassword() {
         return UUID.randomUUID().toString().substring(0, 8);
     }
+
+
+    public byte[] getDefaultImage() throws IOException {
+        //default image holen und speichern
+        Path imagePath = Path.of("src/main/resources/userDefaultImage.png");
+
+        if(Files.exists(imagePath)){
+            byte[] picture = Files.readAllBytes(imagePath);
+            return  picture;
+        }
+        else{
+            return null;
+
+        }
+
+    }
+
+
+
 }

@@ -1,33 +1,39 @@
 package at.htl.resource;
 
 import at.htl.model.Car;
+import at.htl.model.Users;
 import at.htl.repository.CarRepository;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.List;
 
 @Path("egd/cars/")
+
 public class CarResource {
     @Inject
     CarRepository carRepository;
 
 
     @DELETE
-    @Path("remove/")
-    public Response removeCar(final String reservationId) {
-        carRepository.removeCar(Long.parseLong(reservationId));
+    @Path("{carId}/")
+    public Response removeCar(@PathParam("carId") Long carId) {
+        carRepository.removeCar(carId);
         return Response.noContent().build();
     }
 
 
+
     @POST
-    @Path("add/")
+    @Path("")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addCar(final Car car) {
         if (car == null) {
@@ -37,5 +43,32 @@ public class CarResource {
         return Response.created(URI.create("/api/cars/" + createdCar.getId())).build();
     }
 
+
+    @GET
+    @Path("{userId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCarsForUser(@PathParam("userId") Long id){
+        List<Car> cars = carRepository.getCarsForUser(id);
+
+        if (cars == null){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.ok(cars).build();
+    }
+
+    @PUT
+    @Path("")
+    public Response updateCar(Car car){
+
+        if (carRepository.findById(car.getId()) == null){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        else {
+            carRepository.updateCar(car);
+        }
+
+        return Response.ok(car).build();
+    }
 
 }

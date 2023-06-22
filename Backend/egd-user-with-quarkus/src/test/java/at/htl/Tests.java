@@ -1,42 +1,17 @@
 //package at.htl;
 //
-//import at.htl.model.Car;
 //import at.htl.model.Users;
-//import at.htl.repository.CarRepository;
 //import at.htl.repository.UserRepository;
-//import io.quarkus.test.Mock;
 //import io.quarkus.test.junit.QuarkusTest;
-//import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.Test;
 //
-//
 //import javax.inject.Inject;
-//import javax.persistence.EntityManager;
 //import java.security.NoSuchAlgorithmException;
 //import java.security.spec.InvalidKeySpecException;
 //import static org.junit.jupiter.api.Assertions.*;
 //
-//
-//import at.htl.model.Car;
-//import at.htl.model.Users;
-//import at.htl.repository.CarRepository;
-//import io.quarkus.test.junit.QuarkusTest;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//
-//
-//import javax.inject.Inject;
-//import javax.persistence.EntityManager;
-//import javax.persistence.TypedQuery;
-//
-//import java.util.List;
-//
-//import static org.junit.jupiter.api.Assertions.assertEquals;
-//import static org.junit.jupiter.api.Assertions.assertNull;
-//
-//
 //@QuarkusTest
-//class UniTests {
+//class Tests {
 //    @Inject
 //    private UserRepository userRepository;
 //
@@ -53,18 +28,18 @@
 //        assertEquals("johndoe@example.com", addedUser.getEmail());
 //    }
 //
-//    @Test
-//    void removeUser() {
-//        Users user = new Users();
-//        user.setUserName("Jan2");
-//        user.setEmail("janedoe@example.com");
-//
-//        Users addedUser = userRepository.addUser(user);
-//        userRepository.removeUser(addedUser.getId());
-//
-//        Users removedUser = userRepository.findById(addedUser.getId());
-//        assertNull(removedUser);
-//    }
+////    @Test
+////    void removeUser() {
+////        Users user = new Users();
+////        user.setUserName("Jan2");
+////        user.setEmail("janedoe@example.com");
+////
+////        Users addedUser = userRepository.addUser(user);
+////        userRepository.removeUser(addedUser.getId());
+////
+////        Users removedUser = userRepository.findById(addedUser.getId());
+////        assertNull(removedUser);
+////    }
 //
 //    @Test
 //    void findById() {
@@ -84,12 +59,12 @@
 //    @Test
 //    void sendTemporaryPassword() throws NoSuchAlgorithmException, InvalidKeySpecException {
 //        String temporaryPassword = userRepository.sendTemporaryPassword("johndoe@example.com");
-//
+////
 //        assertNotNull(temporaryPassword);
 //        assertTrue(temporaryPassword.contains(":"));
 //    }
-//
-//    @Test
+////
+//  @Test
 //    void getSaltedHash() throws NoSuchAlgorithmException, InvalidKeySpecException {
 //        String password = "password";
 //        String saltedHash = UserRepository.getSaltedHash(password);
@@ -97,14 +72,14 @@
 //        assertNotNull(saltedHash);
 //        assertTrue(saltedHash.contains(":"));
 //    }
-//
+////
 //    @Test
 //    void check() throws NoSuchAlgorithmException, InvalidKeySpecException {
 //        String password = "password";
 //        String storedPassword = UserRepository.getSaltedHash(password);
-//
+////
 //        boolean result = UserRepository.check(password, storedPassword);
-//
+////
 //        assertTrue(result);
 //    }
 //}

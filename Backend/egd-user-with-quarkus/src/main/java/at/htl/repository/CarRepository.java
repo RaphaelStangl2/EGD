@@ -6,7 +6,10 @@ import at.htl.model.Users;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.transaction.Transactional;
+import java.util.List;
 
 @ApplicationScoped
 public class CarRepository {
@@ -28,13 +31,31 @@ public class CarRepository {
         entityManager.remove(car);
     }
 
-    @Transactional
-    public Users addUser(Users user) {
-        entityManager.persist(user);
-        return user;
-    }
+
+
 
     public Car findById(long id) {
+
         return entityManager.find(Car.class, id);
     }
+
+    public List<Car> getCarsForUser(long id){
+        var cars =  entityManager.createQuery("SELECT c FROM Car c WHERE c.id in (Select u.car.id from UserCar u Where u.user.id = :userId)")
+                .setParameter("userId", id).getResultList();
+
+        return cars;
+    }
+
+
+
+    @Transactional
+    public void updateCar(Car car) {
+        entityManager.merge(car);
+    }
+
+    public List<Car> getAllCars() {
+        return entityManager.createQuery("SELECT c FROM Car c", Car.class)
+                .getResultList();
+    }
+
 }

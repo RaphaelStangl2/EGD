@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">EGD</string>
+    <string name="egdEmailReference">egdEmailReference</string>
 </resources>

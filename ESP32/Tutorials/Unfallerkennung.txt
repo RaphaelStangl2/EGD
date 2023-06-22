@@ -1,0 +1,7 @@
+Unfallerkennung:
+1.	Beschleunigungswerte analysieren: Überprüfen Sie die Beschleunigungswerte entlang der x-, y- und z-Achse. Bei einem Autounfall treten normalerweise abrupte Änderungen der Beschleunigung auf. Schauen Sie nach ungewöhnlich hohen Beschleunigungswerten, die über den normalen Fahrbewegungen liegen könnten.
+2.	Gyroskopdaten analysieren: Überprüfen Sie die Gyroskopdaten entlang der x-, y- und z-Achse. Gyroskope messen die Winkelgeschwindigkeit oder die Drehbewegung. Bei einem Unfall kann es zu plötzlichen Änderungen der Drehbewegung kommen. Achten Sie auf schnelle und unerwartete Änderungen der Gyroskopwerte.
+3.	Kombination von Beschleunigungs- und Gyroskopdaten: Untersuchen Sie sowohl die Beschleunigungs- als auch die Gyroskopdaten gemeinsam, um ein umfassenderes Bild der Fahrzeugbewegungen zu erhalten. Eine Kombination von hohen Beschleunigungswerten und plötzlichen Änderungen der Drehbewegung kann auf einen Unfall hinweisen.
+4.	Schwellenwerte und Muster erkennen: Legen Sie Schwellenwerte fest, um zwischen normalen Fahrbewegungen und möglichen Unfallereignissen zu unterscheiden. Durch das Erkennen von Mustern in den Daten können Sie auch bestimmte Bewegungsmuster identifizieren, die typisch für Unfälle sind.
+5.	Temperaturüberwachung: Obwohl die Temperaturmessung nicht direkt zur Erkennung eines Unfalls beiträgt, kann sie den Zustand des Fahrzeugs nach einem Unfall anzeigen. Hohe Temperaturen könnten beispielsweise auf einen Brand hindeuten, der durch den Aufprall verursacht wurde
+

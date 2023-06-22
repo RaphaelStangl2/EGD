@@ -7,7 +7,6 @@ import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import com.example.egd.data.EGDUiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +23,7 @@ class BLEReceiveManager @Inject constructor(
 
     private val DEVICE_NAME = "EGD-SOS"
     private val SERVICE_UIID = "1688a0c8-6cc9-11ed-a1eb-0242ac120002"
-    private val CHARACTERISTICS_UUID = "533cb516-77bb-11ed-a1eb-0242ac120002"
+    private val CHARACTERISTICS_UUID = "1688a0c8-6cc9-11ed-a1eb-0242ac120002"
     private val CCCD_DESCRIPTOR_UUID = "00002902-0000-1000-8000-00805F9B34FB"
 
     val data: MutableSharedFlow<EGDUiState> = MutableSharedFlow()
@@ -93,6 +92,12 @@ class BLEReceiveManager @Inject constructor(
                 return
             }
             enableNotification(characteristic)
+
+            coroutineScope.launch {
+                data.emit(
+                    EGDUiState(true, "0")
+                )
+            }
         }
 
         override fun onCharacteristicChanged(
@@ -105,6 +110,7 @@ class BLEReceiveManager @Inject constructor(
                         //XX XX XX XX XX XX
                         val test: String = value.decodeToString()
 
+                        val boolean: Boolean = true
                         /*val multiplicator = if(value.first().toInt()> 0) -1 else 1
                         val temperature = value[1].toInt() + value[2].toInt() / 10f
                         val humidity = value[4].toInt() + value[5].toInt() / 10f
@@ -119,11 +125,14 @@ class BLEReceiveManager @Inject constructor(
                             )
                         }*/
 
-                        coroutineScope.launch {
-                            data.emit(
-                                EGDUiState(test)
-                            )
-                        }
+                            coroutineScope.launch {
+                                data.emit(
+                                    EGDUiState(boolean, test)
+                                )
+                            }
+
+
+
 
                     //}
                     //else -> Unit

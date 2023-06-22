@@ -8,5 +8,6 @@ sealed class BottomNavItem(var title:String, var icon:Int, var screen_route:Stri
     object Statistics: BottomNavItem("Statistics", R.drawable.ic_baseline_statistics_24, "statistics")
     object AddCarScreen: BottomNavItem("AddCarScreen", R.drawable.ic_baseline_statistics_24, "addCar")
     object EditCarScreen: BottomNavItem("EditCarScreen", R.drawable.ic_baseline_statistics_24, "editCar")
+    object AddUserToCar: BottomNavItem("AddUserToCar", R.drawable.ic_baseline_statistics_24, "addUserToCar")
 
 }

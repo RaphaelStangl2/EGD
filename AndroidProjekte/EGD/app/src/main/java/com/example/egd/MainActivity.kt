@@ -4,7 +4,7 @@ import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
-import android.media.audiofx.BassBoost
+import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
@@ -13,23 +13,13 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.egd.ui.LoginScreen
-import com.example.egd.ui.StartScreen
-import com.example.egd.ui.getStarted.ConnectScreen
-import com.example.egd.ui.internet.NoInternetScreen
-import com.example.egd.ui.permissions.PermissionUtils
-import com.example.egd.ui.permissions.SystemBroadcastReceiver
+import androidx.work.WorkManager
+import com.example.egd.data.ble.BLEService
 import com.example.egd.ui.theme.EGDTheme
-import com.google.accompanist.permissions.PermissionsRequired
-import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -38,8 +28,7 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var bluetoothAdapter: BluetoothAdapter
-
-
+    val workManager = WorkManager.getInstance(application)
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -51,13 +40,40 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                 ) {
 
-                        EGDApp(onNoInternetConnection = {isInternetAvailable(this)}, onBluetoothStateChanged = {showBluetoothDialog()}, onGPSRequired = {showGPSDialog()})
+                    EGDApp( startForegroundService = {startForeground()},onNoInternetConnection = {isInternetAvailable(this)}, onBluetoothStateChanged = {showBluetoothDialog()}, onGPSRequired = {showGPSDialog()}, sharedPreference = {getEmailSharedPreferences()}) { stopForeground() }
                 }
             }
         }
     }
 
+    override fun onDestroy() {
+        //val workManager = WorkManager.getInstance(application)
+        //workManager.enqueue(OneTimeWorkRequest.from(BLEWorker::class.java))
+
+        super.onDestroy()
+
+        BLEService.startService(this, "BLE Service is running")
+
+    }
+
+    fun startForeground(){
+        BLEService.startService(this, "BLE Service is running")
+    }
+
+    fun stopForeground(){
+        BLEService.stopService(this)
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onStart() {
+
+        BLEService.stopService(this)
+
+
+        //val intent = Intent(this, BLEService::class.java) // Build the intent for the service
+        //applicationContext.startForegroundService(intent)
+
         super.onStart()
 
         //showGPSDialog()
@@ -74,6 +90,13 @@ class MainActivity : ComponentActivity() {
                 isBluetootDialogAlreadyShown = true
             }
         }
+    }
+
+    private fun getEmailSharedPreferences(): SharedPreferences? {
+        val sharedPreference =  this.getSharedPreferences(
+            getString(R.string.egdEmailReference), Context.MODE_PRIVATE)
+        return sharedPreference
+
     }
 
     private fun showGPSDialog(){

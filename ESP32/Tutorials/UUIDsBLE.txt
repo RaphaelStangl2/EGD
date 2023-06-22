@@ -1,0 +1,2 @@
+Service: "1688a0c8-6cc9-11ed-a1eb-0242ac120002"
+Charasterstic: "533cb516-77bb-11ed-a1eb-0242ac120002"

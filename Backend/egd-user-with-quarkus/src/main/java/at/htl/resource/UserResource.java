@@ -271,27 +271,5 @@ public class UserResource {
 
 
     }
-/*
-    @PATCH
-    @Path("/updateUser")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateUser(final Users user) {
-        if (user == null) {
-            return Response.status(Response.Status.NO_CONTENT).build();
-        }
 
-        try {
-            Users u = userRepository.findByEmail(user.getEmail());
-
-            userRepository.updateUser(user);
-            return Response.status(Response.Status.NOT_FOUND).build();
-
-        } catch (NoResultException exception) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-
-        }
-
-    }
-
- */
 }

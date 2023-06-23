@@ -2,11 +2,18 @@ package at.htl.model;
 
 
 
+import lombok.*;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@EqualsAndHashCode
 @Entity
 @Table(name = "drive")
 public class Drive {

@@ -1,46 +1,10 @@
-//package at.htl.UserCar;
-//
-//import at.htl.model.Car;
-//import at.htl.model.UserCar;
-//import at.htl.repository.UserCarRepository;
-//import at.htl.repository.UserRepository;
-//import org.junit.jupiter.api.Test;
-//
-//import javax.inject.Inject;
-//
-//import static io.smallrye.common.constraint.Assert.assertNotNull;
-//
-//public class UserCarRepositoryTest {
-//
-//    @Inject
-//    UserCarRepository userCarRepository;
-//
-//
-//    @Test
-//    public void testAddUserCar() {
-//        // Create a sample UserCar entity
-//        UserCar userCar = new UserCar();
-//        Car car1 = new Car();
-//        car1.setName("Berdan");
-//
-//        userCar.setCar(car1);
-//
-//        UserCar addedUserCar = userCarRepository.addUserCar(userCar);
-//
-//        // Assert that the addedUserCar object is not null
-//        assertNotNull(addedUserCar);
-//
-//        // Assert that the addedUserCar object is successfully persisted and has a valid ID
-//        assertNotNull(addedUserCar.getId());
-//    }
-//
-//
-//}
 package at.htl.UserCar;
+
 
 import at.htl.model.Car;
 import at.htl.model.Users;
 import at.htl.model.UserCar;
+import at.htl.model.Users;
 import at.htl.repository.UserCarRepository;
 import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
@@ -55,7 +19,7 @@ import javax.persistence.criteria.Root;
 
 import static org.mockito.Mockito.*;
 
-public class UserCarRepositoryTest {
+public class uni {
 
     @InjectMocks
     private UserCarRepository userCarRepository;
@@ -100,6 +64,6 @@ public class UserCarRepositoryTest {
         Assertions.assertEquals(userCar, addedUserCar);
     }
 
-}
 
+}
 

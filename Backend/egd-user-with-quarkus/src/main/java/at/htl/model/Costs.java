@@ -1,9 +1,15 @@
 package at.htl.model;
 
 import at.htl.model.Drive;
+import lombok.*;
 
 import javax.persistence.*;
-
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@EqualsAndHashCode
 @Entity
 @Table(name = "costs")
 public class Costs {

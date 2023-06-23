@@ -31,7 +31,5 @@ jobs:
     - name: Build Docker Image and push to hub
       run: |
         cd Backend
-        chmod +x mvnw
-        ./mvnw install -DskipTests
-        docker images
-        docker push egddocker/egd-user-with-quarkus
+        ls
+

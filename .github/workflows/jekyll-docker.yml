@@ -36,13 +36,11 @@ jobs:
         docker images
         docker push egddocker/egd-user-with-quarkus
     
-    name: Install kubectl
-
+    - name: Install kubectl
 env:
   KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
 
   shell: bash
-
   run: |
     sudo apt-get update
     sudo apt-get install -y apt-transport-https

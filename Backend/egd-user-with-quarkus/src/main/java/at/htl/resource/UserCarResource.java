@@ -102,6 +102,5 @@ public class UserCarResource {
             return Response.created(URI.create("/api/cars/" + createdUserCar.getId())).build();
         }
         return Response.status(Response.Status.NOT_FOUND).build();
-
     }
 }

@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
+import java.io.Closeable
 import java.io.InputStream
 import java.util.*
 import javax.inject.Inject
@@ -60,6 +61,10 @@ class EGDViewModel @Inject constructor(
     val homeUiState: StateFlow<HomeScreenState> = _homeUiState.asStateFlow()
 
     var connectionState by mutableStateOf<ConnectionState>(ConnectionState.Uninitialized)
+
+    fun setInitializeConnectionBLE(initializeConnectionBLE:Boolean){
+        bleReceiveManager.setInitializeConnection(initializeConnectionBLE)
+    }
 
     fun setCar(car: Car, consumption:String) {
 
@@ -532,6 +537,7 @@ class EGDViewModel @Inject constructor(
         //startForeground()
         bleReceiveManager.startReceiving()
         subscribeToChanges()
+        addCloseable(Closeable({bleReceiveManager.closeConnection()}))
 
         var gpsService: GPSService = GPSService(viewModel = this, {})
         //gpsService.run()
@@ -653,6 +659,7 @@ class EGDViewModel @Inject constructor(
         editor?.apply()
 
         //stopForegroundService()
+        bleReceiveManager.disconnect()
         bleReceiveManager.closeConnection()
 
         onCleared()
@@ -931,5 +938,10 @@ class EGDViewModel @Inject constructor(
             setAssignedEditFriendsList(list.toTypedArray())
         }
     }
+
+    override fun addCloseable(closeable: Closeable) {
+        super.addCloseable(closeable)
+    }
+
 
 }

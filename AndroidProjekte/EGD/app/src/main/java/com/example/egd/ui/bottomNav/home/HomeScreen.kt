@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.example.egd.R
+import com.example.egd.data.ble.ConnectionState
 import com.example.egd.data.entities.Car
 
 
@@ -45,6 +46,8 @@ fun HomeScreen(
 
     var listCars = homeUiState.cars
 
+    var connectionState = viewModel.connectionState
+
 
 
     if (homeUiState.user?.id != null){
@@ -66,8 +69,12 @@ fun HomeScreen(
 
                 }
                 if (event == Lifecycle.Event.ON_CREATE){
-                    viewModel.initializeConnection { startForeground() }
-
+                    //if (connectionState.equals(ConnectionState.Uninitialized)){
+                        viewModel.initializeConnection { startForeground() }
+                    //}
+                   // if (connectionState.equals(ConnectionState.Disconnected)){
+                        viewModel.reconnect()
+                    //}
                 }
                 /*if (event == Lifecycle.Event.ON_START) {
                     viewModel.getUserForEmail(sharedPreference)

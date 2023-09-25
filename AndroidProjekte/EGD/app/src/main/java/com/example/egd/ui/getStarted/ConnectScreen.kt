@@ -98,9 +98,6 @@ fun ConnectScreen(viewModel:EGDViewModel, showBluetoothDialogue:()->Unit, valida
             } else {
                 Text(text ="Successfull", color = com.example.egd.ui.theme.ProgressBar, fontSize = 20.sp)
             }
-
-
-
         }
     }
 

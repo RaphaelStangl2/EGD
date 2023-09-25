@@ -10,6 +10,7 @@ import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.work.WorkManager
+import com.example.egd.data.ble.BLEReceiveManager
 import com.example.egd.data.ble.BLEService
 import com.example.egd.ui.theme.EGDTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,6 +31,9 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var bluetoothAdapter: BluetoothAdapter
     val workManager = WorkManager.getInstance(application)
+
+    @Inject
+    lateinit var bleReceiveManager: BLEReceiveManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -46,13 +51,27 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+
+   override fun onStop() {
+       bleReceiveManager.closeConnection()
+       bleReceiveManager.disconnect()
+        super.onStop()
+    }
+
+
     override fun onDestroy() {
         //val workManager = WorkManager.getInstance(application)
         //workManager.enqueue(OneTimeWorkRequest.from(BLEWorker::class.java))
 
+        bleReceiveManager.closeConnection()
+        bleReceiveManager.disconnect()
+        Toast.makeText(this, "CLose Connection", Toast.LENGTH_SHORT).show()
+
         super.onDestroy()
 
-        BLEService.startService(this, "BLE Service is running")
+
+
+//        BLEService.startService(this, "BLE Service is running")
 
     }
 

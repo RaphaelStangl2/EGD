@@ -33,11 +33,12 @@ jobs:
 
       - name: Test
         run: |
-          cd egd-user-with-quarkus
+          cd Backend/egd-user-with-quarkus
           chmod +x mvnw
           ./mvnw install -DskipTests
           docker images
           docker push egddocker/egd-user-with-quarkus
+
           
       - name: Install kubectl
         env:

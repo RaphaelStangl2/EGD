@@ -190,6 +190,7 @@ fun MapScreen(
                                             car.longitude
                                         )
                                     ),
+                                    title = car.name,
                                     icon = bitmapDescriptorFromVector(
                                         LocalContext.current,
                                         R.drawable.ic_baseline_directions_car_24

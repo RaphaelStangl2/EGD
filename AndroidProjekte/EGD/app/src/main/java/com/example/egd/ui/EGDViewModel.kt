@@ -65,6 +65,9 @@ class EGDViewModel @Inject constructor(
     fun setInitializeConnectionBLE(initializeConnectionBLE:Boolean){
         bleReceiveManager.setInitializeConnection(initializeConnectionBLE)
     }
+    fun setUUIDListBLE(uuidList:Array<String?>?){
+        bleReceiveManager.setUUIDList(uuidList)
+    }
 
     fun setCar(car: Car, consumption:String) {
 
@@ -451,7 +454,7 @@ class EGDViewModel @Inject constructor(
             email = value.email,
             password = value.password
         )
-        var car: Car = Car(null, value.carName, value.averageCarConsumption.toDouble(), 0.0, 0.0)
+        var car: Car = Car(null, value.carName, value.averageCarConsumption.toDouble(), 0.0, 0.0, value.currentUUID)
 
         var friendsAssignList: ArrayList<UserCar> = ArrayList<UserCar>()
 
@@ -511,7 +514,8 @@ class EGDViewModel @Inject constructor(
                 _getStartedUiState.update { currentState ->
                     currentState.copy(
                         connectionSuccessful = result.test,
-                        accidentCode = result.accidentCode
+                        accidentCode = result.accidentCode,
+                        currentUUID = result.uuid
                     )
                 }
             }
@@ -669,7 +673,8 @@ class EGDViewModel @Inject constructor(
     fun setConnectionSuccessful(connectionSuccessful: Boolean) {
         _getStartedUiState.update { currentState ->
             currentState.copy(
-                connectionSuccessful = connectionSuccessful
+                connectionSuccessful = connectionSuccessful,
+                currentUUID = ""
             )
         }
     }
@@ -720,7 +725,8 @@ class EGDViewModel @Inject constructor(
                 getStartedVal.carName,
                 getStartedVal.averageCarConsumption.toDouble(),
                 0.0,
-                0.0
+                0.0,
+                getStartedVal.currentUUID
             )
 
             var friendsAssignList: ArrayList<UserCar> = ArrayList<UserCar>()
@@ -776,7 +782,7 @@ class EGDViewModel @Inject constructor(
 
             if (validationService.validateCarInfoScreen(editCarValue.name, editCarValue.consumption)) {
                 try {
-                    val car = Car(editCarValue.id, editCarValue.name, editCarValue.consumption.toDouble(), 0.0, 0.0)
+                    val car = Car(editCarValue.id, editCarValue.name, editCarValue.consumption.toDouble(), 0.0, 0.0, null)
                     response = HttpService.retrofitService.putCar(car)
 
                     val addedFriendsList =  editCarValue.addFriendList

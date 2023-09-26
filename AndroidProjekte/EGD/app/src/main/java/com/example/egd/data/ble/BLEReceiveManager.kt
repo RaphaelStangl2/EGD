@@ -33,7 +33,7 @@ class BLEReceiveManager @Inject constructor(
 
     private var connectedServiceUUID = ""
     private var initializeConnection: Boolean = false
-    private var serviceUUIDList:List<String> = emptyList()
+    private var serviceUUIDList:Array<String?>? = emptyArray()
     private var tmpUUID:String = ""
     val mutex = Mutex()
 
@@ -58,7 +58,7 @@ class BLEReceiveManager @Inject constructor(
         initializeConnection = initializeConnectionVar
     }
 
-    fun setUUIDList(serviceUUIDList:List<String>){
+    fun setUUIDList(serviceUUIDList:Array<String?>?){
         this.serviceUUIDList = serviceUUIDList
     }
 
@@ -120,8 +120,8 @@ class BLEReceiveManager @Inject constructor(
 
         override fun onMtuChanged(gatt: BluetoothGatt, mtu: Int, status: Int) {
             var characteristic:BluetoothGattCharacteristic? = null
-            for (i in serviceUUIDList){
-                characteristic = findCharacteristics(i, CHARACTERISTICS_UUID)
+            for (i in serviceUUIDList!!){
+                characteristic = i?.let { findCharacteristics(it, CHARACTERISTICS_UUID) }
                 if (characteristic != null){
                     break
                 }

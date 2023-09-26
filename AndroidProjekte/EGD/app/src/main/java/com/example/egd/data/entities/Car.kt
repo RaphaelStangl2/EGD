@@ -21,5 +21,5 @@ data class Car(
     var longitude:Double,
     @SerializedName("uuid")
     @Expose
-    var uuid:String
+    var uuid:String?
     )

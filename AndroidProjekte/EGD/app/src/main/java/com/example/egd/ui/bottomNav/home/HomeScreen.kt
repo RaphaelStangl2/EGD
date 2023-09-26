@@ -25,6 +25,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import com.example.egd.R
 import com.example.egd.data.ble.ConnectionState
 import com.example.egd.data.entities.Car
+import com.example.egd.ui.navigation.BluetoothIconCar
 
 
 @Composable
@@ -66,11 +67,11 @@ fun HomeScreen(
                         viewModel.getCarsForUserId(homeUiState.user.id)
                     } else
                         viewModel.getUserForEmail(sharedPreference)
-
                 }
                 if (event == Lifecycle.Event.ON_CREATE){
                     //if (connectionState.equals(ConnectionState.Uninitialized)){
                         viewModel.initializeConnection { startForeground() }
+                        viewModel.setUUIDListBLE(listCars?.map {it.uuid}?.toTypedArray())
                     //}
                    // if (connectionState.equals(ConnectionState.Disconnected)){
                         viewModel.reconnect()
@@ -205,7 +206,7 @@ fun CarCard(car: Car, name: String, latitude: Double, longitude: Double, viewMod
                 ) {
                     Text(text="Go to map",color = MaterialTheme.colors.primaryVariant, fontWeight = MaterialTheme.typography.body2.fontWeight)
                 }
-
+                BluetoothIconCar(viewModel = viewModel, car = car)
                 Box(){
                     IconButton(onClick = { expanded = !expanded }) {
                         Icon(painterResource(id = R.drawable.ic_baseline_more_vert_24), contentDescription = "More Vert Icon")

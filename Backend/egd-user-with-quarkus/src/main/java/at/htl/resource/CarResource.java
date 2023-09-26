@@ -51,7 +51,7 @@ public class CarResource {
         List<Car> cars = carRepository.getCarsForUser(id);
 
         if (cars == null){
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
 
         return Response.ok(cars).build();

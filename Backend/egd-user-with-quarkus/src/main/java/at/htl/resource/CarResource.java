@@ -45,17 +45,20 @@ public class CarResource {
 
 
     @GET
-    @Path("{userId}")
+    @Path("carsByUserId/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getCarsForUser(@PathParam("userId") Long id){
+    public Response getCarsByUserId(@PathParam("userId") Long id){
         List<Car> cars = carRepository.getCarsForUser(id);
 
         if (cars == null){
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
         return Response.ok(cars).build();
     }
+
+
+
 
     @PUT
     @Path("")
@@ -71,4 +74,5 @@ public class CarResource {
         return Response.ok(car).build();
     }
 
+    
 }

@@ -272,4 +272,17 @@ public class UserResource {
 
     }
 
+    @GET
+    @Path("carsByUserId/{userId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCarsByUserId(@PathParam("userId") Long id){
+        List<Car> cars = carRepository.getCarsForUser(id);
+
+        if (cars == null){
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        return Response.ok(cars).build();
+    }
+
 }

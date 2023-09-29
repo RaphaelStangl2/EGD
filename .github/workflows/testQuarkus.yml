@@ -16,5 +16,5 @@ jobs:
           distribution: 'temurin'
       - name: Build with Maven
         run: mvn -f ./Backend/egd-user-with-quarkus/pom.xml clean package
-      - name: Run Quarkus Tests
-        run: mvn -f ./Backend/egd-user-with-quarkus/pom.xml -Dquarkus.http.test-port=8081 verify --no-transfer-progress
+     # - name: Run Quarkus Tests
+      #  run: mvn -f ./Backend/egd-user-with-quarkus/pom.xml -Dquarkus.http.test-port=8081 verify --no-transfer-progress

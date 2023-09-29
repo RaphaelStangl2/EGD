@@ -61,4 +61,6 @@ jobs:
           pwd
           echo "list"
           ls
-          kubectl apply -f target/kubernetes/kubernetes.yml
+          echo "list in Backend"
+          ls Backend/
+          kubectl apply -f Backend/egd-user-with-quarkus/target/kubernetes/kubernetes.yml

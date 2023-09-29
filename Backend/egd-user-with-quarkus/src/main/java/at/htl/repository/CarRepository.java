@@ -1,6 +1,7 @@
 package at.htl.repository;
 
 import at.htl.model.Car;
+import at.htl.model.UserCar;
 import at.htl.model.Users;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -16,6 +17,7 @@ public class CarRepository {
 
     @Inject
     EntityManager entityManager;
+
 
 
     //CARS
@@ -58,4 +60,24 @@ public class CarRepository {
                 .getResultList();
     }
 
+
+
+    @Transactional
+    public UserCar addCurrentDriver(UserCar userCar) {
+        if (userCar == null || userCar.getUser() == null || userCar.getCar() == null ) {
+            return null;
+        }
+
+        Users currentUser = userCar.getUser();
+        Car car = userCar.getCar();
+
+
+        car.setCurrentUser(currentUser);
+
+        // Save the updated Car entity to the database
+      entityManager.merge(car);
+
+        // Optionally, you can return the updated UserCar entity
+        return userCar;
+    }
 }

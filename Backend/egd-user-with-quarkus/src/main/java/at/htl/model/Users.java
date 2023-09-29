@@ -26,13 +26,15 @@ public class Users {
     private String userName;
 
     private String email;
-    //private String telephoneNumber;
+    private String telephoneNumber;
 
     private String password;
 
     private String resetCode;
+    private String healthProblems;
 
-   /* @OneToMany(cascade = CascadeType.ALL)
+
+    /* @OneToMany(cascade = CascadeType.ALL)
     private List<Car> cars;
 
 
@@ -44,4 +46,5 @@ public class Users {
     @Lob
     private   byte[] image;
 
-}
+
+    }

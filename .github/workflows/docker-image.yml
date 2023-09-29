@@ -57,4 +57,4 @@ jobs:
           export PATH=$PATH:$(realpath kubelogin)
           mkdir ~/.kube
           echo "$KUBE_CONFIG" > ~/.kube/config
-          kubectl apply -f praktex/target/kubernetes/kubernetes.yml
+          kubectl apply -f egd-user-with-quarkus/target/kubernetes/kubernetes.yml

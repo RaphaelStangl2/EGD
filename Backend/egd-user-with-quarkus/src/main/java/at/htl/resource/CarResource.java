@@ -1,6 +1,7 @@
 package at.htl.resource;
 
 import at.htl.model.Car;
+import at.htl.model.UserCar;
 import at.htl.model.Users;
 import at.htl.repository.CarRepository;
 import lombok.AllArgsConstructor;
@@ -74,5 +75,14 @@ public class CarResource {
         return Response.ok(car).build();
     }
 
-    
+    @PUT
+    @Path("addCurrentDriver")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response addCurrentDriver(final UserCar userCar) {
+        if (userCar == null) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        final UserCar editedUserCar = carRepository.addCurrentDriver(userCar);
+        return Response.created(URI.create("/api/userCar/" + editedUserCar.getId())).build();
+    }
 }

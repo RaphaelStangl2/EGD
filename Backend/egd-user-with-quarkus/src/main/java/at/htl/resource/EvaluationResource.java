@@ -13,21 +13,22 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 
-@Path("egd/cars/")
+//@Path("egd/cars/")
 
 public class EvaluationResource {
+
     @Inject
     EvaluationRepository evaluationRepository;
 
-    @POST
-    @Path("")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response addCar(final Car car) {
-        if (car == null) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
-        final Car createdCar = carRepository.addCar(car);
-        return Response.created(URI.create("/api/cars/" + createdCar.getId())).build();
-    }
+   // @POST
+  //  @Path("")
+   // @Consumes(MediaType.APPLICATION_JSON)
+    //public Response addCar(final Car car) {
+        //if (car == null) {
+          //  return Response.status(Response.Status.BAD_REQUEST).build();
+        //}
+       // final Car createdCar = carRepository.addCar(car);
+     //   return Response.created(URI.create("/api/cars/" + createdCar.getId())).build();
+   // }
 
 }

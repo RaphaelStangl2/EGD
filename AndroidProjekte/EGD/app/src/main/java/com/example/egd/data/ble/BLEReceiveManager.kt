@@ -120,12 +120,22 @@ class BLEReceiveManager @Inject constructor(
 
         override fun onMtuChanged(gatt: BluetoothGatt, mtu: Int, status: Int) {
             var characteristic:BluetoothGattCharacteristic? = null
-            for (i in serviceUUIDList!!){
-                characteristic = i?.let { findCharacteristics(it, CHARACTERISTICS_UUID) }
-                if (characteristic != null){
-                    break
+            if (initializeConnection == true) {
+                characteristic = findCharacteristics(gatt.services[2].uuid.toString(), CHARACTERISTICS_UUID)
+                connectedServiceUUID = gatt.services[2].uuid.toString()
+                initializeConnection = false
+            }
+            else if (serviceUUIDList != null) {
+                for (i in serviceUUIDList!!) {
+                    if (gatt.services.get(2).uuid.toString() == i){
+                        characteristic = i?.let { findCharacteristics(it, CHARACTERISTICS_UUID) }
+                    }
+                    if (characteristic != null) {
+                        break
+                    }
                 }
             }
+
             if (characteristic == null){
                 return
             }
@@ -134,7 +144,7 @@ class BLEReceiveManager @Inject constructor(
 
             coroutineScope.launch {
                 data.emit(
-                    EGDUiState(true, "0", "")
+                    EGDUiState(true, "0", connectedServiceUUID)
                 )
             }
         }
@@ -163,10 +173,10 @@ class BLEReceiveManager @Inject constructor(
                                 Resource.Success(data = test)
                             )
                         }*/
-                        if (tmpUUID != null){
+                        if (connectedServiceUUID != null){
                             coroutineScope.launch {
                                 data.emit(
-                                    EGDUiState(boolean, test, tmpUUID)
+                                    EGDUiState(boolean, test, connectedServiceUUID)
                                 )
                             }
                         }
@@ -199,16 +209,6 @@ class BLEReceiveManager @Inject constructor(
         }?.characteristics?.find { characteristics ->
             characteristics.uuid.toString() == characteristicsUUID
         }*/
-        if (initializeConnection == true){
-            tmpUUID =gatt?.services?.get(2)?.uuid.toString()
-            connectedServiceUUID = tmpUUID
-            initializeConnection = false
-        }
-        else if (gatt?.services?.get(2)?.uuid.toString() != serviceUUID)
-        {
-            return null
-        }
-
         return gatt?.services?.get(2)?.characteristics?.get(0)
     }
 

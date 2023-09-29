@@ -11,7 +11,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.*
 
 private const val BASE_URL =
-    "https://student.cloud.htl-leonding.ac.at/b.kadir/egd-user-with-quarkus/"
+    "https://student.cloud.htl-leonding.ac.at/r.alo/egd-user-with-quarkus/"
 
 private val moshi = Moshi.Builder()
     .add(KotlinJsonAdapterFactory())
@@ -31,6 +31,10 @@ interface HttpApiService {
     @Headers("Content-Type: application/json")
     @PUT("egd/cars")
     suspend fun putCar(@Body car: Car) : ResponseBody
+
+    @Headers("Content-Type:application/json")
+    @PUT("egd/cars/addCurrentDriver")
+    suspend fun putCurrentDriver(@Body userCar:UserCar) : ResponseBody
 
     @Headers("Content-Type: application/json")
     @GET("egd/users/getUsersForCar/{carId}")

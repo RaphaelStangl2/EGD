@@ -42,7 +42,7 @@ class EGDViewModel @Inject constructor(
     val fusedLocationClient: FusedLocationProviderClient
 ) : ViewModel() {
 
-
+    private var carTrackingServiceIsRunning = false
 
     private val _editCarUiState = MutableStateFlow(EditCarUiState())
     val editCarUiState: StateFlow<EditCarUiState> = _editCarUiState.asStateFlow()
@@ -448,13 +448,13 @@ class EGDViewModel @Inject constructor(
         val value = getStartedUiState.value
         val homeValue = homeUiState.value
         var sharedPreference = sharedPreference()
-        var userToAdd: User = User(
+        var userToAdd = User(
             id = null,
             userName = value.userName,
             email = value.email,
             password = value.password
         )
-        var car: Car = Car(null, value.carName, value.averageCarConsumption.toDouble(), 0.0, 0.0, value.currentUUID)
+        var car = Car(null, value.carName, value.averageCarConsumption.toDouble(), 0.0, 0.0, value.currentUUID)
 
         var friendsAssignList: ArrayList<UserCar> = ArrayList<UserCar>()
 
@@ -545,31 +545,39 @@ class EGDViewModel @Inject constructor(
 
         var gpsService: GPSService = GPSService(viewModel = this, {})
         //gpsService.run()
+    }
 
-        var homeUiState = homeUiState.value
+    fun startCarTrackingService(){
+        if (!carTrackingServiceIsRunning){
+            carTrackingServiceIsRunning = true
+            var homeUiState = homeUiState.value
+            var getStartedState = getStartedUiState.value
 
-        viewModelScope.launch {
-            while(true){
-
-
-                delay(3000)
-                getUserPosition(){ location ->
-                    if (homeUiState.cars!= null && location!= null){
-
-                        var bool:Boolean= true
-                        var car = homeUiState.cars?.get(0)
-                        car?.latitude = location.latitude
-                        car?.longitude = location.longitude
-                        viewModelScope.launch {
-                        if (car != null) {
-                            HttpService.retrofitService.putCar(car)
-                        }
+            viewModelScope.launch {
+                while(true){
+                    delay(3000)
+                    getUserPosition(){ location ->
+                        if (homeUiState.cars!= null && location!= null){
+                            var car: Car? = null
+                            for (i in homeUiState.cars!!){
+                                if (getStartedState.currentUUID == i.uuid){
+                                    car = i
+                                }
+                            }
+                            if (car != null){
+                                car?.latitude = location.latitude
+                                car?.longitude = location.longitude
+                                viewModelScope.launch {
+                                    if (car != null) {
+                                        HttpService.retrofitService.putCar(car)
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-
 
     }
 
@@ -677,6 +685,8 @@ class EGDViewModel @Inject constructor(
                 currentUUID = ""
             )
         }
+        setCurrentDrivingUser()
+
     }
 
     fun getUserForEmail(sharedPreference: () -> SharedPreferences?) {
@@ -914,6 +924,28 @@ class EGDViewModel @Inject constructor(
 
             for(car in removedCarsList) {
                 HttpService.retrofitService.deleteUserCar(car.id)
+            }
+        }
+    }
+
+    fun setCurrentDrivingUser(){
+        val getStartedState = getStartedUiState.value
+        val homeState = homeUiState.value
+        var car:Car? = null
+        var userCar:UserCar? = null
+        if (getStartedState!= null && homeState.cars!= null){
+            for (i in homeState.cars!!){
+                if (i.uuid == getStartedState.currentUUID && i.id != null){
+                    car = i
+                }
+            }
+        }
+        if (homeState.user != null && car != null){
+            userCar = UserCar(homeState.user, car, true)
+        }
+        if (userCar != null){
+            viewModelScope.launch {
+                HttpService.retrofitService.putCurrentDriver(userCar)
             }
         }
     }

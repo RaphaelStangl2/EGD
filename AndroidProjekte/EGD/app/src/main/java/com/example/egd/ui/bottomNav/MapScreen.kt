@@ -123,8 +123,6 @@ fun MapScreen(
         //var cameraPositionState: CameraPositionState? = null
         //cameraPositionState = rememberCameraPositionState()
 
-
-
         val mapPermission =
             rememberMultiplePermissionsState(permissions = PermissionUtils.mapsPermissions)
         var doNotShowRationale = mapUiState.doNotShowRational
@@ -170,8 +168,6 @@ fun MapScreen(
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
-
                 Box() {
 
                     GoogleMap(
@@ -243,7 +239,6 @@ fun MapScreen(
                     )
                 }
             }
-
         }
     }
 }

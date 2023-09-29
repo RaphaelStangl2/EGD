@@ -70,6 +70,7 @@ fun HomeScreen(
                 }
                 if (event == Lifecycle.Event.ON_CREATE){
                     //if (connectionState.equals(ConnectionState.Uninitialized)){
+                        viewModel.startCarTrackingService()
                         viewModel.initializeConnection { startForeground() }
                         viewModel.setUUIDListBLE(listCars?.map {it.uuid}?.toTypedArray())
                     //}

@@ -61,7 +61,7 @@ interface HttpApiService {
     suspend fun postLogin(@Body user: User): ResponseBody
 
     @Headers("Content-Type: application/json")
-    @GET("egd/cars/{userId}")
+    @GET("egd/cars/carsByUserId/{userId}")
     suspend fun getCarsForUser(@Path("userId") userId: Long): ResponseBody
 
     @Headers("Content-Type: application/json")

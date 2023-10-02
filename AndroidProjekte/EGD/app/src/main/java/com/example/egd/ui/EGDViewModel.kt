@@ -493,6 +493,7 @@ class EGDViewModel @Inject constructor(
                 setCarName("")
                 setFuelConsumption("")
                 onRegistered()
+                bleReceiveManager.closeConnection()
 
                 var editor = sharedPreference?.edit()
                 editor?.putString("email", value.email)
@@ -511,6 +512,11 @@ class EGDViewModel @Inject constructor(
     private fun subscribeToChanges(){
         viewModelScope.launch {
             bleReceiveManager.data.collect{ result ->
+                if (result.test){
+                    connectionState = ConnectionState.Connected
+                } else{
+                    connectionState = ConnectionState.Uninitialized
+                }
                 _getStartedUiState.update { currentState ->
                     currentState.copy(
                         connectionSuccessful = result.test,
@@ -530,10 +536,12 @@ class EGDViewModel @Inject constructor(
 
     fun disconnect(){
         bleReceiveManager.disconnect()
+        connectionState = ConnectionState.Disconnected
     }
 
     fun reconnect(){
         bleReceiveManager.reconnect()
+        connectionState = ConnectionState.Connected
     }
 
     fun initializeConnection(startForeground: () -> Unit) {
@@ -542,6 +550,7 @@ class EGDViewModel @Inject constructor(
         bleReceiveManager.startReceiving()
         subscribeToChanges()
         addCloseable(Closeable({bleReceiveManager.closeConnection()}))
+        connectionState = ConnectionState.CurrentlyInitializing
 
         var gpsService: GPSService = GPSService(viewModel = this, {})
         //gpsService.run()
@@ -582,7 +591,6 @@ class EGDViewModel @Inject constructor(
     }
 
     public override fun onCleared() {
-        connectionState
         super.onCleared()
         bleReceiveManager.closeConnection()
     }
@@ -673,6 +681,7 @@ class EGDViewModel @Inject constructor(
         //stopForegroundService()
         bleReceiveManager.disconnect()
         bleReceiveManager.closeConnection()
+        connectionState = ConnectionState.Uninitialized
 
         onCleared()
         setConnectionSuccessful(false)
@@ -979,6 +988,10 @@ class EGDViewModel @Inject constructor(
 
     override fun addCloseable(closeable: Closeable) {
         super.addCloseable(closeable)
+    }
+
+    fun closeConnection(){
+        bleReceiveManager.closeConnection()
     }
 
 

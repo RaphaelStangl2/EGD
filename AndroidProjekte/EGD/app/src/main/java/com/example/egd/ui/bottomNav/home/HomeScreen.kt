@@ -49,14 +49,11 @@ fun HomeScreen(
 
     var connectionState = viewModel.connectionState
 
-
-
     if (homeUiState.user?.id != null){
         viewModel.getCarsForUserId(homeUiState.user.id)
     }
 
     val lifecycleOwner = LocalLifecycleOwner.current
-
 
     DisposableEffect(
         key1 = lifecycleOwner,
@@ -69,14 +66,14 @@ fun HomeScreen(
                         viewModel.getUserForEmail(sharedPreference)
                 }
                 if (event == Lifecycle.Event.ON_CREATE){
-                    //if (connectionState.equals(ConnectionState.Uninitialized)){
+                    if (connectionState.equals(ConnectionState.Uninitialized)){
+                        viewModel.setUUIDListBLE(listCars?.map {it.uuid}?.toTypedArray())
                         viewModel.startCarTrackingService()
                         viewModel.initializeConnection { startForeground() }
-                        viewModel.setUUIDListBLE(listCars?.map {it.uuid}?.toTypedArray())
-                    //}
-                   // if (connectionState.equals(ConnectionState.Disconnected)){
+                    }
+                    if (connectionState.equals(ConnectionState.Disconnected)){
                         viewModel.reconnect()
-                    //}
+                    }
                 }
                 /*if (event == Lifecycle.Event.ON_START) {
                     viewModel.getUserForEmail(sharedPreference)

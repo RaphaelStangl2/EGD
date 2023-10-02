@@ -172,6 +172,10 @@ fun EGDApp(
                         onBackButtonClick = {
                             if (getStartedUiState.step == 1) {
                                 navController.navigateUp()
+                                viewModel.closeConnection()
+                            } else if (getStartedUiState.step == 2){
+                                viewModel.closeConnection()
+                                viewModel.setStep(getStartedUiState.step - 1)
                             } else {
                                 viewModel.setStep(getStartedUiState.step - 1)
                             }

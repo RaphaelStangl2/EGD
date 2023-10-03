@@ -7,6 +7,7 @@ data class EditCarUiState(
     val car: Car? = null,
     val name: String = "",
     val consumption: String = "",
+    val licencePlate: String = "",
     val id: Long? = null,
     val triedToSubmit: Boolean = false,
     var addFriendList: Array<User>? = null,

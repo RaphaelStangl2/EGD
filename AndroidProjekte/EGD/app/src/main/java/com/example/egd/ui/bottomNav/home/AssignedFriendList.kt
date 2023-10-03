@@ -8,13 +8,21 @@ import com.example.egd.ui.EGDViewModel
 @Composable
 fun AssignedFriendList(
     assignedFriendsList: Array<User>?,
+    addFriendsList: Array<User>?,
     viewModel: EGDViewModel,
     goToFriendsAddScreen: () -> Unit
 ){
     if (assignedFriendsList != null) {
         for (assignedFriend in assignedFriendsList){
             Row(){
-                UserCard(assignedFriend, viewModel)
+                UserCard(assignedFriend,true ,viewModel)
+            }
+        }
+        if (addFriendsList != null) {
+            for (addFriend in addFriendsList){
+                Row(){
+                    UserCard(addFriend, false, viewModel)
+                }
             }
         }
         Row() {

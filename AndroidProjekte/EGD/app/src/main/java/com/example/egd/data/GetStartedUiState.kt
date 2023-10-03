@@ -7,6 +7,7 @@ data class GetStartedUiState(
     var numberOfSteps: Int = 5,
     val EGDDevice: Boolean = true,
     val carName: String = "",
+    val licencePlate: String = "",
     val averageCarConsumption: String = "",
     val email: String = "",
     val password: String = "",

@@ -244,6 +244,12 @@ fun EGDApp(
             Scaffold(
                 topBar = {
                     TopAppBarBackButton(navController, { Text("Add Users") }, onBackButtonClick = {
+
+                        if (homeUiState.assignedFriendsList != null){
+                            viewModel.setAddedFriendsList(homeUiState.assignedFriendsList!!)
+                        }
+                        viewModel.setAssignedFriendsList(emptyArray())
+                        viewModel.setSearchFriendList(emptyArray())
                         navController.navigateUp()
                     })
                 })

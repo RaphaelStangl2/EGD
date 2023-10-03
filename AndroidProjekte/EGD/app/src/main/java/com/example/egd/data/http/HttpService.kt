@@ -25,8 +25,8 @@ private val retrofit = Retrofit.Builder()
 
 interface HttpApiService {
     @Headers("Content-Type: application/json")
-    @DELETE("egd/userCar/{userCarId}")
-    suspend fun deleteUserCar(@Path("userCarId") userCarId:Long?): ResponseBody
+    @POST("egd/userCar/removeUserCar")
+    suspend fun deleteUserCar(@Body userCar:UserCar): ResponseBody
 
     @Headers("Content-Type: application/json")
     @PUT("egd/cars")

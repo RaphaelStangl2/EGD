@@ -70,13 +70,13 @@ class EGDViewModel @Inject constructor(
     }
 
     fun setCar(car: Car, consumption:String) {
-
         _editCarUiState.update { currentState ->
             currentState.copy(
                 id = car.id,
                 car = car,
                 name = car.name,
-                consumption = consumption
+                consumption = consumption,
+                licencePlate = car.licencePlate
             )
         }
     }
@@ -286,6 +286,14 @@ class EGDViewModel @Inject constructor(
         }
     }
 
+    fun setLicencePlate(licencePlate: String){
+        _getStartedUiState.update { currentState ->
+            currentState.copy(
+                licencePlate = licencePlate
+            )
+        }
+    }
+
     fun setStep(stepVal: Int) {
         _getStartedUiState.update { currentState ->
             currentState.copy(
@@ -454,7 +462,7 @@ class EGDViewModel @Inject constructor(
             email = value.email,
             password = value.password
         )
-        var car = Car(null, value.carName, value.averageCarConsumption.toDouble(), 0.0, 0.0, value.currentUUID)
+        var car = Car(null, value.carName, value.averageCarConsumption.toDouble(), 0.0, 0.0, value.currentUUID, value.licencePlate)
 
         var friendsAssignList: ArrayList<UserCar> = ArrayList<UserCar>()
 
@@ -745,7 +753,8 @@ class EGDViewModel @Inject constructor(
                 getStartedVal.averageCarConsumption.toDouble(),
                 0.0,
                 0.0,
-                getStartedVal.currentUUID
+                getStartedVal.currentUUID,
+                getStartedVal.licencePlate
             )
 
             var friendsAssignList: ArrayList<UserCar> = ArrayList<UserCar>()
@@ -795,18 +804,24 @@ class EGDViewModel @Inject constructor(
     fun updateCar(onUpdated: () -> Unit) {
         viewModelScope.launch {
             val editCarValue = editCarUiState.value
+            val homeValue = homeUiState.value
             val validationService = ValidationService()
             var response: ResponseBody? = null
 
 
             if (validationService.validateCarInfoScreen(editCarValue.name, editCarValue.consumption)) {
                 try {
-                    val car = Car(editCarValue.id, editCarValue.name, editCarValue.consumption.toDouble(), 0.0, 0.0, null)
+                    val car = Car(editCarValue.id, editCarValue.name, editCarValue.consumption.toDouble(), 0.0, 0.0, null, editCarValue.licencePlate)
                     response = HttpService.retrofitService.putCar(car)
 
                     val addedFriendsList =  editCarValue.addFriendList
                     val removedFriendsList = editCarValue.removeFriendList
 
+                    if (removedFriendsList != null){
+                        for (user in removedFriendsList){
+                            HttpService.retrofitService.deleteUserCar(UserCar(user, car, false))
+                        }
+                    }
                     if (addedFriendsList != null) {
                         for (user in addedFriendsList){
                             HttpService.retrofitService.postUserCar(UserCar(user, car, false))
@@ -818,7 +833,9 @@ class EGDViewModel @Inject constructor(
                             HttpService.retrofitService.
                         }
                     }*/
-
+                    setAddedFriendsList(emptyArray())
+                    setAssignedFriendsList(emptyArray())
+                    setRemovedFriendsList(emptyArray())
                     setTriedToSubmitEdit(false)
                     onUpdated()
 
@@ -926,17 +943,6 @@ class EGDViewModel @Inject constructor(
         }
     }
 
-    suspend fun editUsersOfCarSuspend() {
-        var removedCarsList = _editCarUiState.value.removeFriendList
-
-        if (removedCarsList != null) {
-
-            for(car in removedCarsList) {
-                HttpService.retrofitService.deleteUserCar(car.id)
-            }
-        }
-    }
-
     fun setCurrentDrivingUser(){
         val getStartedState = getStartedUiState.value
         val homeState = homeUiState.value
@@ -956,12 +962,6 @@ class EGDViewModel @Inject constructor(
             viewModelScope.launch {
                 HttpService.retrofitService.putCurrentDriver(userCar)
             }
-        }
-    }
-
-    fun editUsersOfCar(){
-        viewModelScope.launch {
-            editUsersOfCarSuspend()
         }
     }
 
@@ -994,5 +994,12 @@ class EGDViewModel @Inject constructor(
         bleReceiveManager.closeConnection()
     }
 
-
+    fun removeUserFromAddList(user: User) {
+        val addFriendsList = editCarUiState.value.addFriendList
+        if (addFriendsList != null) {
+            var list = addFriendsList.toMutableList()
+            list.remove(user)
+            setAddedFriendsList(list.toTypedArray())
+        }
+    }
 }

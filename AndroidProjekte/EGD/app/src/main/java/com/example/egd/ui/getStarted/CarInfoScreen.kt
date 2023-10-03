@@ -44,6 +44,19 @@ fun CarInfoScreen(carName:String, fuelConsumption: String, viewModel: EGDViewMod
         }
     }
     Spacer(modifier = Modifier.height(7.dp))
+    Row{
+        Text(text="Licence Plate")
+    }
+
+    Row(){
+        TextField(
+            value = carName,
+            onValueChange = {viewModel.setLicencePlate(it)},
+            placeholder = { Text(text="STK1234") },
+            colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background),
+        )
+    }
+    Spacer(modifier = Modifier.height(7.dp))
 
     Row{
         Text(text="Average fuel consumption per 100 km:")

@@ -1,10 +1,10 @@
 package at.htl.resource;
 
 import at.htl.Classes.Account;
+import at.htl.Classes.Mail;
 import at.htl.model.Car;
 import at.htl.model.Users;
 import at.htl.repository.UserRepository;
-import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
 import io.quarkus.security.User;
 import io.smallrye.common.annotation.Blocking;
@@ -52,9 +52,7 @@ public class UserResource {
     @Inject
     UserRepository userRepository;
 
-    //Mail
-    @Inject
-    Mailer mailer;
+
 
     @POST
     @Path("/forgotPassword")
@@ -74,11 +72,13 @@ public class UserResource {
 
             String tempPassword = userRepository.generateTempPassword();
             user.setResetCode(UserRepository.getSaltedHash(tempPassword));
-
-
             userRepository.update(user);
-            //email versenden
-            mailer.send(Mail.withText("raphael.stangl.12@gmail.com", "Password", "Ihr temporäres Passwort lautet: " + tempPassword));
+            //send email
+            Mail newMail = new at.htl.Classes.Mail();
+            newMail.setMailTo(account);
+            newMail.setSubject("EGD-Password");
+            newMail.setText("Ihr temporäres Passwort lautet: " + tempPassword);
+            userRepository.sendEmailToAcount(newMail);
 
             return Response.ok("Temporary password sent to " + account.getEmail()).build();
         } else {
@@ -101,7 +101,12 @@ public class UserResource {
             user.setPassword(UserRepository.getSaltedHash(account.getNewPassword()));
             userRepository.update(user);
 
-            mailer.send(Mail.withText("raphael.stangl.12@gmail.com", "Password", user.getPassword()));
+            Mail newMail = new at.htl.Classes.Mail();
+            newMail.setMailTo(account);
+            newMail.setSubject("EGD change password");
+            newMail.setText(user.getPassword());
+            userRepository.sendEmailToAcount(newMail);
+
 
             return Response.ok("Temporary password sent to " + account.getEmail()).build();
         } else {

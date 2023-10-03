@@ -80,4 +80,15 @@ public class CarRepository {
         // Optionally, you can return the updated UserCar entity
         return userCar;
     }
+
+    @Transactional
+    public UserCar removeCurrentDriver(UserCar userCar) {
+        final Car car = findById(userCar.getCar().getId());
+        car.setCurrentUser(null);
+        entityManager.merge(car);
+        return userCar;
+    }
+
+
+
 }

@@ -27,7 +27,7 @@ public class UserCarResource {
     @Inject
     CarRepository carRepository;
 
-    @DELETE
+    @POST
     @Path("/removeUserCar")
     public Response removeUserCar(UserCar userCar) {
 

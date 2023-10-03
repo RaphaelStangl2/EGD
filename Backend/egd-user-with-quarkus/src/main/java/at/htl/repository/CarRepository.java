@@ -18,7 +18,8 @@ public class CarRepository {
     @Inject
     EntityManager entityManager;
 
-
+    @Inject
+    UserCarRepository userCarRepository;
 
     //CARS
     @Transactional

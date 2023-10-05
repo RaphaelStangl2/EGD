@@ -227,7 +227,6 @@ public class  UserRepository {
         }
         else{
             return null;
-
         }
 
     }

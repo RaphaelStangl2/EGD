@@ -1,10 +1,14 @@
 package at.htl.resource;
 
+import at.htl.Classes.Account;
+import at.htl.Classes.Mail;
 import at.htl.model.Car;
 import at.htl.model.UserCar;
+import at.htl.model.Users;
 import at.htl.repository.CarRepository;
 import at.htl.repository.UserCarRepository;
 import at.htl.repository.UserRepository;
+import io.smallrye.common.annotation.Blocking;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -26,6 +30,46 @@ public class UserCarResource {
 
     @Inject
     CarRepository carRepository;
+
+    private final String emergencyEmail = "rsheedalo@gmail.com";
+
+    @POST
+    @Path("/contactEmergency")
+    @Blocking
+    public Response contactEmergency(UserCar userCar) {
+
+
+        String emergencyText = "Dies ist ein IoT-Gerät für Autos, das Unfälle erkennt. Es hat soeben einen Unfall registriert.\n\n"
+                + "Details zum Unfall:\n"
+                + "----------------------------------\n"
+                + "Name der beteiligten Person: "+userCar.getUser().getUserName()+"\n"
+                + "Ort des Unfalls:\n"
+                + "  - Längengrad: "+userCar.getCar().getLongitude()+"\n"
+                + "  - Breitengrad: "+userCar.getCar().getLatitude()+"\n\n"
+                + "Fahrzeuginformationen:\n"
+                + "  - Kennzeichen: "+userCar.getCar().getLicensePlate()+"\n\n"
+                + "Zusätzliche Anmerkungen: Es ist wahrscheinlich, dass die Person bewusstlos ist.\n";
+
+        if (userCar.getUser().getHealthProblems() != ""){
+            emergencyText += "Gesundheitliche Probleme der Person: "+userCar.getUser().getHealthProblems()+"\n"
+                    + "----------------------------------\n";
+        }
+
+
+
+        //send email
+        Mail newMail = new at.htl.Classes.Mail();
+        Account account = new Account();
+        account.setEmail(emergencyEmail);
+        newMail.setMailTo(account);
+        newMail.setSubject("Unfall");
+        newMail.setText(emergencyText);
+        userRepository.sendEmailToAcount(newMail);
+
+        return Response.ok("This text is sent to "+account.getEmail()+": " + emergencyText).build();
+
+
+    }
 
     @DELETE
     @Path("/removeUserCar")

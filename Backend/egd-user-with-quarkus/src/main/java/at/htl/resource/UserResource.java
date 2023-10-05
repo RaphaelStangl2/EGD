@@ -193,8 +193,6 @@ public class UserResource {
             List<Users> usersList = (List<Users>) userRepository.filterByName(username);
             return usersList;
         }
-
-
     }
 
 

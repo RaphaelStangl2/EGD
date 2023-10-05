@@ -9,6 +9,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
+import java.util.List;
 
 @ApplicationScoped
 public class UserCarRepository {
@@ -47,4 +48,8 @@ public class UserCarRepository {
     }
 
 
+    public List<UserCar> getAllUserCars() {
+        return entityManager.createQuery("SELECT uc FROM UserCar uc", UserCar.class)
+                .getResultList();
+    }
 }

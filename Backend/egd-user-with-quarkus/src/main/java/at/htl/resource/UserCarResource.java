@@ -118,6 +118,13 @@ public class UserCarResource {
     }
 
 
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUserCars(){
+        List<UserCar> userCars = userCarRepository.getAllUserCars();
+
+        return Response.ok(userCars).build();
+    }
 
     @POST
     @Path("")

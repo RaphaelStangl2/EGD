@@ -59,7 +59,7 @@ public class CarResource {
     }
 
     @GET
-    @Path("carById/{carId}")
+    @Path("{carId}/")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCarById(@PathParam("carId") Long id){
         Car car = carRepository.findById(id);

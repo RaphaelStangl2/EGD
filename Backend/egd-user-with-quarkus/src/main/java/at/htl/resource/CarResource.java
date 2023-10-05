@@ -58,9 +58,22 @@ public class CarResource {
         return Response.ok(cars).build();
     }
 
+    @GET
+    @Path("carById/{carId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCarById(@PathParam("carId") Long id){
+        Car car = carRepository.findById(id);
+
+        if (car == null){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.ok(car).build();
+    }
+
+
 
     @GET
-    @Path("cars")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCars(){
         List<Car> cars = carRepository.getAllCars();

@@ -187,6 +187,11 @@ fun MapScreen(
                                         )
                                     ),
                                     title = car.name,
+                                    snippet =
+                                    if (car.currentDriver != null)
+                                        car.currentDriver!!.userName
+                                    else
+                                        "",
                                     icon = bitmapDescriptorFromVector(
                                         LocalContext.current,
                                         R.drawable.ic_baseline_directions_car_24

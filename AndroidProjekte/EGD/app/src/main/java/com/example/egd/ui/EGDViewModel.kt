@@ -76,7 +76,7 @@ class EGDViewModel @Inject constructor(
                 car = car,
                 name = car.name,
                 consumption = consumption,
-                licencePlate = car.licencePlate
+                licensePlate = car.licensePlate
             )
         }
     }
@@ -286,10 +286,10 @@ class EGDViewModel @Inject constructor(
         }
     }
 
-    fun setLicencePlate(licencePlate: String){
+    fun setLicensePlate(licensePlate: String){
         _getStartedUiState.update { currentState ->
             currentState.copy(
-                licencePlate = licencePlate
+                licensePlate = licensePlate
             )
         }
     }
@@ -462,7 +462,7 @@ class EGDViewModel @Inject constructor(
             email = value.email,
             password = value.password
         )
-        var car = Car(null, value.carName, value.averageCarConsumption.toDouble(), 0.0, 0.0, value.currentUUID, value.licencePlate)
+        var car = Car(null, value.carName, value.averageCarConsumption.toDouble(), 0.0, 0.0, value.currentUUID, value.licensePlate, null)
 
         var friendsAssignList: ArrayList<UserCar> = ArrayList<UserCar>()
 
@@ -754,7 +754,8 @@ class EGDViewModel @Inject constructor(
                 0.0,
                 0.0,
                 getStartedVal.currentUUID,
-                getStartedVal.licencePlate
+                getStartedVal.licensePlate,
+                null
             )
 
             var friendsAssignList: ArrayList<UserCar> = ArrayList<UserCar>()
@@ -811,7 +812,7 @@ class EGDViewModel @Inject constructor(
 
             if (validationService.validateCarInfoScreen(editCarValue.name, editCarValue.consumption)) {
                 try {
-                    val car = Car(editCarValue.id, editCarValue.name, editCarValue.consumption.toDouble(), 0.0, 0.0, null, editCarValue.licencePlate)
+                    val car = Car(editCarValue.id, editCarValue.name, editCarValue.consumption.toDouble(), 0.0, 0.0, null, editCarValue.licensePlate, null)
                     response = HttpService.retrofitService.putCar(car)
 
                     val addedFriendsList =  editCarValue.addFriendList
@@ -1000,6 +1001,12 @@ class EGDViewModel @Inject constructor(
             var list = addFriendsList.toMutableList()
             list.remove(user)
             setAddedFriendsList(list.toTypedArray())
+        }
+    }
+
+    fun deleteCar(car:Car) {
+        viewModelScope.launch {
+            HttpService.retrofitService.deleteCar(car.id!!)
         }
     }
 }

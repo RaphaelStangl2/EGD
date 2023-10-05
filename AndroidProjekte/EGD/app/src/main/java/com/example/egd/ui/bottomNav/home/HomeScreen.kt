@@ -215,11 +215,12 @@ fun CarCard(car: Car, name: String, latitude: Double, longitude: Double, viewMod
                             DropdownMenuItem(
                                 onClick = {
                                     expanded = false
+                                    viewModel.deleteCar(car)
                                 },
                                 enabled = false,
                                 modifier = Modifier.background(color = Color.White)
                             ) {
-                                Text(text = "Delete")
+                                Text(color = MaterialTheme.colors.primary, text = "Delete")
                             }
                         }
                     }

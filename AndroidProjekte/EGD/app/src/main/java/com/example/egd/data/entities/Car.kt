@@ -22,7 +22,10 @@ data class Car(
     @SerializedName("uuid")
     @Expose
     var uuid:String?,
-    @SerializedName("licencePlate")
+    @SerializedName("licensePlate")
     @Expose
-    var licencePlate: String
+    var licensePlate: String,
+    @SerializedName("currentDriver")
+    @Expose
+    var currentDriver: User?
     )

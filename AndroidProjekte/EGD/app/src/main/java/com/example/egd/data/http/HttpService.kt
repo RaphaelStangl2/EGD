@@ -32,6 +32,10 @@ interface HttpApiService {
     @PUT("egd/cars")
     suspend fun putCar(@Body car: Car) : ResponseBody
 
+    @Headers("Content-Type: application/json")
+    @DELETE("egd/cars/{carId}")
+    suspend fun deleteCar(@Path("carId") carId:Long) : ResponseBody
+
     @Headers("Content-Type:application/json")
     @PUT("egd/cars/addCurrentDriver")
     suspend fun putCurrentDriver(@Body userCar:UserCar) : ResponseBody

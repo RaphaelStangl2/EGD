@@ -52,7 +52,7 @@ fun CarEditScreen(onUpdate: () -> Unit, viewModel: EGDViewModel, goToFriendsAddS
     if (car != null)
     {
         val carName = carUiState.name
-        val licencePlate = carUiState.licencePlate
+        val licensePlate = carUiState.licensePlate
         val carConsumption = carUiState.consumption
 
         val validationService = ValidationService()
@@ -97,10 +97,10 @@ fun CarEditScreen(onUpdate: () -> Unit, viewModel: EGDViewModel, goToFriendsAddS
 
             Row(){
                 TextField(
-                    value = licencePlate,
+                    value = licensePlate,
                     onValueChange =
                     {
-                        car.licencePlate = it
+                        car.licensePlate = it
                         viewModel.setCar(car, car.consumption.toString())
                     },
                     placeholder = { Text(text="STK1234") },

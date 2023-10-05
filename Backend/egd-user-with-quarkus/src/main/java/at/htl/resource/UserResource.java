@@ -29,18 +29,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 
-/*
-import javax.mail.*;
-
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-
-
- */
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
@@ -52,6 +40,13 @@ public class UserResource {
     @Inject
     UserRepository userRepository;
 
+
+    @DELETE
+    @Path("{userId}/")
+    public Response removeUser(@PathParam("userId") Long carId) {
+        userRepository.removeUser(carId);
+        return Response.noContent().build();
+    }
 
 
     @POST
@@ -115,16 +110,7 @@ public class UserResource {
 
     }
 
-/*
-    @GET
-    @Path("/email")
-    @Blocking
-    public Response hello() {
-        mailer.send(Mail.withText("raphael.stangl.12@gmail.com", "A sivcvlcmple emkjdkfjdkfjfkdjail from quarkus", "SOSOS"));
-        return Response.ok("Erfolgreich eingeloggt").build();
-    }
 
- */
 
 
     @POST
@@ -184,7 +170,6 @@ public class UserResource {
     @GET
     @Path("{filter}/")
     @Consumes(MediaType.APPLICATION_JSON)
-
     public List<Users> getUsersByFilter(@PathParam("filter") String username) {
         //Pathpram man kann die parameter durch url geben
         if (username == null) {

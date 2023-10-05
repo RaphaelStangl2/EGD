@@ -59,6 +59,15 @@ public class CarResource {
     }
 
 
+    @GET
+    @Path("cars")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCars(){
+        List<Car> cars = carRepository.getAllCars();
+
+        return Response.ok(cars).build();
+    }
+
 
 
     @PUT

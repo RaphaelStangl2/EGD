@@ -85,4 +85,15 @@ public class CarResource {
         final UserCar editedUserCar = carRepository.addCurrentDriver(userCar);
         return Response.created(URI.create("/api/userCar/" + editedUserCar.getId())).build();
     }
+
+    @PUT
+    @Path("removeCurrentDriver")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response removeCurrentDriver(final UserCar userCar) {
+        if (userCar == null) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        final UserCar removedUserCar = carRepository.removeCurrentDriver(userCar);
+        return Response.created(URI.create("/api/userCar/" + removedUserCar.getId())).build();
+    }
 }

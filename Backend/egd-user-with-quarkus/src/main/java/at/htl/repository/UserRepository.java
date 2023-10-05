@@ -2,6 +2,7 @@ package at.htl.repository;
 
 import at.htl.Classes.Mail;
 import at.htl.model.Car;
+import at.htl.model.UserCar;
 import at.htl.model.Users;
 import io.quarkus.mailer.Mailer;
 
@@ -35,6 +36,9 @@ public class  UserRepository {
     @Inject
     Mailer mailer;
 
+    @Inject
+    UserCarRepository userCarRepository;
+
     //USERS
     public Users addUser(Users user) {
         entityManager.persist(user);
@@ -42,6 +46,9 @@ public class  UserRepository {
     }
 
     public void removeUser(final long reservationId) {
+        final UserCar userCar= userCarRepository.findByCarId(reservationId);
+        entityManager.remove(userCar);
+
         final Users user = findById(reservationId);
         entityManager.remove(user);
     }

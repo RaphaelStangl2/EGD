@@ -25,6 +25,10 @@ public class UserCarRepository {
         return entityManager.find(UserCar.class, carId);
     }
 
+    public UserCar findByUserId(long userId) {
+        return entityManager.find(UserCar.class, userId);
+    }
+
     @Transactional
     public UserCar addUserCar(UserCar userCar) {
         entityManager.persist(userCar);

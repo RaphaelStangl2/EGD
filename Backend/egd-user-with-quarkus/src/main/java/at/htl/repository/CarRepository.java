@@ -18,7 +18,8 @@ public class CarRepository {
     @Inject
     EntityManager entityManager;
 
-
+    @Inject
+    UserCarRepository userCarRepository;
 
     //CARS
     @Transactional
@@ -29,7 +30,9 @@ public class CarRepository {
 
     @Transactional
     public void removeCar(final long carId) {
+        final UserCar userCar= userCarRepository.findByCarId(carId);
         final Car car = findById(carId);
+        entityManager.remove(userCar);
         entityManager.remove(car);
     }
 
@@ -80,4 +83,15 @@ public class CarRepository {
         // Optionally, you can return the updated UserCar entity
         return userCar;
     }
+
+    @Transactional
+    public UserCar removeCurrentDriver(UserCar userCar) {
+        final Car car = findById(userCar.getCar().getId());
+        car.setCurrentUser(null);
+        entityManager.merge(car);
+        return userCar;
+    }
+
+
+
 }

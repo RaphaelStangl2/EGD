@@ -20,6 +20,9 @@ public class UserCarRepository {
     public UserCar findById(long userCarId) {
         return entityManager.find(UserCar.class, userCarId);
     }
+    public UserCar findByCarId(long carId) {
+        return entityManager.find(UserCar.class, carId);
+    }
 
     @Transactional
     public UserCar addUserCar(UserCar userCar) {

@@ -124,9 +124,11 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
                                 if (validationService.validateConnectionScreen(connectionSuccessful).valid)
                                 {
                                     viewModel.setStep(step + 1)
+                                    viewModel.setButtonClicked(false)
                                     viewModel.setTriedToSubmit(false)
                                 } else{
                                     viewModel.setTriedToSubmit(true)
+                                    viewModel.setButtonClicked(false)
                                 }
                             } else if (step == 3) {
                                 if (validationService.validateCarInfoScreen(

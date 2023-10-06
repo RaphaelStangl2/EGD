@@ -129,6 +129,7 @@ class BLEReceiveManager @Inject constructor(
                 for (i in serviceUUIDList!!) {
                     if (gatt.services.get(2).uuid.toString() == i){
                         characteristic = i?.let { findCharacteristics(it, CHARACTERISTICS_UUID) }
+                        connectedServiceUUID = gatt.services[2].uuid.toString()
                     }
                     if (characteristic != null) {
                         break

@@ -47,6 +47,7 @@ fun AddCarDialogue(viewModel: EGDViewModel, onAdded: () -> Unit,modifier: Modifi
     var userName = carUiState.userName
     var email = carUiState.email
     var password = carUiState.password
+    var licensePlate = carUiState.licensePlate
     var triedToSubmit = carUiState.triedToSubmit
     var searchBarContent = carUiState.friendSearchBarContent
 
@@ -77,7 +78,7 @@ fun AddCarDialogue(viewModel: EGDViewModel, onAdded: () -> Unit,modifier: Modifi
             ConnectScreen(viewModel, onBluetoothStateChanged, validationService, triedToSubmit)
         }
         else if(step == 2) {
-            CarInfoScreen(carName, fuelConsumption, viewModel, triedToSubmit)
+            CarInfoScreen(carName, fuelConsumption, viewModel, triedToSubmit, licensePlate)
         }
         else if(step == 3) {
            AddUserScreen(

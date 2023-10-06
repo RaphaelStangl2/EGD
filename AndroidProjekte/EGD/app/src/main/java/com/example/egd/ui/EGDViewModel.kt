@@ -3,9 +3,7 @@ package com.example.egd.ui
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import android.location.Location
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.egd.data.*
@@ -60,7 +58,17 @@ class EGDViewModel @Inject constructor(
     private val _homeUiState = MutableStateFlow(HomeScreenState())
     val homeUiState: StateFlow<HomeScreenState> = _homeUiState.asStateFlow()
 
-    var connectionState by mutableStateOf<ConnectionState>(ConnectionState.Uninitialized)
+    private val _connectionState  = MutableStateFlow(ConnectionScreenState())
+    val connectionState: StateFlow<ConnectionScreenState> = _connectionState.asStateFlow()
+
+
+    fun setConnectionState(connectionEnum: ConnectionEnum){
+        _connectionState.update { currentState ->
+            currentState.copy(
+                connectionState = connectionEnum
+            )
+        }
+    }
 
     fun setInitializeConnectionBLE(initializeConnectionBLE:Boolean){
         bleReceiveManager.setInitializeConnection(initializeConnectionBLE)
@@ -335,6 +343,8 @@ class EGDViewModel @Inject constructor(
         val listCarType = object : TypeToken<Array<Car>>() {}.type
         var carList = Gson().fromJson(jsonStringVar, Array<Car>::class.java)
 
+        setUUIDListBLE(carList?.map {it.uuid}?.toTypedArray())
+
         _homeUiState.update { currentState ->
             currentState.copy(
                 cars = carList
@@ -484,7 +494,7 @@ class EGDViewModel @Inject constructor(
 
         var finalList: Array<UserCar> = friendsAssignList.toTypedArray()
 
-        if (service.validateRegisterForm(value.userName, value.email, value.password)) {
+        if (service.validateRegisterForm(value.userName, value.email, value.password, value.licensePlate)) {
             try {
                 //response = HttpService.retrofitService.postRegistration(userToAdd)
                 response = HttpService.retrofitService.postUserCars(finalList)
@@ -519,11 +529,12 @@ class EGDViewModel @Inject constructor(
 
     private fun subscribeToChanges(){
         viewModelScope.launch {
+            var connectionState = connectionState.value
             bleReceiveManager.data.collect{ result ->
                 if (result.test){
-                    connectionState = ConnectionState.Connected
+                    connectionState.connectionState = ConnectionEnum.Connected
                 } else{
-                    connectionState = ConnectionState.Uninitialized
+                    connectionState.connectionState = ConnectionEnum.Uninitialized
                 }
                 _getStartedUiState.update { currentState ->
                     currentState.copy(
@@ -544,12 +555,12 @@ class EGDViewModel @Inject constructor(
 
     fun disconnect(){
         bleReceiveManager.disconnect()
-        connectionState = ConnectionState.Disconnected
+        connectionState.value.connectionState = ConnectionEnum.Disconnected
     }
 
     fun reconnect(){
         bleReceiveManager.reconnect()
-        connectionState = ConnectionState.Connected
+        connectionState.value.connectionState = ConnectionEnum.Connected
     }
 
     fun initializeConnection(startForeground: () -> Unit) {
@@ -558,7 +569,7 @@ class EGDViewModel @Inject constructor(
         bleReceiveManager.startReceiving()
         subscribeToChanges()
         addCloseable(Closeable({bleReceiveManager.closeConnection()}))
-        connectionState = ConnectionState.CurrentlyInitializing
+        connectionState.value.connectionState = ConnectionEnum.CurrentlyInitializing
 
         var gpsService: GPSService = GPSService(viewModel = this, {})
         //gpsService.run()
@@ -567,12 +578,12 @@ class EGDViewModel @Inject constructor(
     fun startCarTrackingService(){
         if (!carTrackingServiceIsRunning){
             carTrackingServiceIsRunning = true
-            var homeUiState = homeUiState.value
-            var getStartedState = getStartedUiState.value
 
             viewModelScope.launch {
                 while(true){
                     delay(3000)
+                    var homeUiState = homeUiState.value
+                    var getStartedState = getStartedUiState.value
                     getUserPosition(){ location ->
                         if (homeUiState.cars!= null && location!= null){
                             var car: Car? = null
@@ -689,7 +700,6 @@ class EGDViewModel @Inject constructor(
         //stopForegroundService()
         bleReceiveManager.disconnect()
         bleReceiveManager.closeConnection()
-        connectionState = ConnectionState.Uninitialized
 
         onCleared()
         setConnectionSuccessful(false)

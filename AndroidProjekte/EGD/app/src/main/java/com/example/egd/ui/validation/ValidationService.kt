@@ -62,9 +62,9 @@ class ValidationService () {
 
     fun validateLicencePlate(licencePlate: String): ValidationObject {
         if (licencePlate.isNotEmpty()){
-            return ValidationObject(false, "License Plate must have a value")
+            return ValidationObject(true, "License Plate must have a value")
         }
-        return ValidationObject(true, "")
+        return ValidationObject(false, "")
     }
 
     fun validateLoginForm(email: String, password: String): Boolean{

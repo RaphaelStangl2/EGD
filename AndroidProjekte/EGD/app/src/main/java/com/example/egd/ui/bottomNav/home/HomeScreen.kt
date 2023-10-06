@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.example.egd.R
+import com.example.egd.data.ConnectionEnum
 import com.example.egd.data.ble.ConnectionState
 import com.example.egd.data.entities.Car
 import com.example.egd.ui.navigation.BluetoothIconCar
@@ -43,11 +44,11 @@ fun HomeScreen(
 
     val scrollState = rememberScrollState()
     var searchBarContent = homeUiState.searchBarContent
-    //viewModel.readCarsFromJson(LocalContext.current.resources.openRawResource(R.raw.car))
+    //viewModel.readCarsFromJson(LocalContext.current.resources.openRawResource(R.raw.car)
 
     var listCars = homeUiState.cars
 
-    var connectionState = viewModel.connectionState
+    val connectionState = viewModel.connectionState.collectAsState().value
 
     if (homeUiState.user?.id != null){
         viewModel.getCarsForUserId(homeUiState.user.id)
@@ -62,18 +63,38 @@ fun HomeScreen(
                 if(event == Lifecycle.Event.ON_RESUME){
                     if (homeUiState.user?.id != null){
                         viewModel.getCarsForUserId(homeUiState.user.id)
+
+                        if (connectionState.connectionState.equals(ConnectionEnum.Uninitialized)){
+                            viewModel.setUUIDListBLE(listCars?.map {it.uuid}?.toTypedArray())
+                            viewModel.startCarTrackingService()
+                            viewModel.initializeConnection { startForeground() }
+
+                        }
+                        if (connectionState.connectionState.equals(ConnectionEnum.Disconnected)){
+                            viewModel.reconnect()
+                        }
                     } else
                         viewModel.getUserForEmail(sharedPreference)
+
+
                 }
                 if (event == Lifecycle.Event.ON_CREATE){
-                    if (connectionState.equals(ConnectionState.Uninitialized)){
+                    if (homeUiState.user?.id != null){
+                        viewModel.getCarsForUserId(homeUiState.user.id)
+
+                    } else
+                        viewModel.getUserForEmail(sharedPreference)
+
+                    if (connectionState.connectionState.equals(ConnectionEnum.Uninitialized)){
                         viewModel.setUUIDListBLE(listCars?.map {it.uuid}?.toTypedArray())
                         viewModel.startCarTrackingService()
                         viewModel.initializeConnection { startForeground() }
+
                     }
-                    if (connectionState.equals(ConnectionState.Disconnected)){
+                    if (connectionState.connectionState.equals(ConnectionEnum.Disconnected)){
                         viewModel.reconnect()
                     }
+
                 }
                 /*if (event == Lifecycle.Event.ON_START) {
                     viewModel.getUserForEmail(sharedPreference)

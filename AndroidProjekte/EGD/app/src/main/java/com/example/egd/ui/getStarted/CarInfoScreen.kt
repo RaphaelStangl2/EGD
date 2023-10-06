@@ -51,7 +51,7 @@ fun CarInfoScreen(carName:String, fuelConsumption: String, viewModel: EGDViewMod
 
     Row(){
         TextField(
-            value = carName,
+            value = licensePlate,
             onValueChange = {viewModel.setLicensePlate(it)},
             placeholder = { Text(text="STK1234") },
             colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background),

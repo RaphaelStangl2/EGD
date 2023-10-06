@@ -13,14 +13,15 @@ fun StatisticsScreen(
     viewModel: EGDViewModel,
     modifier: Modifier = Modifier
 ){
+    var connection = true
     val connectionSuccessful = viewModel.getStartedUiState.collectAsState().value.connectionSuccessful
 
 
     Column(){
-        Button(onClick = {}){
+        Button(onClick = {connection = false}){
             Text(text="Statistics Screen")
         }
-
+        Text(text=connection.toString())
 
         Text(text=connectionSuccessful.toString())
     }

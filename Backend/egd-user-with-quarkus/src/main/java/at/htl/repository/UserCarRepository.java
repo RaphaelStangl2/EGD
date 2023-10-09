@@ -9,6 +9,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
+import java.util.List;
 
 @ApplicationScoped
 public class UserCarRepository {
@@ -20,9 +21,15 @@ public class UserCarRepository {
     public UserCar findById(long userCarId) {
         return entityManager.find(UserCar.class, userCarId);
     }
-    public UserCar findByCarId(long carId) {
-        return entityManager.find(UserCar.class, carId);
+
+
+    public List<UserCar> findByCarId(long carId) {
+        return entityManager.createQuery("SELECT c FROM UserCar c WHERE c.car.id = :carId", UserCar.class)
+                .setParameter("carId", carId)
+                .getResultList();
     }
+
+
 
     @Transactional
     public UserCar addUserCar(UserCar userCar) {

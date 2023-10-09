@@ -30,9 +30,15 @@ public class CarRepository {
 
     @Transactional
     public void removeCar(final long carId) {
-        final UserCar userCar= userCarRepository.findByCarId(carId);
+        final List<UserCar> userCars= userCarRepository.findByCarId(carId);
         final Car car = findById(carId);
-        entityManager.remove(userCar);
+
+
+        for (UserCar uCar : userCars)
+        {
+            entityManager.remove(uCar);
+        }
+
         entityManager.remove(car);
     }
 

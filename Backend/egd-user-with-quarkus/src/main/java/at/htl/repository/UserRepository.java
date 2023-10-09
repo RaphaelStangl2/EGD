@@ -1,7 +1,10 @@
 package at.htl.repository;
 
+import at.htl.Classes.Mail;
 import at.htl.model.Car;
+import at.htl.model.UserCar;
 import at.htl.model.Users;
+import io.quarkus.mailer.Mailer;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -29,6 +32,12 @@ public class  UserRepository {
     @Inject
     EntityManager entityManager;
 
+    //Mail
+    @Inject
+    Mailer mailer;
+
+    @Inject
+    UserCarRepository userCarRepository;
 
     //USERS
     public Users addUser(Users user) {
@@ -37,6 +46,9 @@ public class  UserRepository {
     }
 
     public void removeUser(final long reservationId) {
+        final UserCar userCar= userCarRepository.findByCarId(reservationId);
+        entityManager.remove(userCar);
+
         final Users user = findById(reservationId);
         entityManager.remove(user);
     }
@@ -222,11 +234,13 @@ public class  UserRepository {
         }
         else{
             return null;
-
         }
 
     }
 
+    public void sendEmailToAcount(Mail newMail){
+        mailer.send(io.quarkus.mailer.Mail.withText(newMail.getMailTo().getEmail(), newMail.getSubject(), newMail.getText()));
+    }
 
 
 }

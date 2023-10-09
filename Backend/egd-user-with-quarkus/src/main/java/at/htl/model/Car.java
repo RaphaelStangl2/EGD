@@ -23,6 +23,8 @@ public class Car {
 
     private String name;
 
+    private String licensePlate;
+
     private Double consumption;
 
     private Double longitude;

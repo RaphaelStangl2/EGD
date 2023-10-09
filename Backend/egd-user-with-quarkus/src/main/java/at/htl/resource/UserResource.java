@@ -1,10 +1,10 @@
 package at.htl.resource;
 
 import at.htl.Classes.Account;
+import at.htl.Classes.Mail;
 import at.htl.model.Car;
 import at.htl.model.Users;
 import at.htl.repository.UserRepository;
-import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
 import io.quarkus.security.User;
 import io.smallrye.common.annotation.Blocking;
@@ -29,18 +29,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 
-/*
-import javax.mail.*;
-
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-
-
- */
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
@@ -52,9 +40,14 @@ public class UserResource {
     @Inject
     UserRepository userRepository;
 
-    //Mail
-    @Inject
-    Mailer mailer;
+
+    @DELETE
+    @Path("{userId}/")
+    public Response removeUser(@PathParam("userId") Long carId) {
+        userRepository.removeUser(carId);
+        return Response.noContent().build();
+    }
+
 
     @POST
     @Path("/forgotPassword")
@@ -74,11 +67,13 @@ public class UserResource {
 
             String tempPassword = userRepository.generateTempPassword();
             user.setResetCode(UserRepository.getSaltedHash(tempPassword));
-
-
             userRepository.update(user);
-            //email versenden
-            mailer.send(Mail.withText("raphael.stangl.12@gmail.com", "Password", "Ihr temporäres Passwort lautet: " + tempPassword));
+            //send email
+            Mail newMail = new at.htl.Classes.Mail();
+            newMail.setMailTo(account);
+            newMail.setSubject("EGD-Password");
+            newMail.setText("Ihr temporäres Passwort lautet: " + tempPassword);
+            userRepository.sendEmailToAcount(newMail);
 
             return Response.ok("Temporary password sent to " + account.getEmail()).build();
         } else {
@@ -101,7 +96,12 @@ public class UserResource {
             user.setPassword(UserRepository.getSaltedHash(account.getNewPassword()));
             userRepository.update(user);
 
-            mailer.send(Mail.withText("raphael.stangl.12@gmail.com", "Password", user.getPassword()));
+            Mail newMail = new at.htl.Classes.Mail();
+            newMail.setMailTo(account);
+            newMail.setSubject("EGD change password");
+            newMail.setText(user.getPassword());
+            userRepository.sendEmailToAcount(newMail);
+
 
             return Response.ok("Temporary password sent to " + account.getEmail()).build();
         } else {
@@ -110,16 +110,7 @@ public class UserResource {
 
     }
 
-/*
-    @GET
-    @Path("/email")
-    @Blocking
-    public Response hello() {
-        mailer.send(Mail.withText("raphael.stangl.12@gmail.com", "A sivcvlcmple emkjdkfjdkfjfkdjail from quarkus", "SOSOS"));
-        return Response.ok("Erfolgreich eingeloggt").build();
-    }
 
- */
 
 
     @POST
@@ -179,7 +170,6 @@ public class UserResource {
     @GET
     @Path("{filter}/")
     @Consumes(MediaType.APPLICATION_JSON)
-
     public List<Users> getUsersByFilter(@PathParam("filter") String username) {
         //Pathpram man kann die parameter durch url geben
         if (username == null) {
@@ -188,8 +178,6 @@ public class UserResource {
             List<Users> usersList = (List<Users>) userRepository.filterByName(username);
             return usersList;
         }
-
-
     }
 
 

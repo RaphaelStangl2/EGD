@@ -30,6 +30,9 @@ public class UserCarRepository {
     }
 
 
+    public UserCar findByUserId(long userId) {
+        return entityManager.find(UserCar.class, userId);
+    }
 
     @Transactional
     public UserCar addUserCar(UserCar userCar) {
@@ -54,4 +57,8 @@ public class UserCarRepository {
     }
 
 
+    public List<UserCar> getAllUserCars() {
+        return entityManager.createQuery("SELECT uc FROM UserCar uc", UserCar.class)
+                .getResultList();
+    }
 }

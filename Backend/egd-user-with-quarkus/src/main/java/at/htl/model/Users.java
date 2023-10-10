@@ -36,8 +36,6 @@ public class Users {
 
     /* @OneToMany(cascade = CascadeType.ALL)
     private List<Car> cars;
-
-
     */
     @ManyToOne
     @JoinColumn(name = "place_id")

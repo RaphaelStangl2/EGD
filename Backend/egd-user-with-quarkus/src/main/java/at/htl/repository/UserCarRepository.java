@@ -4,6 +4,7 @@ package at.htl.repository;
 import at.htl.model.Car;
 import at.htl.model.UserCar;
 import at.htl.model.Users;
+import io.vertx.ext.auth.User;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -28,6 +29,14 @@ public class UserCarRepository {
                 .setParameter("carId", carId)
                 .getResultList();
     }
+
+    public List<UserCar> findByDriveId(long driveId) {
+        return entityManager.createQuery(
+                        "SELECT uc FROM UserCar uc JOIN uc.drives d WHERE d.id = :driveId", UserCar.class)
+                .setParameter("driveId", driveId)
+                .getResultList();
+    }
+
 
 
     public UserCar findByUserId(long userId) {

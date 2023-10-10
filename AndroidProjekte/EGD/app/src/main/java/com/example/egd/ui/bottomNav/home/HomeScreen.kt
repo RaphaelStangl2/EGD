@@ -57,56 +57,42 @@ fun HomeScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
 
     DisposableEffect(
-        key1 = lifecycleOwner,
-        effect = {
-            val observer = LifecycleEventObserver{_,event ->
-                if(event == Lifecycle.Event.ON_RESUME){
-                    if (homeUiState.user?.id != null){
-                        viewModel.getCarsForUserId(homeUiState.user.id)
+        key1 = lifecycleOwner
+    ) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                if (homeUiState.user?.id != null) {
+                    viewModel.getCarsForUserId(homeUiState.user.id)
 
-                        if (connectionState.connectionState.equals(ConnectionEnum.Uninitialized)){
-                            viewModel.setUUIDListBLE(listCars?.map {it.uuid}?.toTypedArray())
-                            viewModel.startCarTrackingService()
-                            viewModel.initializeConnection { startForeground() }
-
-                        }
-                        if (connectionState.connectionState.equals(ConnectionEnum.Disconnected)){
-                            viewModel.reconnect()
-                        }
-                    } else
-                        viewModel.getUserForEmail(sharedPreference)
-
-
-                }
-                if (event == Lifecycle.Event.ON_CREATE){
-                    if (homeUiState.user?.id != null){
-                        viewModel.getCarsForUserId(homeUiState.user.id)
-
-                    } else
-                        viewModel.getUserForEmail(sharedPreference)
-
-                    if (connectionState.connectionState.equals(ConnectionEnum.Uninitialized)){
-                        viewModel.setUUIDListBLE(listCars?.map {it.uuid}?.toTypedArray())
-                        viewModel.startCarTrackingService()
-                        viewModel.initializeConnection { startForeground() }
-
-                    }
-                    if (connectionState.connectionState.equals(ConnectionEnum.Disconnected)){
-                        viewModel.reconnect()
-                    }
-
-                }
-                /*if (event == Lifecycle.Event.ON_START) {
+                    viewModel.startCarTrackingService()
+                    viewModel.startBLEService()
+                } else {
                     viewModel.getUserForEmail(sharedPreference)
-                }*/
+                    viewModel.startCarTrackingService()
+                    viewModel.startBLEService()
+                }
             }
-            lifecycleOwner.lifecycle.addObserver(observer)
-
-            onDispose {
-                lifecycleOwner.lifecycle.removeObserver(observer)
+            if (event == Lifecycle.Event.ON_CREATE) {
+                if (homeUiState.user?.id != null) {
+                    viewModel.getCarsForUserId(homeUiState.user.id)
+                    viewModel.startCarTrackingService()
+                    viewModel.startBLEService()
+                } else {
+                    viewModel.getUserForEmail(sharedPreference)
+                    viewModel.startCarTrackingService()
+                    viewModel.startBLEService()
+                }
             }
+            /*if (event == Lifecycle.Event.ON_START) {
+                viewModel.getUserForEmail(sharedPreference)
+            }*/
         }
-    )
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
 
     Column (

@@ -1,7 +1,9 @@
 package com.example.egd
 
 import android.bluetooth.BluetoothAdapter
+import android.content.Context
 import android.content.SharedPreferences
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -28,6 +30,7 @@ import com.example.egd.ui.permissions.SystemBroadcastReceiver
 import com.google.accompanist.permissions.*
 import com.example.egd.ui.navigation.*
 import com.example.egd.ui.profile.Profile
+import dagger.hilt.android.qualifiers.ApplicationContext
 
 /*@Composable
 fun TopAppBar(
@@ -58,6 +61,7 @@ fun EGDApp(
     onNoInternetConnection: () -> Boolean,
     sharedPreference: () -> SharedPreferences?,
     startForegroundService: () -> Unit,
+    context: Context,
     stopForegroundService: () -> Unit
 ) {
 
@@ -307,8 +311,13 @@ fun EGDApp(
                         viewModel = viewModel
                     ) {
                         viewModel.setStep(1)
+                        if (getStartedUiState.currentUUID != ""){
+                            Toast.makeText(context, "Disconnect from current device before adding car", Toast.LENGTH_LONG).show()
+                        }
+                        else{
+                            navController.navigate(BottomNavItem.AddCarScreen.screen_route)
+                        }
 
-                        navController.navigate(BottomNavItem.AddCarScreen.screen_route)
                     }
                 },
                 floatingActionButtonPosition = FabPosition.Center

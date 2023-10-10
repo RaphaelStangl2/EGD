@@ -89,15 +89,13 @@ class BLEReceiveManager @Inject constructor(
                     this@BLEReceiveManager.gatt = gatt
                 } else if(newState == BluetoothProfile.STATE_DISCONNECTED){
                     //Toast.makeText(context, "State Connected", Toast.LENGTH_SHORT).show()
-
                     coroutineScope.launch {
                         data.emit(
                             EGDUiState(false, "0","")
                         )
                     }
                     gatt.close()
-
-                    startReceiving()
+                    //startReceiving()
                 }
             }else{
                 //Toast.makeText(context, "Gatt closed", Toast.LENGTH_SHORT).show()
@@ -105,8 +103,13 @@ class BLEReceiveManager @Inject constructor(
                 gatt.close()
                 currentConnectionAttempt+=1
 
+                coroutineScope.launch {
+                    data.emit(
+                        EGDUiState(false, "0","")
+                    )
+                }
                // if(currentConnectionAttempt<=MAXIMUM_CONNECTION_ATTEMPTS){
-                    startReceiving()
+                //startReceiving()
                 //}else{
                 //}
             }

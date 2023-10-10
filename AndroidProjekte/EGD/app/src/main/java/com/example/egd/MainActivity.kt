@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                 ) {
 
-                    EGDApp( startForegroundService = {startForeground()},onNoInternetConnection = {isInternetAvailable(this)}, onBluetoothStateChanged = {showBluetoothDialog()}, onGPSRequired = {showGPSDialog()}, sharedPreference = {getEmailSharedPreferences()}) { stopForeground() }
+                    EGDApp( startForegroundService = {startForeground()},onNoInternetConnection = {isInternetAvailable(this)}, onBluetoothStateChanged = {showBluetoothDialog()}, onGPSRequired = {showGPSDialog()}, sharedPreference = {getEmailSharedPreferences()}, context= this) { stopForeground() }
                 }
             }
         }

@@ -31,8 +31,6 @@ fun AddCarDialogue(viewModel: EGDViewModel, onAdded: () -> Unit,modifier: Modifi
     val searchFriendList = homeUiState.searchFriendList
     var assignedFriendList = homeUiState.assignedFriendsList
 
-
-
     val loginUiState = viewModel.loginUiState.collectAsState().value
     val carUiState = viewModel.getStartedUiState.collectAsState().value
 

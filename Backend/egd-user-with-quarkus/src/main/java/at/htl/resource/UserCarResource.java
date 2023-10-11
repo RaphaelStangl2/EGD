@@ -71,7 +71,7 @@ public class UserCarResource {
 
     }
 
-    @DELETE
+    @POST
     @Path("/removeUserCar")
     public Response removeUserCar(UserCar userCar) {
 

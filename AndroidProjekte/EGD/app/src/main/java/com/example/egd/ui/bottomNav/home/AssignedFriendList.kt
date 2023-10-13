@@ -2,6 +2,7 @@ package com.example.egd.ui.bottomNav.home
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import com.example.egd.data.entities.User
 import com.example.egd.ui.EGDViewModel
 
@@ -12,10 +13,13 @@ fun AssignedFriendList(
     viewModel: EGDViewModel,
     goToFriendsAddScreen: () -> Unit
 ){
+    val homeUiStateVal = viewModel.homeUiState.collectAsState().value
     if (assignedFriendsList != null) {
         for (assignedFriend in assignedFriendsList){
-            Row(){
-                UserCard(assignedFriend,true ,viewModel)
+            if (assignedFriend != homeUiStateVal.user){
+                Row(){
+                    UserCard(assignedFriend,true ,viewModel)
+                }
             }
         }
         if (addFriendsList != null) {

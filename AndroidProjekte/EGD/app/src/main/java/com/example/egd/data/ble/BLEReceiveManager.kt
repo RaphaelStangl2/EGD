@@ -141,15 +141,20 @@ class BLEReceiveManager @Inject constructor(
             }
 
             if (characteristic == null){
+                coroutineScope.launch {
+                    data.emit(
+                        EGDUiState(false, "0", connectedServiceUUID)
+                    )
+                }
                 return
             }
-
-            enableNotification(characteristic)
-
-            coroutineScope.launch {
-                data.emit(
-                    EGDUiState(true, "0", connectedServiceUUID)
-                )
+            else{
+                enableNotification(characteristic)
+                coroutineScope.launch {
+                    data.emit(
+                        EGDUiState(true, "0", connectedServiceUUID)
+                    )
+                }
             }
         }
 

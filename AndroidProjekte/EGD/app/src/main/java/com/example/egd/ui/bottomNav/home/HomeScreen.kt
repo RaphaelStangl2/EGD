@@ -224,7 +224,7 @@ fun CarCard(car: Car, name: String, latitude: Double, longitude: Double, viewMod
                                     expanded = false
                                     viewModel.deleteCar(car)
                                 },
-                                enabled = false,
+                                enabled = true,
                                 modifier = Modifier.background(color = Color.White)
                             ) {
                                 Text(color = MaterialTheme.colors.primary, text = "Delete")

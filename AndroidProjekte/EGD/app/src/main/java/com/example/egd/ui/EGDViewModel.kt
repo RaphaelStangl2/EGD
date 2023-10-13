@@ -87,7 +87,8 @@ class EGDViewModel @Inject constructor(
                 consumption = consumption,
                 licensePlate = car.licensePlate,
                 latitude = car.latitude,
-                longitude = car.longitude
+                longitude = car.longitude,
+                uuid = car.uuid
             )
         }
     }
@@ -515,6 +516,8 @@ class EGDViewModel @Inject constructor(
                 setFuelConsumption("")
                 onRegistered()
                 bleReceiveManager.closeConnection()
+                setUUIDListBLE(emptyArray())
+                setCurrentUUID("")
 
                 var editor = sharedPreference?.edit()
                 editor?.putString("email", value.email)
@@ -528,6 +531,15 @@ class EGDViewModel @Inject constructor(
         }
     }
 
+    private fun setCurrentUUID(uuid: String) {
+        _getStartedUiState.update { currentState ->
+            currentState.copy(
+                currentUUID = uuid,
+                connectionSuccessful = false
+
+            )
+        }
+    }
 
 
     private fun subscribeToChanges(){
@@ -536,18 +548,28 @@ class EGDViewModel @Inject constructor(
             bleReceiveManager.data.collect{ result ->
                 if (result.test){
                     connectionState.connectionState = ConnectionEnum.Connected
-                    setCurrentDrivingUser()
+                    _getStartedUiState.update { currentState ->
+                        currentState.copy(
+                            connectionSuccessful = result.uuid!= null,
+                            accidentCode = result.accidentCode,
+                            currentUUID = result.uuid
+                        )
+                    }
+                    setCurrentDrivingUser(result.uuid)
+
                 } else{
                     connectionState.connectionState = ConnectionEnum.Uninitialized
                     removeCurrentDrivingUser()
+                    _getStartedUiState.update { currentState ->
+                        currentState.copy(
+                            connectionSuccessful = false,
+                            accidentCode = result.accidentCode,
+                        )
+                    }
                 }
-                _getStartedUiState.update { currentState ->
-                    currentState.copy(
-                        connectionSuccessful = result.uuid!= null,
-                        accidentCode = result.accidentCode,
-                        currentUUID = result.uuid
-                    )
-                }
+
+
+
             }
         }
         /*_uiState.update { currentState ->
@@ -620,17 +642,17 @@ class EGDViewModel @Inject constructor(
             viewModelScope.launch {
                 while(true){
                     var homeUiState = homeUiState.value
-                    delay(3000)
                     if (homeUiState.cars != null){
                         val listCars = homeUiState.cars
                         setUUIDListBLE(listCars?.map {it.uuid}?.toTypedArray())
                         if (connectionState.value.connectionState == ConnectionEnum.Uninitialized){
                             initializeConnection {  }
                         }
-                        if (connectionState.value.connectionState == ConnectionEnum.Disconnected){
-                            reconnect()
-                        }
+                        //if (connectionState.value.connectionState == ConnectionEnum.Disconnected){
+                        //    reconnect()
+                        //}
                     }
+                    delay(10000)
                 }
             }
         }
@@ -720,6 +742,7 @@ class EGDViewModel @Inject constructor(
         getStartedUiState.value.numberOfSteps = 5
         setUser(User(id = null, userName = "", email = "", password = "",))
 
+
         editor?.putString("email", "")
         editor?.putBoolean("isLoggedIn", false)
         editor?.apply()
@@ -727,9 +750,19 @@ class EGDViewModel @Inject constructor(
         //stopForegroundService()
         bleReceiveManager.disconnect()
         bleReceiveManager.closeConnection()
+        setCurrentUUID("")
+        homeUiState.value.cars = emptyArray()
 
         onCleared()
         setConnectionSuccessful(false)
+    }
+
+    private fun setCars(emptyArray: Array<Car>) {
+        _homeUiState.update { currentState ->
+            currentState.copy(
+                 cars = emptyArray,
+            )
+        }
     }
 
     fun setConnectionSuccessful(connectionSuccessful: Boolean) {
@@ -841,13 +874,14 @@ class EGDViewModel @Inject constructor(
         viewModelScope.launch {
             val editCarValue = editCarUiState.value
             val homeValue = homeUiState.value
+            val getStartedValue = getStartedUiState.value
             val validationService = ValidationService()
             var response: ResponseBody? = null
 
 
             if (validationService.validateCarInfoScreen(editCarValue.name, editCarValue.consumption)) {
                 try {
-                    val car = Car(editCarValue.id, editCarValue.name, editCarValue.consumption.toDouble(), editCarValue.latitude, editCarValue.longitude, null, editCarValue.licensePlate, null)
+                    val car = Car(editCarValue.id, editCarValue.name, editCarValue.consumption.toDouble(), editCarValue.latitude, editCarValue.longitude, editCarValue.uuid, editCarValue.licensePlate, null)
                     response = HttpService.retrofitService.putCar(car)
 
                     val addedFriendsList =  editCarValue.addFriendList
@@ -855,7 +889,10 @@ class EGDViewModel @Inject constructor(
 
                     if (removedFriendsList != null){
                         for (user in removedFriendsList){
-                            HttpService.retrofitService.deleteUserCar(UserCar(user, car, false))
+                            try{
+                                HttpService.retrofitService.deleteUserCar(UserCar(user, car, false))
+                            } catch( e:Exception){
+                            }
                         }
                     }
                     if (addedFriendsList != null) {
@@ -982,14 +1019,14 @@ class EGDViewModel @Inject constructor(
 
     }
 
-    private fun setCurrentDrivingUser(){
+    private fun setCurrentDrivingUser(uuid:String){
         val getStartedState = getStartedUiState.value
         val homeState = homeUiState.value
         var car:Car? = null
         var userCar:UserCar? = null
         if (getStartedState!= null && homeState.cars!= null){
             for (i in homeState.cars!!){
-                if (i.uuid == getStartedState.currentUUID && i.id != null){
+                if (i.uuid == uuid && i.id != null){
                     car = i
                 }
             }

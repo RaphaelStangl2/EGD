@@ -79,7 +79,7 @@ public class CarRepository {
         car.setCurrentUser(currentUser);
 
         // Save the updated Car entity to the database
-      entityManager.merge(car);
+        entityManager.merge(car);
 
         // Optionally, you can return the updated UserCar entity
         return userCar;

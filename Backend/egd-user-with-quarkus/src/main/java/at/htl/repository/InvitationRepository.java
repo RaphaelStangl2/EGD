@@ -55,4 +55,17 @@ public class InvitationRepository {
     }
 
 
+    public List<Invitation> getInvitatationsForUser(Long id) {
+        var invs =  entityManager.createQuery("SELECT i FROM Invitation i WHERE i.userToInvite.id = :userId")
+                .setParameter("userId", id).getResultList();
+
+        return invs;
+    }
+
+    public List<Invitation> getInvitatationsSendForUser(Long id) {
+        var invs =  entityManager.createQuery("SELECT i FROM Invitation i WHERE i.userCar.user.id = :userId")
+                .setParameter("userId", id).getResultList();
+
+        return invs;
+    }
 }

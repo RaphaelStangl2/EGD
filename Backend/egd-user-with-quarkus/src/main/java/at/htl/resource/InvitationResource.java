@@ -57,6 +57,33 @@ public class InvitationResource {
     }
 
 
+    @GET
+    @Path("byUserId/{userId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getIvsByUserId(@PathParam("userId") Long id){
+        List<Invitation> invs = invitationRepository.getInvitatationsForUser(id);
+
+        if (invs == null){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.ok(invs).build();
+    }
+
+
+
+    @GET
+    @Path("invsSendByUserId/{userId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getIvsSendByUserId(@PathParam("userId") Long id){
+        List<Invitation> invs = invitationRepository.getInvitatationsSendForUser(id);
+
+        if (invs == null){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.ok(invs).build();
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

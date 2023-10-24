@@ -3,9 +3,11 @@ package at.htl.repository;
 import at.htl.model.Costs;
 import at.htl.model.UserCar;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
+@ApplicationScoped
 public class CostsRepository {
 
     @Inject

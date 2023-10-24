@@ -3,12 +3,16 @@ package at.htl.repository;
 import at.htl.model.Costs;
 import at.htl.model.Drive;
 import at.htl.model.UserCar;
+import at.htl.model.Users;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
+import javax.ws.rs.core.Response;
 import java.util.List;
 
+@ApplicationScoped
 public class DriveRepository {
 
     @Inject
@@ -33,25 +37,16 @@ public class DriveRepository {
     @Transactional
     public void removeDrive(final long driveId) {
         final Drive drive= findByDriveId(driveId);
-        final Costs costs= costsRepository.findCostsByDriveId(driveId);
 
 
-        final List<UserCar> userCars= userCarRepository.findByDriveId(driveId);
+        try {
+            final Costs costs= costsRepository.findCostsByDriveId(driveId);
+            entityManager.remove(costs);
+            entityManager.remove(drive);
+        } catch (Exception e) {
+            entityManager.remove(drive);
 
-        for (UserCar userCar : userCars) {
-            if (userCar.getDrives().contains(drive)) {
-                userCar.getDrives().remove(drive);
-            }
         }
-
-        // Aktualisieren der UserCar-Objekte in der Datenbank
-        for (UserCar userCar : userCars) {
-            entityManager.merge(userCar);
-        }
-
-
-        entityManager.remove(costs);
-        entityManager.remove(drive);
     }
 
     private Drive findByDriveId(long driveId) {

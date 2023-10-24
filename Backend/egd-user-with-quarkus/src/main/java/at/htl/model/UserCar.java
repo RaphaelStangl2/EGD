@@ -29,9 +29,6 @@ public class UserCar {
     @JoinColumn(name = "car_id")
     private Car car;
 
-    @OneToMany(mappedBy = "userCar")
-    private List<Drive> drives;
-
     private Boolean isAdmin;
 
 

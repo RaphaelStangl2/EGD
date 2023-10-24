@@ -30,12 +30,7 @@ public class UserCarRepository {
                 .getResultList();
     }
 
-    public List<UserCar> findByDriveId(long driveId) {
-        return entityManager.createQuery(
-                        "SELECT uc FROM UserCar uc JOIN uc.drives d WHERE d.id = :driveId", UserCar.class)
-                .setParameter("driveId", driveId)
-                .getResultList();
-    }
+
 
 
 

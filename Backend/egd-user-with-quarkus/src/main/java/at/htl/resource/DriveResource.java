@@ -10,6 +10,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.List;
 
 @Path("egd/drives/")
 public class DriveResource {
@@ -33,5 +34,19 @@ public class DriveResource {
     public Response removeDrive(@PathParam("driveId") Long driveId) {
         driveRepository.removeDrive(driveId);
         return Response.noContent().build();
+    }
+
+
+    @GET
+    @Path("{userCarId}/")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllDrivesByUserCarId(@PathParam("userCarId") Long userCarId){
+        List<Drive> drives = driveRepository.getAllDrivesByUserId(userCarId);
+
+        if (drives == null){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.ok(drives).build();
     }
 }

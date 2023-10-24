@@ -8,6 +8,7 @@ import at.htl.model.Users;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -47,6 +48,15 @@ public class DriveRepository {
             entityManager.remove(drive);
 
         }
+    }
+
+
+    public List<Drive> getAllDrivesByUserId(long userCarId) {
+        String queryString = "SELECT d FROM Drive d WHERE d.userCar.id = :userCarId";
+        TypedQuery<Drive> query = entityManager.createQuery(queryString, Drive.class);
+        query.setParameter("userCarId", userCarId);
+
+        return query.getResultList();
     }
 
     private Drive findByDriveId(long driveId) {

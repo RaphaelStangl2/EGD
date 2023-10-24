@@ -30,9 +30,11 @@ public class Accident {
     private Users user;
 
 
-    @OneToMany
+
+
+    @ManyToOne
     @JoinColumn(name = "costs_id")
-    private List<Costs> costs;
+    private Costs costs;
 
     @OneToOne
     @JoinColumn(name = "drive_id")

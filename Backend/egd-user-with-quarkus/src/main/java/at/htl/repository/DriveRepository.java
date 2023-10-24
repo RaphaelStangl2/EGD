@@ -59,6 +59,16 @@ public class DriveRepository {
         return query.getResultList();
     }
 
+
+   // getAllDrivesByCar;    (Gesamtübersicht für alle die dieses Auto haben)
+    public List<Drive> getAllDrivesByCar(long carId){
+        String queryString = "SELECT d FROM Drive d WHERE d.userCar.car.id = :carId";
+        TypedQuery<Drive> query = entityManager.createQuery(queryString, Drive.class);
+        query.setParameter("carId", carId);
+
+        return query.getResultList();
+    }
+
     private Drive findByDriveId(long driveId) {
         return entityManager.find(Drive.class, driveId);
     }

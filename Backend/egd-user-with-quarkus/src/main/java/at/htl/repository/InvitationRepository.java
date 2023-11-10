@@ -3,6 +3,8 @@ package at.htl.repository;
 import at.htl.model.Car;
 import at.htl.model.Invitation;
 import at.htl.model.UserCar;
+import at.htl.model.Users;
+import com.dajudge.kindcontainer.client.config.User;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -20,9 +22,22 @@ public class InvitationRepository {
     @Inject
     UserCarRepository userCarRepository;
 
+    @Inject
+    UserRepository userRepository;
+
+    @Inject
+    CarRepository carRepository;
+
     @Transactional
     public Invitation addInv(Invitation invitation) {
         long id = userCarRepository.getUserCarIdByUserCar(invitation.getUserCar());
+        Users user =userRepository.findByEmail(invitation.getUserCar().getUser().getEmail());
+        invitation.getUserCar().setUser(user);
+
+
+        Car car = carRepository.getCarWithOutId(invitation.getUserCar().getCar());
+        invitation.getUserCar().setCar(car);
+
         invitation.getUserCar().setId(id);
         entityManager.persist(invitation);
         return invitation;

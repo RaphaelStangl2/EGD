@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.util.List;
 
@@ -99,6 +100,18 @@ public class CarRepository {
         return userCar;
     }
 
+
+    public Car getCarWithOutId(Car car) {
+
+        String jpql = "SELECT c FROM Car c WHERE c.name = :name AND c.licensePlate = :licensePlate";
+        TypedQuery<Car> query = entityManager.createQuery(jpql, Car.class);
+        query.setParameter("name", car.getName());
+        query.setParameter("licensePlate", car.getLicensePlate());
+
+        Car existingCar = query.getSingleResult();
+        return existingCar; // Falls gefunden, gib das existierende Auto zurück
+
+    }
 
 
 }

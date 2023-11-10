@@ -6,7 +6,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModel
+import com.example.egd.ui.bottomNav.statistics.CircleDiagram
 
 @Composable
 fun StatisticsScreen(
@@ -25,4 +27,10 @@ fun StatisticsScreen(
         Text(text=connectionSuccessful.toString())
     }
 
+}
+
+@Preview
+@Composable
+fun StatisticsScreenPreview(){
+    CircleDiagram()
 }

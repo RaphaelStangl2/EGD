@@ -23,6 +23,7 @@ public class InvitationRepository {
     @Transactional
     public Invitation addInv(Invitation invitation) {
         long id = userCarRepository.getUserCarIdByUserCar(invitation.getUserCar());
+        invitation.getUserCar().setId(id);
         entityManager.persist(invitation);
         return invitation;
     }

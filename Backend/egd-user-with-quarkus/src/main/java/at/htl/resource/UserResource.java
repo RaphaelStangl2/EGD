@@ -48,7 +48,6 @@ public class UserResource {
         return Response.noContent().build();
     }
 
-
     @POST
     @Path("/forgotPassword")
     @Blocking

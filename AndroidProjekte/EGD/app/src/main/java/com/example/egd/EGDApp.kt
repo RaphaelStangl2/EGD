@@ -30,7 +30,6 @@ import com.example.egd.ui.permissions.SystemBroadcastReceiver
 import com.google.accompanist.permissions.*
 import com.example.egd.ui.navigation.*
 import com.example.egd.ui.profile.Profile
-import dagger.hilt.android.qualifiers.ApplicationContext
 
 /*@Composable
 fun TopAppBar(
@@ -124,7 +123,7 @@ fun EGDApp(
                 {
                     viewModel.logout(sharedPreference, stopForegroundService)
                     navController.navigate(StartItem.StartScreen.screen_route) { popUpTo(0) }
-                })
+                }, viewModel = viewModel)
             }
         }
 
@@ -328,6 +327,7 @@ fun EGDApp(
                     goToMap = { navController.navigate(BottomNavItem.Map.screen_route) },
                     goToProfile = { navController.navigate(StartItem.ProfileScreen.screen_route) },
                     sharedPreference = sharedPreference,
+                    onNoInternetConnection = {onNoInternetConnection()},
                     stopForegroundService = { stopForegroundService() },
                     startForeground = { startForegroundService() }
                 )

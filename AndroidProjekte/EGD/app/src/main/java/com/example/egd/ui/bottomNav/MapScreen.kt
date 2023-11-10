@@ -188,8 +188,8 @@ fun MapScreen(
                                     ),
                                     title = car.name,
                                     snippet =
-                                    if (car.currentDriver != null)
-                                        car.currentDriver!!.userName
+                                    if (car.currentUser != null)
+                                        car.currentUser!!.userName
                                     else
                                         "",
                                     icon = bitmapDescriptorFromVector(

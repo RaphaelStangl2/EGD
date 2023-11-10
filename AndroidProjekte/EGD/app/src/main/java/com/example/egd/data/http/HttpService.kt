@@ -1,6 +1,7 @@
 package com.example.egd.data.http
 
 import com.example.egd.data.entities.Car
+import com.example.egd.data.entities.Invitation
 import com.example.egd.data.entities.User
 import com.example.egd.data.entities.UserCar
 import com.squareup.moshi.Moshi
@@ -24,6 +25,18 @@ private val retrofit = Retrofit.Builder()
 
 
 interface HttpApiService {
+    @Headers("Content-Type: application/json")
+    @GET("egd/invitations/getInvitationsByUserId/{invitationId}")
+    suspend fun getInvitationByUserId(@Path("invitationId") invitationId:Long): ResponseBody?
+
+    @Headers("Content-Type: application/json")
+    @GET("egd/invitations/getInvitationsByUserId/{invitationId}")
+    suspend fun getInvitationBySendUserId(@Path("invitationId") invitationId:Long): ResponseBody?
+
+    @Headers("Content-Type: application/json")
+    @POST("egd/invitations")
+    suspend fun addInvitation(@Body invitation:Invitation): ResponseBody?
+
     @Headers("Content-Type: application/json")
     @POST("egd/userCar/removeUserCar")
     suspend fun deleteUserCar(@Body userCar:UserCar)

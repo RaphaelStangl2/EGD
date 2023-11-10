@@ -23,8 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.example.egd.R
-import com.example.egd.data.ConnectionEnum
-import com.example.egd.data.ble.ConnectionState
 import com.example.egd.data.entities.Car
 import com.example.egd.ui.navigation.BluetoothIconCar
 
@@ -38,7 +36,8 @@ fun HomeScreen(
     goToProfile: () -> Unit,
     sharedPreference: () -> SharedPreferences?,
     startForeground: () -> Unit,
-    stopForegroundService: () -> Unit
+    stopForegroundService: () -> Unit,
+    onNoInternetConnection: () -> Boolean
 ){
     val homeUiState = viewModel.homeUiState.collectAsState().value
 
@@ -77,10 +76,12 @@ fun HomeScreen(
                     viewModel.getCarsForUserId(homeUiState.user.id)
                     viewModel.startCarTrackingService()
                     viewModel.startBLEService()
+                    viewModel.startInvitationService(onNoInternetConnection)
                 } else {
                     viewModel.getUserForEmail(sharedPreference)
                     viewModel.startCarTrackingService()
                     viewModel.startBLEService()
+                    viewModel.startInvitationService(onNoInternetConnection)
                 }
             }
             /*if (event == Lifecycle.Event.ON_START) {

@@ -53,8 +53,8 @@ class MainActivity : ComponentActivity() {
 
 
    override fun onStop() {
-       bleReceiveManager.closeConnection()
-       bleReceiveManager.disconnect()
+       //bleReceiveManager.closeConnection()
+       //bleReceiveManager.disconnect()
         super.onStop()
     }
 

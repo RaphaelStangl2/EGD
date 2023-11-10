@@ -15,6 +15,7 @@ data class EditCarUiState(
     var assignedFriendList: Array<User>? = null,
     var longitude: Double = 0.0,
     var latitude: Double = 0.0,
-    var uuid: String? = ""
+    var uuid: String? = "",
+    var currentUser: User? = null
 
     )

@@ -53,11 +53,18 @@ class ValidationService () {
         return ValidationObject(true, "")
     }
 
-    fun validateRegisterForm(userName: String, email: String, password: String) :Boolean{
-        if (validatePassword(password).valid && validateEmail(email).valid && validateUserName(userName).valid){
+    fun validateRegisterForm(userName: String, email: String, password: String, licencePlate:String) :Boolean{
+        if (validatePassword(password).valid && validateEmail(email).valid && validateUserName(userName).valid && validateLicencePlate(licencePlate).valid){
             return true
         }
         return false
+    }
+
+    fun validateLicencePlate(licencePlate: String): ValidationObject {
+        if (licencePlate.isNotEmpty()){
+            return ValidationObject(true, "License Plate must have a value")
+        }
+        return ValidationObject(false, "")
     }
 
     fun validateLoginForm(email: String, password: String): Boolean{

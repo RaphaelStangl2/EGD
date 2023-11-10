@@ -1,7 +1,9 @@
 package com.example.egd
 
 import android.bluetooth.BluetoothAdapter
+import android.content.Context
 import android.content.SharedPreferences
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -58,6 +60,7 @@ fun EGDApp(
     onNoInternetConnection: () -> Boolean,
     sharedPreference: () -> SharedPreferences?,
     startForegroundService: () -> Unit,
+    context: Context,
     stopForegroundService: () -> Unit
 ) {
 
@@ -120,7 +123,7 @@ fun EGDApp(
                 {
                     viewModel.logout(sharedPreference, stopForegroundService)
                     navController.navigate(StartItem.StartScreen.screen_route) { popUpTo(0) }
-                })
+                }, viewModel = viewModel)
             }
         }
 
@@ -172,6 +175,10 @@ fun EGDApp(
                         onBackButtonClick = {
                             if (getStartedUiState.step == 1) {
                                 navController.navigateUp()
+                                viewModel.closeConnection()
+                            } else if (getStartedUiState.step == 2){
+                                viewModel.closeConnection()
+                                viewModel.setStep(getStartedUiState.step - 1)
                             } else {
                                 viewModel.setStep(getStartedUiState.step - 1)
                             }
@@ -240,6 +247,12 @@ fun EGDApp(
             Scaffold(
                 topBar = {
                     TopAppBarBackButton(navController, { Text("Add Users") }, onBackButtonClick = {
+
+                        if (homeUiState.assignedFriendsList != null){
+                            viewModel.setAddedFriendsList(homeUiState.assignedFriendsList!!)
+                        }
+                        viewModel.setAssignedFriendsList(emptyArray())
+                        viewModel.setSearchFriendList(emptyArray())
                         navController.navigateUp()
                     })
                 })
@@ -297,8 +310,13 @@ fun EGDApp(
                         viewModel = viewModel
                     ) {
                         viewModel.setStep(1)
+                        if (getStartedUiState.currentUUID != ""){
+                            Toast.makeText(context, "Disconnect from current device before adding car", Toast.LENGTH_LONG).show()
+                        }
+                        else{
+                            navController.navigate(BottomNavItem.AddCarScreen.screen_route)
+                        }
 
-                        navController.navigate(BottomNavItem.AddCarScreen.screen_route)
                     }
                 },
                 floatingActionButtonPosition = FabPosition.Center
@@ -309,6 +327,7 @@ fun EGDApp(
                     goToMap = { navController.navigate(BottomNavItem.Map.screen_route) },
                     goToProfile = { navController.navigate(StartItem.ProfileScreen.screen_route) },
                     sharedPreference = sharedPreference,
+                    onNoInternetConnection = {onNoInternetConnection()},
                     stopForegroundService = { stopForegroundService() },
                     startForeground = { startForegroundService() }
                 )

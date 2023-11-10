@@ -29,7 +29,9 @@ fun Profile(logout: () -> Unit, modifier: Modifier, viewModel: EGDViewModel){
     Column() {
 
         Row(modifier = Modifier.background(color = MaterialTheme.colors.primary)){
-            Column(modifier = Modifier.fillMaxWidth().padding(15.dp), horizontalAlignment = Alignment.CenterHorizontally){
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .padding(15.dp), horizontalAlignment = Alignment.CenterHorizontally){
                 if (user != null) {
                     UserInfo(user = user)
                 }
@@ -37,15 +39,17 @@ fun Profile(logout: () -> Unit, modifier: Modifier, viewModel: EGDViewModel){
         }
         Row(Modifier.padding(15.dp)){
             Column() {
-                Row(){
-                    Button(onClick = { logout() }) {
-                        Text("Log Out")
-                    }
-                }
+
                 Row() {
                     Column(){
                         Text("Invitations")
                         InvitationList(statusInvitationList, incomingInvitationList)
+                    }
+                }
+                Row(){
+                    Button(onClick = { logout() }, modifier = Modifier.background(color=Color.White)) {
+                        Icon(tint = Color.LightGray, painter = painterResource(id = R.drawable.ic_baseline_exit_to_app_24), contentDescription = "Logout")
+                        Text("Log Out", color = Color.LightGray)
                     }
                 }
             }

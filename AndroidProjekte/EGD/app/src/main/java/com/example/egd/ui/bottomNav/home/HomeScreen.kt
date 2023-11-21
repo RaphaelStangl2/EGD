@@ -24,6 +24,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.example.egd.R
 import com.example.egd.data.entities.Car
+import com.example.egd.ui.navigation.BluetoothIconCar
 
 
 @Composable
@@ -35,17 +36,18 @@ fun HomeScreen(
     goToProfile: () -> Unit,
     sharedPreference: () -> SharedPreferences?,
     startForeground: () -> Unit,
-    stopForegroundService: () -> Unit
+    stopForegroundService: () -> Unit,
+    onNoInternetConnection: () -> Boolean
 ){
     val homeUiState = viewModel.homeUiState.collectAsState().value
 
     val scrollState = rememberScrollState()
     var searchBarContent = homeUiState.searchBarContent
-    //viewModel.readCarsFromJson(LocalContext.current.resources.openRawResource(R.raw.car))
+    //viewModel.readCarsFromJson(LocalContext.current.resources.openRawResource(R.raw.car)
 
     var listCars = homeUiState.cars
 
-
+    val connectionState = viewModel.connectionState.collectAsState().value
 
     if (homeUiState.user?.id != null){
         viewModel.getCarsForUserId(homeUiState.user.id)
@@ -53,33 +55,45 @@ fun HomeScreen(
 
     val lifecycleOwner = LocalLifecycleOwner.current
 
-
     DisposableEffect(
-        key1 = lifecycleOwner,
-        effect = {
-            val observer = LifecycleEventObserver{_,event ->
-                if(event == Lifecycle.Event.ON_RESUME){
-                    if (homeUiState.user?.id != null){
-                        viewModel.getCarsForUserId(homeUiState.user.id)
-                    } else
-                        viewModel.getUserForEmail(sharedPreference)
+        key1 = lifecycleOwner
+    ) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                if (homeUiState.user?.id != null) {
+                    viewModel.getCarsForUserId(homeUiState.user.id)
 
-                }
-                if (event == Lifecycle.Event.ON_CREATE){
-                    viewModel.initializeConnection { startForeground() }
-
-                }
-                /*if (event == Lifecycle.Event.ON_START) {
+                    viewModel.startCarTrackingService()
+                    viewModel.startBLEService()
+                } else {
                     viewModel.getUserForEmail(sharedPreference)
-                }*/
+                    viewModel.startCarTrackingService()
+                    viewModel.startBLEService()
+                }
             }
-            lifecycleOwner.lifecycle.addObserver(observer)
-
-            onDispose {
-                lifecycleOwner.lifecycle.removeObserver(observer)
+            if (event == Lifecycle.Event.ON_CREATE) {
+                if (homeUiState.user?.id != null) {
+                    viewModel.getCarsForUserId(homeUiState.user.id)
+                    viewModel.startCarTrackingService()
+                    viewModel.startBLEService()
+                    viewModel.startInvitationService(onNoInternetConnection)
+                } else {
+                    viewModel.getUserForEmail(sharedPreference)
+                    viewModel.startCarTrackingService()
+                    viewModel.startBLEService()
+                    viewModel.startInvitationService(onNoInternetConnection)
+                }
             }
+            /*if (event == Lifecycle.Event.ON_START) {
+                viewModel.getUserForEmail(sharedPreference)
+            }*/
         }
-    )
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
 
     Column (
@@ -198,7 +212,7 @@ fun CarCard(car: Car, name: String, latitude: Double, longitude: Double, viewMod
                 ) {
                     Text(text="Go to map",color = MaterialTheme.colors.primaryVariant, fontWeight = MaterialTheme.typography.body2.fontWeight)
                 }
-
+                BluetoothIconCar(viewModel = viewModel, car = car)
                 Box(){
                     IconButton(onClick = { expanded = !expanded }) {
                         Icon(painterResource(id = R.drawable.ic_baseline_more_vert_24), contentDescription = "More Vert Icon")
@@ -209,11 +223,12 @@ fun CarCard(car: Car, name: String, latitude: Double, longitude: Double, viewMod
                             DropdownMenuItem(
                                 onClick = {
                                     expanded = false
+                                    viewModel.deleteCar(car)
                                 },
-                                enabled = false,
+                                enabled = true,
                                 modifier = Modifier.background(color = Color.White)
                             ) {
-                                Text(text = "Delete")
+                                Text(color = MaterialTheme.colors.primary, text = "Delete")
                             }
                         }
                     }

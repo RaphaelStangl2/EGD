@@ -14,7 +14,7 @@ import com.example.egd.ui.EGDViewModel
 
 
 @Composable
-fun UserCard(user: User, viewModel:EGDViewModel){
+fun UserCard(user: User,assignedFriend:Boolean, viewModel:EGDViewModel){
     Card(
         modifier = Modifier
             .fillMaxWidth(0.9f)
@@ -33,8 +33,14 @@ fun UserCard(user: User, viewModel:EGDViewModel){
                 Row(modifier = Modifier.fillMaxWidth(1f), horizontalArrangement = Arrangement.End){
                     Button(modifier = Modifier.padding(end=4.dp),
                         onClick = {
-                            viewModel.removeUserFromAssignedEditFriendsList(user)
-                            viewModel.addUserToRemovedFriendsList(user)},
+                            if (assignedFriend){
+                                viewModel.removeUserFromAssignedEditFriendsList(user)
+                                viewModel.addUserToRemovedFriendsList(user)
+                            }
+                            else {
+                                viewModel.removeUserFromAddList(user)
+                            }
+                        },
                         colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.error), shape = MaterialTheme.shapes.large){
                         Text("Remove")
                     }

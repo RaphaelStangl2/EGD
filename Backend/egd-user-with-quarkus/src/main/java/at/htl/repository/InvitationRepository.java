@@ -71,8 +71,9 @@ public class InvitationRepository {
             //userCar adden wenn einladung erfolgreich war
             UserCar userCar = new UserCar();
             userCar.setIsAdmin(false);
-            userCar.setUser(invitation.getUserToInvite());
-            userCar.setCar(invitation.getUserCar().getCar());
+            userCar.setUser(userRepository.findById(invitation.getUserToInvite().getId()));
+            userCar.setCar(carRepository.findById(invitation.getUserCar().getCar().getId()));
+            userCarRepository.addUserCar(userCar);
         }
 
     }

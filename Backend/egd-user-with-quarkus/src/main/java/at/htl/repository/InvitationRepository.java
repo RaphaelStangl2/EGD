@@ -4,7 +4,6 @@ import at.htl.model.Car;
 import at.htl.model.Invitation;
 import at.htl.model.UserCar;
 import at.htl.model.Users;
-import com.dajudge.kindcontainer.client.config.User;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -67,6 +66,15 @@ public class InvitationRepository {
     @Transactional
     public void updateInvation(Invitation invitation) {
         entityManager.merge(invitation);
+        //Status kann "waiting"/"agree"/"dismiss"
+        if(invitation.getStatus()=="agree"){
+            //userCar adden wenn einladung erfolgreich war
+            UserCar userCar = new UserCar();
+            userCar.setIsAdmin(false);
+            userCar.setUser(invitation.getUserToInvite());
+            userCar.setCar(invitation.getUserCar().getCar());
+        }
+
     }
 
     public List<Invitation> getAllInv() {

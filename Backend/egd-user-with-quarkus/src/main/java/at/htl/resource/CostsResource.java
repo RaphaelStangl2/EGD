@@ -1,0 +1,38 @@
+package at.htl.resource;
+
+import at.htl.model.Car;
+import at.htl.model.Costs;
+import at.htl.repository.CarRepository;
+import at.htl.repository.CostsRepository;
+
+import javax.inject.Inject;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.net.URI;
+
+@Path("egd/costs/")
+public class CostsResource {
+
+    @Inject
+    CostsRepository costsRepository;
+
+
+    @POST
+    @Path("")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response addCosts(final Costs costs) {
+        if (costs == null) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        final Costs createdCar = costsRepository.addCosts(costs);
+        return Response.created(URI.create("/api/costs/" + createdCar.getId())).build();
+    }
+
+    @DELETE
+    @Path("{costsId}/")
+    public Response removeCosts(@PathParam("costsId") Long costsId) {
+        costsRepository.removeCosts(costsId);
+        return Response.noContent().build();
+    }
+}

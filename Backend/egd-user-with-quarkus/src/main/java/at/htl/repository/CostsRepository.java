@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import java.util.List;
 
 @ApplicationScoped
 public class CostsRepository {
@@ -18,17 +19,17 @@ public class CostsRepository {
     EntityManager entityManager;
 
 
-    public Costs findCostsByDriveId(long driveId) {
-        return entityManager.createQuery("SELECT c FROM Costs c WHERE c.drive.id = :driveId", Costs.class)
-                .setParameter("driveId", driveId)
-                .getSingleResult();
+    public List<Costs> findAllCostsByCarId(long carId) {
+        return entityManager.createQuery("SELECT c FROM Costs c WHERE c.userCar.car.id = :carId", Costs.class)
+                .setParameter("carId", carId)
+                .getResultList();
     }
 
-    public Costs findCostsByUserId(long userId) {
+    public List<Costs> findCostsByUserId(long userId) {
         TypedQuery<Costs> query = entityManager.createQuery(
-                "SELECT c FROM Costs c WHERE c.drive.userCar.user.id = :userId", Costs.class);
+                "SELECT c FROM Costs c WHERE c.userCar.user.id = :userId", Costs.class);
         query.setParameter("userId", userId);
-        return (Costs) query.getResultList();
+        return  query.getResultList();
     }
 
     @Transactional

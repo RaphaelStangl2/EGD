@@ -38,16 +38,8 @@ public class DriveRepository {
     @Transactional
     public void removeDrive(final long driveId) {
         final Drive drive= findByDriveId(driveId);
-
-
-        try {
-            final Costs costs= costsRepository.findCostsByDriveId(driveId);
-            entityManager.remove(costs);
-            entityManager.remove(drive);
-        } catch (Exception e) {
             entityManager.remove(drive);
 
-        }
     }
 
 

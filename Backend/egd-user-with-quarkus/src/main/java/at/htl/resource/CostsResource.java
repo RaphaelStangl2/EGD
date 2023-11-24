@@ -2,6 +2,7 @@ package at.htl.resource;
 
 import at.htl.model.Car;
 import at.htl.model.Costs;
+import at.htl.model.Drive;
 import at.htl.repository.CarRepository;
 import at.htl.repository.CostsRepository;
 
@@ -10,6 +11,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.List;
 
 @Path("egd/costs/")
 public class CostsResource {
@@ -35,4 +37,19 @@ public class CostsResource {
         costsRepository.removeCosts(costsId);
         return Response.noContent().build();
     }
+    //findCostsByUserId
+
+    @GET
+    @Path("costyByUser/{userId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllDrivesByUserCarId(@PathParam("userId") Long userId){
+        List<Costs> costs = costsRepository.findCostsByUserId(userId);
+
+        if (costs == null){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.ok(costs).build();
+    }
+
 }

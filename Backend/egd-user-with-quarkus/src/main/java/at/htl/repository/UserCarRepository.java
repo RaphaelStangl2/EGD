@@ -78,4 +78,5 @@ public class UserCarRepository {
 
         return (Long) query.getSingleResult();
     }
+
 }

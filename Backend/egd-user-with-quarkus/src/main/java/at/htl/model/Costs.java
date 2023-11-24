@@ -21,8 +21,9 @@ public class Costs {
     private Double costs;
 
     @ManyToOne
-    @JoinColumn(name = "drive_id", nullable = true)
-    private Drive drive;
+    @JoinColumn(name = "user_car_id")
+    private UserCar userCar;
+
 
 
 }

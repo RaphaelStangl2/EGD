@@ -43,16 +43,11 @@ public class InvitationRepository {
     }
 
 
-
-
-
     @Transactional
     public void removeInv(final long invId) {
         final Invitation invitation = findById(invId);
         entityManager.remove(invitation);
     }
-
-
 
 
     public Invitation findById(long id) {
@@ -61,18 +56,22 @@ public class InvitationRepository {
     }
 
 
-
-
     @Transactional
     public void updateInvation(Invitation invitation) {
+        //userCar hat keine Id
+        long userCarIdFromInvitar =userCarRepository.getUserCarIdByUserCar(invitation.getUserCar());
+        invitation.getUserCar().setId(userCarIdFromInvitar);
         entityManager.merge(invitation);
+
+
         //Status kann "waiting"/"agree"/"dismiss"
         if(invitation.getStatus()=="agree"){
             //userCar adden wenn einladung erfolgreich war
-            UserCar userCar = new UserCar();
-            userCar.setIsAdmin(false);
-            userCar.setUser(invitation.getUserToInvite());
-            userCar.setCar(invitation.getUserCar().getCar());
+            UserCar newUserCar = new UserCar();
+            newUserCar.setIsAdmin(false);
+            newUserCar.setUser(invitation.getUserToInvite());
+            newUserCar.setCar(invitation.getUserCar().getCar());
+            userCarRepository.addUserCar(newUserCar);
         }
 
     }

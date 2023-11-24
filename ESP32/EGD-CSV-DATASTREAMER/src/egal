@@ -1,0 +1,127 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: praktex-postgres-config
+  namespace: student-r-nguyen
+  labels:
+    app: praktexdb
+data:
+  POSTGRES_DB: praktexdb
+  POSTGRES_USER: praktexdb
+  POSTGRES_HOST: praktexdb-postgres
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: praktexdb-postgres-secret
+  namespace: student-r-nguyen
+  labels:
+    app: praktexdb
+data:
+  POSTGRES_PASSWORD: UzNjcjN0LkRibWFuMg==
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: praktexdb-postgres-claim
+  namespace: student-r-nguyen
+  labels:
+    app: praktexdb
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: praktexdb-postgres
+  namespace: student-r-nguyen
+  labels:
+    app: praktexdb
+    tier: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: praktexdb
+      tier: database
+  template:
+    metadata:
+      labels:
+        app: praktexdb
+        tier: database
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:13.5
+          imagePullPolicy: "IfNotPresent"
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "0.5"
+            requests:
+              memory: 128Mi
+              cpu: "0.1"
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_DB
+                  name: praktex-postgres-config
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_USER
+                  name: praktex-postgres-config
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: POSTGRES_PASSWORD
+                  name: praktexdb-postgres-secret
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgredb             
+      volumes:
+        - name: postgredb
+          persistentVolumeClaim:
+            claimName: praktexdb-postgres-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+ name: praktexdb-postgres
+ namespace: student-r-nguyen
+ labels:
+   app: praktexdb
+spec:
+  type: NodePort
+  ports:
+    - port: 5432
+  selector:
+    app: praktexdb
+    tier: database
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: angular-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: "/$1"
+spec:
+  rules:
+    - host: student.cloud.htl-leonding.ac.at
+      http:
+        paths:
+          - path: /r.nguyen/praktex/(.*)$
+            pathType: Prefix
+            backend:
+              service:
+                name: praktex
+                port:
+                  number: 80

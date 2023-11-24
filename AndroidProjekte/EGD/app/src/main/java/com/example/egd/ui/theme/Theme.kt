@@ -1,21 +1,36 @@
 package com.example.egd.ui.theme
 
+import android.annotation.SuppressLint
+import android.graphics.Color
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color.Companion.White
 
 private val DarkColorPalette = darkColors(
-    primary = Purple200,
-    primaryVariant = Purple700,
-    secondary = Teal200
+    primary = PrimaryColor,
+    primaryVariant = PrimaryDarkColor,
+    secondary = SecondaryColor,
+    secondaryVariant = SecondaryDarkColor,
+    onPrimary = OnPrimary,
+    onSecondary = OnSecondary
 )
 
+@SuppressLint("ConflictingOnColor")
 private val LightColorPalette = lightColors(
-    primary = Purple500,
-    primaryVariant = Purple700,
-    secondary = Teal200
+    primary = PrimaryColor,
+    primaryVariant = PrimaryLightColor,
+    secondary = SecondaryColor,
+    secondaryVariant = SecondaryLightColor,
+    surface = BackgroundColor,
+    onPrimary = OnPrimary,
+    onSecondary = OnSecondary,
+    onSurface = PrimaryColor,
+    onBackground = PrimaryColor
+
+
 
     /* Other default colors to override
     background = Color.White,
@@ -23,7 +38,6 @@ private val LightColorPalette = lightColors(
     onPrimary = Color.White,
     onSecondary = Color.Black,
     onBackground = Color.Black,
-    onSurface = Color.Black,
     */
 )
 

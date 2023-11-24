@@ -1,0 +1,2 @@
+hier wird erklärt wie man die Esp32 neu aufsetzt
+https://randomnerdtutorials.com/esp32-erase-flash-memory/

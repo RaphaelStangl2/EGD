@@ -1,0 +1,17 @@
+[
+  {
+    "name" : "RsheedsCar",
+    "model" :  "Fiord",
+    "consumption" : 7,
+    "latitude": 48.319938,
+    "longitude":  14.292129
+
+  },
+  {
+    "name" : "RaphaelsCar",
+    "model" :  "Hyundai",
+    "consumption" : 5,
+    "latitude": 48.272461,
+    "longitude":  14.288130
+  }
+]

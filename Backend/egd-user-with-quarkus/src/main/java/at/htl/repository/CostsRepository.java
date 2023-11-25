@@ -26,10 +26,10 @@ public class CostsRepository {
     }
 
     public List<Costs> findCostsByUserId(long userId) {
-        TypedQuery<Costs> query = entityManager.createQuery(
-                "SELECT c FROM Costs c WHERE c.userCar.user.id = :userId", Costs.class);
-        query.setParameter("userId", userId);
-        return  query.getResultList();
+
+        return entityManager.createQuery("SELECT c FROM Costs c WHERE c.userCar.user.id = :userId", Costs.class)
+                .setParameter("userId", userId)
+                .getResultList();
     }
 
     @Transactional

@@ -40,7 +40,7 @@ public class CostsResource {
     //findCostsByUserId
 
     @GET
-    @Path("costyByUser/{userId}")
+    @Path("costsByUser/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllDrivesByUserCarId(@PathParam("userId") Long userId){
         List<Costs> costs = costsRepository.findCostsByUserId(userId);

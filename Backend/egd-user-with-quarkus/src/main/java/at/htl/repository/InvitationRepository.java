@@ -95,4 +95,11 @@ public class InvitationRepository {
 
         return invs;
     }
+
+    public Invitation findByCarId(long carId) {
+        var invs =  entityManager.createQuery("SELECT i FROM Invitation i WHERE i.userCar.car.id = :carId")
+                .setParameter("carId", carId).getSingleResult();
+
+        return (Invitation) invs;
+    }
 }

@@ -1,6 +1,7 @@
 package at.htl.repository;
 
 import at.htl.model.Car;
+import at.htl.model.Invitation;
 import at.htl.model.UserCar;
 import at.htl.model.Users;
 
@@ -22,6 +23,8 @@ public class CarRepository {
     @Inject
     UserCarRepository userCarRepository;
 
+    @Inject
+    InvitationRepository invitationRepository;
     //CARS
     @Transactional
     public Car addCar(Car car) {
@@ -31,14 +34,19 @@ public class CarRepository {
 
     @Transactional
     public void removeCar(final long carId) {
+        final Invitation invitation = invitationRepository.findByCarId(carId);
         final List<UserCar> userCars= userCarRepository.findByCarId(carId);
         final Car car = findById(carId);
+
+        entityManager.remove(invitation);
 
 
         for (UserCar uCar : userCars)
         {
             entityManager.remove(uCar);
         }
+
+
 
         entityManager.remove(car);
     }

@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Objects;
 
 
 @ApplicationScoped
@@ -65,7 +66,7 @@ public class InvitationRepository {
 
 
         //Status kann "waiting"/"agree"/"dismiss"
-        if(invitation.getStatus()=="agree"){
+        if(Objects.equals(invitation.getStatus(), "agree")){
             //userCar adden wenn einladung erfolgreich war
             UserCar newUserCar = new UserCar();
             newUserCar.setIsAdmin(false);

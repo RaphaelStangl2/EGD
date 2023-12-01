@@ -23,7 +23,4 @@ public class Costs {
     @ManyToOne
     @JoinColumn(name = "user_car_id")
     private UserCar userCar;
-
-
-
 }

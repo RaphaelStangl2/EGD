@@ -126,6 +126,19 @@ public class UserCarResource {
         return Response.ok(userCars).build();
     }
 
+    @GET
+    @Path("isAdmin")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response isAdmin(UserCar userCar){
+
+        //UserCar ohne Id
+        Boolean isAdmin = userCarRepository.isThisUserAdmin(userCar);
+
+        return Response.ok(isAdmin).build();
+    }
+
+
+
     @POST
     @Path("")
     @Consumes(MediaType.APPLICATION_JSON)

@@ -40,10 +40,23 @@ public class CostsResource {
     //findCostsByUserId
 
     @GET
-    @Path("costsByUser/{userId}")
+    @Path("costsByUserId/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllDrivesByUserCarId(@PathParam("userId") Long userId){
+    public Response getAllCostsByUserId(@PathParam("userId") Long userId){
         List<Costs> costs = costsRepository.findCostsByUserId(userId);
+
+        if (costs == null){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.ok(costs).build();
+    }
+
+    @GET
+    @Path("costsByCarId/{carId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllCostsByCarId(@PathParam("carId") Long carId){
+        List<Costs> costs = costsRepository.findAllCostsByCarId(carId);
 
         if (costs == null){
             return Response.status(Response.Status.NOT_FOUND).build();

@@ -36,6 +36,8 @@ public class UserCarRepository {
 
 
 
+
+
     public UserCar findByUserId(long userId) {
         return entityManager.find(UserCar.class, userId);
     }
@@ -74,9 +76,15 @@ public class UserCarRepository {
         Query query = entityManager.createQuery(jpql);
         query.setParameter("user", userCar.getUser());
         query.setParameter("car", userCar.getCar());
-        query.setParameter("isAdmin", userCar.getIsAdmin());
 
         return (Long) query.getSingleResult();
     }
 
+    public Boolean isThisUserAdmin(UserCar userCar) {
+        //UserCar ohne Admin
+
+        long id = getUserCarIdByUserCar(userCar);
+        UserCar userCarWithId = findByUserId(id);
+        return userCarWithId.getIsAdmin();
+    }
 }

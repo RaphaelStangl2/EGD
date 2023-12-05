@@ -24,18 +24,13 @@ public class CostsRepository {
 
     public List<Costs> findCostsByUserId(long userId) {
 
-     //   List<Costs> costs= entityManager.createQuery("SELECT c FROM Costs c WHERE c.userCar.user.id = :userId", Costs.class)
-     //           .setParameter("userId", userId)
-    //            .getResultList();
+        List<Costs> costs= entityManager.createQuery("SELECT c FROM Costs c WHERE c.userCar.user.id = :userId", Costs.class)
+                .setParameter("userId", userId)
+                .getResultList();
+
+       return  costs;
 
 
-    //    return  costs;
-
-        String queryString = "SELECT c FROM Costs c WHERE c.userCar.user.id = :userId";
-        TypedQuery<Costs> query = entityManager.createQuery(queryString, Costs.class);
-        query.setParameter("userId", userId);
-
-        return query.getResultList();
     }
 
     @Transactional

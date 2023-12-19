@@ -138,6 +138,17 @@ public class UserCarResource {
     }
 
 
+    @GET
+    @Path("getUserCarWithOutId")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUserCarWithOutId(UserCar userCar){
+
+      long id = userCarRepository.getUserCarIdByUserCar(userCar);
+      UserCar actUserCar = userCarRepository.findById(id);
+
+        return Response.ok(actUserCar).build();
+    }
+
 
     @POST
     @Path("")

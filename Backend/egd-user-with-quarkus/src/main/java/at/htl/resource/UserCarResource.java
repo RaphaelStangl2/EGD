@@ -138,7 +138,7 @@ public class UserCarResource {
     }
 
 
-    @GET
+    @POST
     @Path("getUserCarWithOutId")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserCarWithOutId(UserCar userCar){

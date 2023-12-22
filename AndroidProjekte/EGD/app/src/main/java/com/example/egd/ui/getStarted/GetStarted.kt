@@ -97,9 +97,9 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
             }
 
 
-        } else if (numberOfSteps == 3) {
+        } else if (numberOfSteps == 2) {
 
-            if (step == 3){
+            if (step == 2){
                 RegisterScreen(viewModel = viewModel, userName = userName, email = email, password = password, passwordVisibility = passwordVisibility, icon = icon, response = response, triedToSubmit = triedToSubmit)
             }
         }
@@ -114,9 +114,13 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
                         if (step + 1 > numberOfSteps){
 
                             viewModel.setTriedToSubmit(true)
-                            if (validationService.validateRegisterForm(userName, email, password, licensePlate)){
-                                viewModel.checkRegister(onRegistered, sharedPreference)
-                            }
+                                if (validationService.validateRegisterForm(userName, email, password)) {
+                                    if (numberOfSteps == 2){
+                                        viewModel.checkRegister(onRegistered, sharedPreference, withCar = false)
+                                    } else{
+                                        viewModel.checkRegister(onRegistered, sharedPreference, withCar = true)
+                                    }
+                                }
                             //onRegistered()
 
                         } else if (numberOfSteps == 5) {
@@ -133,7 +137,8 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
                             } else if (step == 3) {
                                 if (validationService.validateCarInfoScreen(
                                         carName,
-                                        fuelConsumption
+                                        fuelConsumption,
+                                        licensePlate
                                     )
                                 ) {
                                     viewModel.setStep(step + 1)
@@ -145,7 +150,7 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
                                 viewModel.setStep(step + 1)
                             }
 
-                        } else if (numberOfSteps == 3){
+                        } else if (numberOfSteps == 2){
                             viewModel.setStep(step+1)
                         }
                     },

@@ -1,22 +1,25 @@
 package com.example.egd.ui
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.SharedPreferences
 import android.location.Location
+import android.os.Build
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.*
-import androidx.compose.ui.text.resolveDefaults
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.egd.data.*
 import com.example.egd.data.ble.BLEReceiveManager
 import com.example.egd.data.ble.GPSService
-import com.example.egd.data.entities.Car
-import com.example.egd.data.entities.Invitation
-import com.example.egd.data.entities.User
-import com.example.egd.data.entities.UserCar
+import com.example.egd.data.entities.*
 import com.example.egd.data.http.HttpService
+import com.example.egd.data.http.MapsHttpService
 import com.example.egd.ui.validation.ValidationService
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,6 +32,9 @@ import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 import java.io.Closeable
 import java.io.InputStream
+import java.time.DateTimeException
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -43,6 +49,8 @@ class EGDViewModel @Inject constructor(
     private var BLEServiceIsRunning = false
     private var InvitationServiceIsRunning = false
 
+    private val _driveState = MutableStateFlow(DriveState())
+    val driveState: StateFlow<DriveState> = _driveState.asStateFlow()
 
     private val _editCarUiState = MutableStateFlow(EditCarUiState())
     val editCarUiState: StateFlow<EditCarUiState> = _editCarUiState.asStateFlow()
@@ -55,7 +63,6 @@ class EGDViewModel @Inject constructor(
 
     private val _mapUiState = MutableStateFlow(MapUiState())
     val mapUiState: StateFlow<MapUiState> = _mapUiState.asStateFlow()
-
 
     private val _homeUiState = MutableStateFlow(HomeScreenState())
     val homeUiState: StateFlow<HomeScreenState> = _homeUiState.asStateFlow()
@@ -362,16 +369,28 @@ class EGDViewModel @Inject constructor(
             if (currentDriverIsInitialized){
                 lockCarTracking = false
             }
-
         }
-
-        setUUIDListBLE(carList?.map {it.uuid}?.toTypedArray())
-
-        _homeUiState.update { currentState ->
-            currentState.copy(
-                cars = carList
-            )
+        viewModelScope.launch {
+            carList.forEach {
+                if (homeUiState.value.user != null){
+                    val response: ResponseBody = HttpService.retrofitService.getUserCarWithoutId(UserCar(homeUiState.value.user!!, it, false))
+                    val userCar = readUserCarFromJson(response.byteStream())
+                    it.isAdmin = userCar!!.isAdmin
+                }
+            }
+            setUUIDListBLE(carList?.map {it.uuid}?.toTypedArray())
+            _homeUiState.update { currentState ->
+                currentState.copy(
+                    cars = carList
+                )
+            }
         }
+    }
+
+    private fun readUserCarFromJson(inputStream: InputStream): UserCar? {
+        var jsonStringVar = inputStream.bufferedReader()
+            .use { it.readText() }
+        return Gson().fromJson(jsonStringVar, UserCar::class.java)
     }
 
     fun setUser(user: User) {
@@ -486,6 +505,52 @@ class EGDViewModel @Inject constructor(
 
     }
 
+    private suspend fun sendRegisterRequestWithoutCar(onRegistered: () -> Unit, sharedPreference: () -> SharedPreferences?) {
+        val service = ValidationService()
+        var response: ResponseBody? = null
+        val value = getStartedUiState.value
+        val homeValue = homeUiState.value
+        var sharedPreference = sharedPreference()
+        var userToAdd = User(
+            id = null,
+            userName = value.userName,
+            email = value.email,
+            password = value.password
+        )
+
+        if (service.validateRegisterForm(value.userName, value.email, value.password)) {
+            try {
+                //response = HttpService.retrofitService.postRegistration(userToAdd)
+                response = HttpService.retrofitService.postRegistration(userToAdd)
+
+                if (response != null) {
+                    _loginUiState.update { currentState ->
+                        currentState.copy(
+                            response = response.string()
+                        )
+                    }
+                }
+
+                setTriedToSubmit(false)
+                setCarName("")
+                setFuelConsumption("")
+                onRegistered()
+                bleReceiveManager.closeConnection()
+                setUUIDListBLE(emptyArray())
+                setCurrentUUID("")
+                setNumberOfSteps(5)
+
+                var editor = sharedPreference?.edit()
+                editor?.putString("email", value.email)
+                editor?.putBoolean("isLoggedIn", true)
+                editor?.apply()
+            } catch (e: Exception) {
+                if (e.localizedMessage == "HTTP 500 ") {
+                    setResponse("Email address already exists")
+                }
+            }
+        }
+    }
 
     @SuppressLint("SuspiciousIndentation")
     suspend fun sendRegisterRequest(
@@ -503,7 +568,7 @@ class EGDViewModel @Inject constructor(
             email = value.email,
             password = value.password
         )
-        var car = Car(null, value.carName, value.averageCarConsumption.toDouble(), 0.0, 0.0, value.currentUUID, value.licensePlate, null)
+        var car = Car(null, value.carName, value.averageCarConsumption.toDouble(), 0.0, 0.0, value.currentUUID, value.licensePlate, null, null)
         var userCarToAdd = UserCar(userToAdd, car, true)
 
         var friendsAssignList: ArrayList<UserCar> = ArrayList<UserCar>()
@@ -524,7 +589,7 @@ class EGDViewModel @Inject constructor(
 
         var finalList: Array<UserCar> = friendsAssignList.toTypedArray()
 
-        if (service.validateRegisterForm(value.userName, value.email, value.password, value.licensePlate)) {
+        if (service.validateRegisterForm(value.userName, value.email, value.password)) {
             try {
 
                 //response = HttpService.retrofitService.postRegistration(userToAdd)
@@ -548,6 +613,7 @@ class EGDViewModel @Inject constructor(
                 bleReceiveManager.closeConnection()
                 setUUIDListBLE(emptyArray())
                 setCurrentUUID("")
+                setNumberOfSteps(5)
 
                 var editor = sharedPreference?.edit()
                 editor?.putString("email", value.email)
@@ -573,6 +639,7 @@ class EGDViewModel @Inject constructor(
 
 
     private fun subscribeToChanges(){
+        var homeScreenState = homeUiState.value
         viewModelScope.launch {
             var connectionState = connectionState.value
             bleReceiveManager.data.collect{ result ->
@@ -585,11 +652,15 @@ class EGDViewModel @Inject constructor(
                             currentUUID = result.uuid
                         )
                     }
+                    var userCar = getUserCarForUUID(result.uuid)
+                    if (userCar != null){
+                        setDriveStartPosition(LatLng(userCar?.car!!.latitude, userCar.car.longitude))
+                    }
                     setCurrentDrivingUser(result.uuid)
 
                 } else{
                     connectionState.connectionState = ConnectionEnum.Uninitialized
-                    removeCurrentDrivingUser()
+                    removeCurrentDrivingUser(result.uuid)
                     _getStartedUiState.update { currentState ->
                         currentState.copy(
                             connectionSuccessful = false,
@@ -597,9 +668,6 @@ class EGDViewModel @Inject constructor(
                         )
                     }
                 }
-
-
-
             }
         }
         /*_uiState.update { currentState ->
@@ -632,6 +700,7 @@ class EGDViewModel @Inject constructor(
         //gpsService.run()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun startCarTrackingService() {
         if (!carTrackingServiceIsRunning){
             carTrackingServiceIsRunning = true
@@ -641,6 +710,7 @@ class EGDViewModel @Inject constructor(
                     delay(3000)
                     var homeUiState = homeUiState.value
                     var getStartedState = getStartedUiState.value
+                    var driveState = driveState.value
                     getUserPosition(){ location ->
                         if (homeUiState.cars!= null && location!= null && !lockCarTracking){
                             var car: Car? = null
@@ -655,6 +725,17 @@ class EGDViewModel @Inject constructor(
                                 viewModelScope.launch {
                                     if (car != null) {
                                         HttpService.retrofitService.putCar(car)
+                                        if (driveState.startPosition != null && getKilometersWithoutAPI(driveState.startPosition!!,
+                                                LatLng(location.latitude, location.longitude)) > 1) {
+                                            setKilometersForDrive(
+                                                driveState.startPosition!!,
+                                                LatLng(location.latitude, location.longitude)
+                                            )
+                                            setDriveStartPosition(LatLng(location.latitude, location.longitude))
+                                            var drive: Drive = Drive(null, driveState.kilometers, userCar = null, date = localDateToDate(LocalDate.now()))
+                                            HttpService.retrofitService.addDrive(drive)
+                                            // UserCar setzen
+                                        }
                                     }
                                 }
                             }
@@ -665,14 +746,22 @@ class EGDViewModel @Inject constructor(
         }
     }
 
+    private fun getKilometersWithoutAPI(startPosition: LatLng, destinationPosition: LatLng): Double {
+        var results : FloatArray = FloatArray(1)
+        Location.distanceBetween(startPosition.latitude, startPosition.longitude, destinationPosition.latitude, destinationPosition.longitude, results)
+        return results[0].toDouble()/1000
+    }
+
     fun startInvitationService(onNoInternetConnection: () -> Boolean) {
 
-        if (!InvitationServiceIsRunning && 1 ==2){
+        if (!InvitationServiceIsRunning){
             InvitationServiceIsRunning = true
 
             viewModelScope.launch {
                 while(true){
                     var homeUiState = homeUiState.value
+                    var invitationState = invitation.value
+                    invitationState.incomingInvitationList
                     var user = homeUiState.user
                     if (onNoInternetConnection()){
                         if (user?.id != null){
@@ -682,8 +771,8 @@ class EGDViewModel @Inject constructor(
                             var invArray =readInvitationsFromJson(responseInvSend!!.byteStream())
                             var invSendArray= readInvitationsFromJson(responseInv!!.byteStream())
 
-                            setStatusInvitationList(invSendArray)
-                            setIncomingInvitationList(invArray)
+                            setStatusInvitationList(invArray)
+                            setIncomingInvitationList(invSendArray)
                         }
                     }
 
@@ -693,7 +782,21 @@ class EGDViewModel @Inject constructor(
         }
     }
 
-    private fun setIncomingInvitationList(invArray: Array<Invitation>) {
+    fun updateInvitatioStatus(invitationV: Invitation, status:String){
+        invitationV.status = status
+        var incomingInvitationArray = invitation.value.incomingInvitationList
+        var incomingInvitationList = incomingInvitationArray?.toMutableList()
+        incomingInvitationList?.remove(invitationV)
+        invitationV.status=status
+        incomingInvitationList?.add(invitationV)
+        setIncomingInvitationList(incomingInvitationList?.toTypedArray())
+
+        viewModelScope.launch {
+            HttpService.retrofitService.updateInvitationStatus(invitationV)
+        }
+    }
+
+    private fun setIncomingInvitationList(invArray: Array<Invitation>?) {
         _invitationState.update { currentState->
             currentState.copy(
                 incomingInvitationList = invArray
@@ -704,7 +807,7 @@ class EGDViewModel @Inject constructor(
     private fun setStatusInvitationList(invSendArray: Array<Invitation>) {
         _invitationState.update { currentState->
             currentState.copy(
-                incomingInvitationList = invSendArray
+                statusInvitationList = invSendArray
             )
         }
     }
@@ -733,6 +836,15 @@ class EGDViewModel @Inject constructor(
     }
 
     public override fun onCleared() {
+        if (homeUiState.value.cars != null){
+            for (car:Car in homeUiState.value.cars!!){
+                if (car.currentUser != null){
+                    if (car.uuid != null){
+                        removeCurrentDrivingUser(car.uuid!!)
+                    }
+                }
+            }
+        }
         super.onCleared()
         //bleReceiveManager.closeConnection()
     }
@@ -754,9 +866,17 @@ class EGDViewModel @Inject constructor(
         }
     }
 
-    fun checkRegister(onRegistered: () -> Unit, sharedPreference: () -> SharedPreferences?) {
+    fun checkRegister(
+        onRegistered: () -> Unit,
+        sharedPreference: () -> SharedPreferences?,
+        withCar: Boolean
+    ) {
         viewModelScope.launch {
-            sendRegisterRequest(onRegistered, sharedPreference)
+            if (withCar == true){
+                sendRegisterRequest(onRegistered, sharedPreference)
+            } else{
+                sendRegisterRequestWithoutCar(onRegistered, sharedPreference)
+            }
         }
     }
 
@@ -812,6 +932,8 @@ class EGDViewModel @Inject constructor(
         homeUiState.value.assignedFriendsList = null
         homeUiState.value.searchFriendList = null
         homeUiState.value.cars = null
+        invitation.value.statusInvitationList = null
+        invitation.value.incomingInvitationList = null
         getStartedUiState.value.step = 1
         getStartedUiState.value.numberOfSteps = 5
         setUser(User(id = null, userName = "", email = "", password = "",))
@@ -897,12 +1019,13 @@ class EGDViewModel @Inject constructor(
                 0.0,
                 getStartedVal.currentUUID,
                 getStartedVal.licensePlate,
+                null,
                 null
             )
 
             var friendsAssignList: ArrayList<UserCar> = ArrayList<UserCar>()
 
-            if (homeValue.assignedFriendsList != null) {
+            /*if (homeValue.assignedFriendsList != null) {
                 for (friend in homeValue.assignedFriendsList!!) {
                     friendsAssignList.add(
                         UserCar(
@@ -915,7 +1038,7 @@ class EGDViewModel @Inject constructor(
                         )
                     )
                 }
-            }
+            }*/
             friendsAssignList.add(UserCar(homeValue.user!!, car, true))
 
             var finalList: Array<UserCar> = friendsAssignList.toTypedArray()
@@ -923,6 +1046,14 @@ class EGDViewModel @Inject constructor(
             try {
                 //response = HttpService.retrofitService.postRegistration(userToAdd)
                 response = HttpService.retrofitService.postUserCars(finalList)
+
+                if (homeValue.assignedFriendsList != null) {
+                    for (user in homeValue.assignedFriendsList!!){
+                        if (homeValue.user != null){
+                            HttpService.retrofitService.addInvitation(Invitation(null,user,UserCar(homeValue.user, car, true), "waiting"))
+                        }
+                    }
+                }
 
                 if (response != null) {
                     _loginUiState.update { currentState ->
@@ -953,9 +1084,9 @@ class EGDViewModel @Inject constructor(
             var response: ResponseBody? = null
 
 
-            if (validationService.validateCarInfoScreen(editCarValue.name, editCarValue.consumption)) {
+            if (validationService.validateCarInfoScreen(editCarValue.name, editCarValue.consumption, editCarValue.licensePlate)) {
                 try {
-                    val car = Car(editCarValue.id, editCarValue.name, editCarValue.consumption.toDouble(), editCarValue.latitude, editCarValue.longitude, editCarValue.uuid, editCarValue.licensePlate, editCarValue.currentUser)
+                    val car = Car(editCarValue.id, editCarValue.name, editCarValue.consumption.toDouble(), editCarValue.latitude, editCarValue.longitude, editCarValue.uuid, editCarValue.licensePlate, editCarValue.currentUser,null)
                     response = HttpService.retrofitService.putCar(car)
 
 
@@ -1092,11 +1223,7 @@ class EGDViewModel @Inject constructor(
             )
         }
     }
-    private fun removeCurrentDrivingUser(){
-
-    }
-
-    private fun setCurrentDrivingUser(uuid:String){
+    private fun getUserCarForUUID(uuid:String): UserCar?{
         val getStartedState = getStartedUiState.value
         val homeState = homeUiState.value
         var car:Car? = null
@@ -1111,6 +1238,21 @@ class EGDViewModel @Inject constructor(
         if (homeState.user != null && car != null){
             userCar = UserCar(homeState.user, car, true)
         }
+        return userCar
+    }
+
+    private fun removeCurrentDrivingUser(uuid: String){
+        val userCar = getUserCarForUUID(uuid)
+        if (userCar != null){
+            lockCarTracking = true
+            viewModelScope.launch {
+                HttpService.retrofitService.removeCurrentDriver(userCar)
+            }
+        }
+    }
+
+    private fun setCurrentDrivingUser(uuid:String){
+        val userCar = getUserCarForUUID(uuid)
         if (userCar != null){
             lockCarTracking = true
             viewModelScope.launch {
@@ -1160,9 +1302,90 @@ class EGDViewModel @Inject constructor(
         }
     }
 
-    fun deleteCar(car:Car) {
+    fun deleteCar(car:Car, context: Context) {
         viewModelScope.launch {
-            HttpService.retrofitService.deleteCar(car.id!!)
+            try{
+                HttpService.retrofitService.deleteCar(car.id!!)
+            } catch(e: Exception){
+                if (e.localizedMessage == "HTTP 500 ") {
+                    Toast.makeText(context, "Disconnect from current device before deleting car", Toast.LENGTH_LONG).show()
+                }
+            }
         }
+    }
+
+    fun addInvitationToDeleteList(deleteInvitationList: Array<Invitation>?){
+        _invitationState.update { currentState ->
+            currentState.copy(
+                deleteInvitationList =deleteInvitationList
+            )
+        }
+    }
+
+    @SuppressLint("SuspiciousIndentation")
+    fun deleteInvitations() {
+        var deleteInvitationList = invitation.value.deleteInvitationList
+        var statusInvitationArray = invitation.value.statusInvitationList
+        addInvitationToDeleteList(null)
+        var statusInvitationList = statusInvitationArray?.toMutableList()
+
+
+
+
+        if (deleteInvitationList != null) {
+                for (invitation in deleteInvitationList){
+                    statusInvitationList?.remove(invitation)
+                    viewModelScope.launch {
+                        HttpService.retrofitService.deleteInvitation(invitation.id.toString())
+                    }
+                }
+                setStatusInvitationList(statusInvitationList!!.toTypedArray())
+            }
+    }
+
+    fun getNotificationCount(): Int{
+        val invitation = invitation.value
+        var notificationCount = 0
+        if (invitation.deleteInvitationList != null){
+            notificationCount += invitation.deleteInvitationList?.size!!
+        }
+        if (invitation.incomingInvitationList != null){
+            for (invitation in invitation.incomingInvitationList!!) {
+                if (invitation.status == "agree" || invitation.status == "dismiss") {
+                    notificationCount--
+                }
+            }
+            notificationCount += invitation.incomingInvitationList?.size!!
+        }
+        if (invitation.statusInvitationList != null){
+            notificationCount += invitation.statusInvitationList?.size!!
+        }
+
+        return notificationCount
+    }
+
+    suspend fun setKilometersForDrive(startPosition: LatLng, destinationPosition: LatLng) {
+        var response: DirectionsResponse? = null
+        response = MapsHttpService.retrofitService.getMapsDirections(startPosition.latitude.toString()+","+startPosition.longitude.toString(),destinationPosition.latitude.toString()+","+destinationPosition.longitude.toString(), "driving", "AIzaSyBzdzVWCdsxOGDXDpFx71mtdlhXnQeVdDk")
+        _driveState.update { currentState->
+            currentState.copy(
+                kilometers = response.routes[0].legs[0].distance.value.toDouble()/1000
+            )
+        }
+    }
+
+    fun setDriveStartPosition(startPosition: LatLng){
+        _driveState.update { currentState->
+            currentState.copy(
+                startPosition = startPosition
+            )
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun localDateToDate(localDate: LocalDate): Date {
+        val zoneId = ZoneId.systemDefault() // You can specify a different time zone if needed
+        val instant = localDate.atStartOfDay(zoneId).toInstant()
+        return Date.from(instant)
     }
 }

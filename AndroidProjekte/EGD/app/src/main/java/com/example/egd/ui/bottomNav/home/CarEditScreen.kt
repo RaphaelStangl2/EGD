@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.example.egd.ui.EGDViewModel
+import com.example.egd.ui.dialogues.AccidentDialogue
 import com.example.egd.ui.validation.ErrorText
 import com.example.egd.ui.validation.ValidationService
 

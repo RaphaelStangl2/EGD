@@ -27,5 +27,6 @@ data class Car(
     var licensePlate: String,
     @SerializedName("currentUser")
     @Expose
-    var currentUser: User?
+    var currentUser: User?,
+    var isAdmin: Boolean?,
     )

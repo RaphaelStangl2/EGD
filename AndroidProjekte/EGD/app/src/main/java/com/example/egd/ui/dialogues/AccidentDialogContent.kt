@@ -1,9 +1,11 @@
 package com.example.egd.ui.dialogues
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,15 +22,16 @@ fun AccidenDialogContent(viewModel: EGDViewModel){
         modifier = Modifier
             .fillMaxHeight(0.5f)
             .fillMaxWidth(0.9f),
-        shape = RoundedCornerShape(8.dp)
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(width = 2.dp,color=MaterialTheme.colors.onError)
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
             Row(horizontalArrangement = Arrangement.Center){
                 Text(text = "Unfall", fontSize = 25.sp
                 )
             }
-            Row(){
-                Text("Eines der von Ihnen angemeldeten Fahrzeuge hatte einen Unfall")
+            Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.padding(start= 20.dp)){
+                Text("Raphael hatte einen Unfall im Test60 Car. Die Rettung wurde automatisch alamiert")
             }
             Row(horizontalArrangement = Arrangement.Center){
                 Button(onClick = { viewModel.setAccidentCode("0") }) {

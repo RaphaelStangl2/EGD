@@ -22,14 +22,8 @@ public class Accident {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "car_id")
-    private Car car;
-
-    @ManyToOne
-    @JoinColumn(name = "users_id")
-    private Users user;
-
-
+    @JoinColumn(name = "user_car_id")
+    private UserCar userCar;
 
 
     @ManyToOne

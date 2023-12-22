@@ -15,6 +15,8 @@ public class CostsRepository {
     @Inject
     EntityManager entityManager;
 
+    @Inject
+    AccidentRepository accidentRepository;
 
     public List<Costs> findAllCostsByCarId(long carId) {
         return entityManager.createQuery("SELECT c FROM Costs c WHERE c.userCar.car.id = :carId", Costs.class)
@@ -42,6 +44,10 @@ public class CostsRepository {
     @Transactional
     public void removeCosts(Long costsId) {
         Costs costs = entityManager.find(Costs.class, costsId);
+
+        Accident accident = accidentRepository.findByCostsId(costsId);
+        accidentRepository.removeAccident(accident.getId());
+
         entityManager.remove(costs);
     }
 

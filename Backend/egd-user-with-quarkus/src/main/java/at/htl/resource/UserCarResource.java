@@ -80,6 +80,7 @@ public class UserCarResource {
         }
 
 
+
        userCarRepository.removeUserCar(userCar);
 
         return Response.noContent().build();

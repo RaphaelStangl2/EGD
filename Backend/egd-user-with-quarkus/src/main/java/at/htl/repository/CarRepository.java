@@ -1,9 +1,6 @@
 package at.htl.repository;
 
-import at.htl.model.Car;
-import at.htl.model.Invitation;
-import at.htl.model.UserCar;
-import at.htl.model.Users;
+import at.htl.model.*;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -25,6 +22,10 @@ public class CarRepository {
 
     @Inject
     InvitationRepository invitationRepository;
+
+    @Inject
+    AccidentRepository accidentRepository;
+
     //CARS
     @Transactional
     public Car addCar(Car car) {

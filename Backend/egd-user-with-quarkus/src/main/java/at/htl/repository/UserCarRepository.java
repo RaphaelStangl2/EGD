@@ -1,10 +1,7 @@
 package at.htl.repository;
 
 
-import at.htl.model.Car;
-import at.htl.model.Invitation;
-import at.htl.model.UserCar;
-import at.htl.model.Users;
+import at.htl.model.*;
 import io.vertx.ext.auth.User;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -19,7 +16,8 @@ public class UserCarRepository {
     @Inject
     EntityManager entityManager;
 
-
+    @Inject
+    AccidentRepository accidentRepository;
 
     public UserCar findById(long userCarId) {
         return entityManager.find(UserCar.class, userCarId);
@@ -60,6 +58,9 @@ public class UserCarRepository {
                 .getSingleResult();
 
         UserCar userCarToRemove = findById(id);
+
+        Accident accident = accidentRepository.findByUserCarId(userCarToRemove.getId());
+        accidentRepository.removeAccident(accident.getId());
 
         entityManager.remove(userCarToRemove);
     }

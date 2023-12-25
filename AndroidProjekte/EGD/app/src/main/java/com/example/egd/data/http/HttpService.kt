@@ -11,7 +11,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.*
 
 private const val BASE_URL =
-    "https://student.cloud.htl-leonding.ac.at/b.kadir/egd-user-with-quarkus/"
+    "https://student.cloud.htl-leonding.ac.at/r.alo/egd-user-with-quarkus/"
 
 private val moshi = Moshi.Builder()
     .add(KotlinJsonAdapterFactory())

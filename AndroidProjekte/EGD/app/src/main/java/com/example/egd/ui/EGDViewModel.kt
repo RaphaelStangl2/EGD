@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 import java.io.InputStream
+import java.time.LocalDate
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -41,6 +42,10 @@ class EGDViewModel @Inject constructor(
     val fusedLocationClient: FusedLocationProviderClient
 ) : ViewModel() {
 
+
+    //stats rsheed
+    private val _statsState = MutableStateFlow(StatisticsScreenState())
+    val statsState: StateFlow<StatisticsScreenState> = _statsState.asStateFlow()
 
 
     private val _editCarUiState = MutableStateFlow(EditCarUiState())
@@ -97,9 +102,12 @@ class EGDViewModel @Inject constructor(
             assignedListToAdd = arrayOf(user)
             setAssignedFriendsList(assignedListToAdd)
         } else {
-            list = assignedFriendsList?.toMutableList()
-            list?.add(user)
-            setAssignedFriendsList(list.toTypedArray())
+            if (assignedFriendsList != null){
+                list = assignedFriendsList?.toMutableList()!!
+                list?.add(user)
+                setAssignedFriendsList(list.toTypedArray())
+
+            }
         }
     }
 
@@ -137,9 +145,12 @@ class EGDViewModel @Inject constructor(
             searchListToAdd = arrayOf(user)
             setSearchFriendList(searchListToAdd)
         } else {
-            list = searchFriendList?.toMutableList()
-            list?.add(user)
-            setSearchFriendList(list.toTypedArray())
+            if (searchFriendList != null){
+                list = searchFriendList?.toMutableList()!!
+                list?.add(user)
+                setSearchFriendList(list.toTypedArray())
+            }
+
         }
     }
 
@@ -849,9 +860,12 @@ class EGDViewModel @Inject constructor(
             removedListToAdd = arrayOf(user)
             setRemovedFriendsList(removedListToAdd)
         } else {
-            list = removedFriendsList?.toMutableList()
-            list?.add(user)
-            setRemovedFriendsList(list.toTypedArray())
+            if(removedFriendsList != null){
+                list = removedFriendsList?.toMutableList()!!
+                list?.add(user)
+                setRemovedFriendsList(list.toTypedArray())
+            }
+
         }
     }
     fun addUserToAddedList(user:User){
@@ -929,6 +943,12 @@ class EGDViewModel @Inject constructor(
             list = assignedList.toMutableList()
             list?.add(user)
             setAssignedEditFriendsList(list.toTypedArray())
+        }
+    }
+
+    fun setDate(selectedDate: LocalDate) {
+        _statsState.update { statisticsScreenState ->
+            statisticsScreenState.copy(selectedDate=selectedDate)
         }
     }
 

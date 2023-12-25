@@ -97,7 +97,7 @@ fun AddCarDialogue(viewModel: EGDViewModel, onAdded: () -> Unit,modifier: Modifi
 
                         onAdded()
                     } else if (step == 2){
-                        if (validationService.validateCarInfoScreen(carName, fuelConsumption)){
+                        if (validationService.validateCarInfoScreen(carName, fuelConsumption, licensePlate)){
                             viewModel.setStep(step + 1)
                             viewModel.setTriedToSubmit(false)
                         }else{

@@ -273,7 +273,7 @@ fun EGDApp(
                         searchedFriendsList = homeUiState.searchFriendList
                     )
 
-                    if (homeUiState.assignedFriendsList != null){
+                    /*if (homeUiState.assignedFriendsList != null){
                         Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxHeight(0.2f)){
                             Button(onClick = {
                                 if (homeUiState.assignedFriendsList != null){
@@ -291,7 +291,7 @@ fun EGDApp(
                                 Text("Hinzufügen")
                             }
                         }
-                    }
+                    }*/
                 }
             }
         }
@@ -329,7 +329,8 @@ fun EGDApp(
                     sharedPreference = sharedPreference,
                     onNoInternetConnection = {onNoInternetConnection()},
                     stopForegroundService = { stopForegroundService() },
-                    startForeground = { startForegroundService() }
+                    startForeground = { startForegroundService() },
+                    context = context
                 )
             }
         }

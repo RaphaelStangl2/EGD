@@ -197,6 +197,8 @@ fun StatisticsScreen(
 
     val pagerState = rememberPagerState(initialPage = 2)
     val coroutineScope = rememberCoroutineScope()
+    val statsState = viewModel.statsState.collectAsState().value
+    val car = statsState.car
 
     Column(modifier = modifier) {
 

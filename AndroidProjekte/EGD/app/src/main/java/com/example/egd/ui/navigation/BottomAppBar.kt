@@ -18,8 +18,7 @@ fun BottomAppBar(navController: NavHostController,
 
     val items = listOf(
         BottomNavItem.Home,
-        BottomNavItem.Map,
-        BottomNavItem.Statistics,
+        BottomNavItem.Map
     )
 
     BottomNavigation(

@@ -1409,4 +1409,12 @@ class EGDViewModel @Inject constructor(
         val instant = localDate.atStartOfDay(zoneId).toInstant()
         return Date.from(instant)
     }
+
+    fun setStatisticsCar(car: Car?) {
+        _statsState.update { state->
+            state.copy(
+                car = car
+            )
+        }
+    }
 }

@@ -2,6 +2,7 @@ package at.htl.model;
 
 
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.*;
 
 import javax.persistence.*;
@@ -26,6 +27,7 @@ public class Drive {
     private UserCar userCar;
 
     private Double kilometers;
+
     private Date date;
 
 

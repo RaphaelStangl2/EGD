@@ -45,11 +45,16 @@ public class  UserRepository {
         return user;
     }
 
-    public void removeUser(final long reservationId) {
-        final UserCar userCar= userCarRepository.findByCarId(reservationId);
-        entityManager.remove(userCar);
+    public void removeUser(final long carId) {
 
-        final Users user = findById(reservationId);
+        final List<UserCar> userCars= userCarRepository.findByCarId(carId);
+        for (UserCar uCar : userCars)
+        {
+            entityManager.remove(uCar);
+        }
+
+
+        final Users user = findById(carId);
         entityManager.remove(user);
     }
 

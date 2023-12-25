@@ -42,6 +42,7 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
     var userName = uiState.userName
     var email = uiState.email
     var password = uiState.password
+    var licensePlate = uiState.licensePlate
     var response = uiState.response
     var friendSearchBarContent = uiState.friendSearchBarContent
     var assignedFriendsList = homeUiState.assignedFriendsList
@@ -80,7 +81,7 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
                 ConnectScreen(viewModel, onBluetoothStateChanged,validationService, triedToSubmit)
             }
             else if(step == 3) {
-                CarInfoScreen(carName, fuelConsumption, viewModel, triedToSubmit)
+                CarInfoScreen(carName, fuelConsumption, viewModel, triedToSubmit, licensePlate)
             }
             else if (step == 4){
                 AddUserScreen(
@@ -96,9 +97,9 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
             }
 
 
-        } else if (numberOfSteps == 3) {
+        } else if (numberOfSteps == 2) {
 
-            if (step == 3){
+            if (step == 2){
                 RegisterScreen(viewModel = viewModel, userName = userName, email = email, password = password, passwordVisibility = passwordVisibility, icon = icon, response = response, triedToSubmit = triedToSubmit)
             }
         }
@@ -113,9 +114,13 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
                         if (step + 1 > numberOfSteps){
 
                             viewModel.setTriedToSubmit(true)
-                            if (validationService.validateRegisterForm(userName, email, password)){
-                                viewModel.checkRegister(onRegistered, sharedPreference)
-                            }
+                                if (validationService.validateRegisterForm(userName, email, password)) {
+                                    if (numberOfSteps == 2){
+                                        viewModel.checkRegister(onRegistered, sharedPreference, withCar = false)
+                                    } else{
+                                        viewModel.checkRegister(onRegistered, sharedPreference, withCar = true)
+                                    }
+                                }
                             //onRegistered()
 
                         } else if (numberOfSteps == 5) {
@@ -123,14 +128,17 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
                                 if (validationService.validateConnectionScreen(connectionSuccessful).valid)
                                 {
                                     viewModel.setStep(step + 1)
+                                    viewModel.setButtonClicked(false)
                                     viewModel.setTriedToSubmit(false)
                                 } else{
                                     viewModel.setTriedToSubmit(true)
+                                    viewModel.setButtonClicked(false)
                                 }
                             } else if (step == 3) {
                                 if (validationService.validateCarInfoScreen(
                                         carName,
-                                        fuelConsumption
+                                        fuelConsumption,
+                                        licensePlate
                                     )
                                 ) {
                                     viewModel.setStep(step + 1)
@@ -142,7 +150,7 @@ fun GetStarted(viewModel: EGDViewModel, onRegistered: () -> Unit, modifier: Modi
                                 viewModel.setStep(step + 1)
                             }
 
-                        } else if (numberOfSteps == 3){
+                        } else if (numberOfSteps == 2){
                             viewModel.setStep(step+1)
                         }
                     },

@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.example.egd.ui.EGDViewModel
+import com.example.egd.ui.dialogues.AccidentDialogue
 import com.example.egd.ui.validation.ErrorText
 import com.example.egd.ui.validation.ValidationService
 
@@ -25,6 +26,7 @@ fun CarEditScreen(onUpdate: () -> Unit, viewModel: EGDViewModel, goToFriendsAddS
     val homeUiState = viewModel.homeUiState.collectAsState().value
     val car = carUiState.car
     val assignedEditFriendsList = carUiState.assignedFriendList
+    val addFriendsList = carUiState.addFriendList
     val searchFriendList = homeUiState.searchFriendList
 
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -51,6 +53,7 @@ fun CarEditScreen(onUpdate: () -> Unit, viewModel: EGDViewModel, goToFriendsAddS
     if (car != null)
     {
         val carName = carUiState.name
+        val licensePlate = carUiState.licensePlate
         val carConsumption = carUiState.consumption
 
         val validationService = ValidationService()
@@ -90,6 +93,25 @@ fun CarEditScreen(onUpdate: () -> Unit, viewModel: EGDViewModel, goToFriendsAddS
             Spacer(modifier = Modifier.height(7.dp))
 
             Row(){
+                Text(text="Licence plate:", fontWeight = FontWeight.Bold)
+            }
+
+            Row(){
+                TextField(
+                    value = licensePlate,
+                    onValueChange =
+                    {
+                        car.licensePlate = it
+                        viewModel.setCar(car, car.consumption.toString())
+                    },
+                    placeholder = { Text(text="STK1234") },
+                    colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background),
+                )
+            }
+
+            Spacer(modifier = Modifier.height(7.dp))
+
+            Row(){
                 Text(text="Average fuel consumption per 100 km:", fontWeight = FontWeight.Bold)
             }
             Row(
@@ -117,13 +139,11 @@ fun CarEditScreen(onUpdate: () -> Unit, viewModel: EGDViewModel, goToFriendsAddS
             }
             Spacer(modifier = Modifier.height(7.dp))
 
-
-
             Row(){
                 Text(text="Friends:", fontWeight = FontWeight.Bold)
             }
 
-            AssignedFriendList(assignedFriendsList = assignedEditFriendsList, viewModel, goToFriendsAddScreen)
+            AssignedFriendList(assignedFriendsList = assignedEditFriendsList, addFriendsList, viewModel, goToFriendsAddScreen)
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Button(

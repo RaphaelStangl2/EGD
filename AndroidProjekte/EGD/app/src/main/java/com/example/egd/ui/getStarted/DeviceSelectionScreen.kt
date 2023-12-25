@@ -40,7 +40,7 @@ fun DeviceSelectionFields(viewModel: EGDViewModel, hasEgdDevice: Boolean) {
                 if (hasEgdDevice){
                     viewModel.setEGDDevice(!hasEgdDevice)
                 }
-                viewModel.setNumberOfSteps(3)
+                viewModel.setNumberOfSteps(2)
             },
             colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colors.primaryVariant)
         )

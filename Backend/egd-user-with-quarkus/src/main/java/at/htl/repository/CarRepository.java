@@ -1,6 +1,7 @@
 package at.htl.repository;
 
 import at.htl.model.Car;
+import at.htl.model.Invitation;
 import at.htl.model.UserCar;
 import at.htl.model.Users;
 
@@ -9,6 +10,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.util.List;
 
@@ -21,6 +23,8 @@ public class CarRepository {
     @Inject
     UserCarRepository userCarRepository;
 
+    @Inject
+    InvitationRepository invitationRepository;
     //CARS
     @Transactional
     public Car addCar(Car car) {
@@ -30,9 +34,20 @@ public class CarRepository {
 
     @Transactional
     public void removeCar(final long carId) {
-        final UserCar userCar= userCarRepository.findByCarId(carId);
+        final Invitation invitation = invitationRepository.findByCarId(carId);
+        final List<UserCar> userCars= userCarRepository.findByCarId(carId);
         final Car car = findById(carId);
-        entityManager.remove(userCar);
+
+        entityManager.remove(invitation);
+
+
+        for (UserCar uCar : userCars)
+        {
+            entityManager.remove(uCar);
+        }
+
+
+
         entityManager.remove(car);
     }
 
@@ -79,7 +94,7 @@ public class CarRepository {
         car.setCurrentUser(currentUser);
 
         // Save the updated Car entity to the database
-      entityManager.merge(car);
+        entityManager.merge(car);
 
         // Optionally, you can return the updated UserCar entity
         return userCar;
@@ -93,6 +108,18 @@ public class CarRepository {
         return userCar;
     }
 
+
+    public Car getCarWithOutId(Car car) {
+
+        String jpql = "SELECT c FROM Car c WHERE c.name = :name AND c.licensePlate = :licensePlate";
+        TypedQuery<Car> query = entityManager.createQuery(jpql, Car.class);
+        query.setParameter("name", car.getName());
+        query.setParameter("licensePlate", car.getLicensePlate());
+
+        Car existingCar = query.getSingleResult();
+        return existingCar; // Falls gefunden, gib das existierende Auto zurück
+
+    }
 
 
 }

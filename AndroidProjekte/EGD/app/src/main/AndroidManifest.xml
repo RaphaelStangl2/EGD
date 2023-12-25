@@ -31,14 +31,17 @@
 
         <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyBzdzVWCdsxOGDXDpFx71mtdlhXnQeVdDk"/>
 
-        <service android:name=".data.ble.BLEService" android:debuggable="true"
+        <service android:name=".data.ble.BLEService" android:stopWithTask="true" android:debuggable="true"
             tools:ignore="HardcodedDebugMode"></service>
+
+        <service android:name=".ClearService" android:stopWithTask="false" />
 
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.EGD">
+            android:theme="@style/Theme.EGD"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

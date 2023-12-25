@@ -2,6 +2,7 @@ package com.example.egd
 
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -9,19 +10,27 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.provider.Settings
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.*
 import androidx.work.WorkManager
+import com.example.egd.data.ble.BLEReceiveManager
 import com.example.egd.data.ble.BLEService
+import com.example.egd.ui.EGDViewModel
 import com.example.egd.ui.theme.EGDTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -30,7 +39,14 @@ class MainActivity : ComponentActivity() {
     lateinit var bluetoothAdapter: BluetoothAdapter
     val workManager = WorkManager.getInstance(application)
 
+    private val viewModel: EGDViewModel by viewModels()
+
+    @Inject
+    lateinit var bleReceiveManager: BLEReceiveManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        //startService(Intent(baseContext, ClearService::class.java))
 
         super.onCreate(savedInstanceState)
         setContent {
@@ -40,21 +56,63 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                 ) {
 
-                    EGDApp( startForegroundService = {startForeground()},onNoInternetConnection = {isInternetAvailable(this)}, onBluetoothStateChanged = {showBluetoothDialog()}, onGPSRequired = {showGPSDialog()}, sharedPreference = {getEmailSharedPreferences()}) { stopForeground() }
+                    EGDApp( startForegroundService = {startForeground()},onNoInternetConnection = {isInternetAvailable(this)}, onBluetoothStateChanged = {showBluetoothDialog()}, onGPSRequired = {showGPSDialog()}, sharedPreference = {getEmailSharedPreferences()}, context= this) { stopForeground() }
                 }
             }
         }
     }
 
+    /*override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
+        if (isFinishing){
+            viewModel.onCleared()
+            Log.i(TAG, "onSaveInstanceState is Finishing")
+
+        }
+        Log.i(TAG, "onSaveInstanceState")
+        super.onSaveInstanceState(outState, outPersistentState)
+    }
+
+
+   override fun onStop() {
+       if (isFinishing){
+           viewModel.onCleared()
+           Log.i(TAG, "onStop is Finishing")
+
+       }
+       viewModel.onCleared()
+       Log.i(TAG, "onStop")
+       super.onStop()
+   }
+
+    override fun onPause() {
+        if (isFinishing){
+            viewModel.onCleared()
+            Log.i(TAG, "onPause is Finishing")
+
+        }
+        viewModel.onCleared()
+        Log.i(TAG, "onPause")
+
+        super.onPause()
+    }
+
+
     override fun onDestroy() {
         //val workManager = WorkManager.getInstance(application)
         //workManager.enqueue(OneTimeWorkRequest.from(BLEWorker::class.java))
 
+        Log.i(TAG, "onDestroy")
+
+        viewModel.onCleared()
+
+        bleReceiveManager.closeConnection()
+        bleReceiveManager.disconnect()
+        Toast.makeText(this, "CLose Connection", Toast.LENGTH_SHORT).show()
+
         super.onDestroy()
+//        BLEService.startService(this, "BLE Service is running")
 
-        BLEService.startService(this, "BLE Service is running")
-
-    }
+    }*/
 
     fun startForeground(){
         BLEService.startService(this, "BLE Service is running")
@@ -69,7 +127,6 @@ class MainActivity : ComponentActivity() {
     override fun onStart() {
 
         BLEService.stopService(this)
-
 
         //val intent = Intent(this, BLEService::class.java) // Build the intent for the service
         //applicationContext.startForegroundService(intent)

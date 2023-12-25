@@ -6,8 +6,8 @@ import com.example.egd.ui.EGDViewModel
 
 class ValidationService () {
 
-    fun validateCarInfoScreen(carName: String, fuelConsumption: String): Boolean{
-        if (validateCarName(carName).valid && validateFuelConsumption(fuelConsumption).valid){
+    fun validateCarInfoScreen(carName: String, fuelConsumption: String, licencePlate: String): Boolean{
+        if (validateCarName(carName).valid && validateFuelConsumption(fuelConsumption).valid && validateLicencePlate(licencePlate).valid){
             return true
         }
         return false
@@ -58,6 +58,13 @@ class ValidationService () {
             return true
         }
         return false
+    }
+
+    fun validateLicencePlate(licencePlate: String): ValidationObject {
+        if (licencePlate.isNotEmpty()){
+            return ValidationObject(true, "License Plate must have a value")
+        }
+        return ValidationObject(false, "")
     }
 
     fun validateLoginForm(email: String, password: String): Boolean{

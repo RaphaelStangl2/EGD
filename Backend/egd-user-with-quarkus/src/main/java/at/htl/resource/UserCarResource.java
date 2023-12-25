@@ -71,7 +71,7 @@ public class UserCarResource {
 
     }
 
-    @DELETE
+    @POST
     @Path("/removeUserCar")
     public Response removeUserCar(UserCar userCar) {
 
@@ -125,6 +125,30 @@ public class UserCarResource {
 
         return Response.ok(userCars).build();
     }
+
+    @GET
+    @Path("isAdmin")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response isAdmin(UserCar userCar){
+
+        //UserCar ohne Id
+        Boolean isAdmin = userCarRepository.isThisUserAdmin(userCar);
+
+        return Response.ok(isAdmin).build();
+    }
+
+
+    @POST
+    @Path("getUserCarWithOutId")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUserCarWithOutId(UserCar userCar){
+
+      long id = userCarRepository.getUserCarIdByUserCar(userCar);
+      UserCar actUserCar = userCarRepository.findById(id);
+
+        return Response.ok(actUserCar).build();
+    }
+
 
     @POST
     @Path("")

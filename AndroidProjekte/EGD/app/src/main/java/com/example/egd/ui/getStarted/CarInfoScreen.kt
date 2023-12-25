@@ -19,11 +19,12 @@ import com.example.egd.ui.validation.ErrorText
 import com.example.egd.ui.validation.ValidationService
 
 @Composable
-fun CarInfoScreen(carName:String, fuelConsumption: String, viewModel: EGDViewModel, triedToSubmit: Boolean) {
+fun CarInfoScreen(carName:String, fuelConsumption: String, viewModel: EGDViewModel, triedToSubmit: Boolean, licensePlate:String) {
     val validationService = ValidationService()
 
     val validationCarName = validationService.validateCarName(carName)
     val validationFuelConsumption = validationService.validateFuelConsumption(fuelConsumption)
+    val validationLicensePlate = validationService.validateLicencePlate(licensePlate)
 
     Row(){
         Text(text="Car Name:")
@@ -41,6 +42,25 @@ fun CarInfoScreen(carName:String, fuelConsumption: String, viewModel: EGDViewMod
     Row(){
         if (!validationCarName.valid && triedToSubmit){
             ErrorText(message = validationCarName.message)
+        }
+    }
+    Spacer(modifier = Modifier.height(7.dp))
+    Row{
+        Text(text="Licence Plate")
+    }
+
+    Row(){
+        TextField(
+            value = licensePlate,
+            onValueChange = {viewModel.setLicensePlate(it)},
+            placeholder = { Text(text="STK1234") },
+            colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background),
+            isError = !validationLicensePlate.valid && triedToSubmit
+        )
+    }
+    Row(){
+        if (!validationLicensePlate.valid && triedToSubmit){
+            ErrorText(message = validationLicensePlate.message)
         }
     }
     Spacer(modifier = Modifier.height(7.dp))

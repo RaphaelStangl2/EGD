@@ -10,5 +10,6 @@ data class HomeScreenState(
     var searchFriendList: Array<User>? = null,
     val friendSearchBarContent:String = "",
     var assignedFriendsList: Array<User>? = null,
-    val user: User? = null
+    val user: User? = null,
+    val deleteResponse:String = ""
 )

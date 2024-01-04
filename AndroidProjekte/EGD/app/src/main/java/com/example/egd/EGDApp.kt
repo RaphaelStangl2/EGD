@@ -30,6 +30,7 @@ import com.example.egd.ui.permissions.SystemBroadcastReceiver
 import com.google.accompanist.permissions.*
 import com.example.egd.ui.navigation.*
 import com.example.egd.ui.profile.Profile
+import com.google.accompanist.pager.ExperimentalPagerApi
 
 /*@Composable
 fun TopAppBar(
@@ -50,7 +51,7 @@ fun TopAppBar(
 
 
 
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalPagerApi::class)
 @Composable
 fun EGDApp(
     modifier: Modifier = Modifier,
@@ -273,7 +274,7 @@ fun EGDApp(
                         searchedFriendsList = homeUiState.searchFriendList
                     )
 
-                    if (homeUiState.assignedFriendsList != null){
+                    /*if (homeUiState.assignedFriendsList != null){
                         Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxHeight(0.2f)){
                             Button(onClick = {
                                 if (homeUiState.assignedFriendsList != null){
@@ -291,7 +292,7 @@ fun EGDApp(
                                 Text("Hinzufügen")
                             }
                         }
-                    }
+                    }*/
                 }
             }
         }
@@ -329,7 +330,8 @@ fun EGDApp(
                     sharedPreference = sharedPreference,
                     onNoInternetConnection = {onNoInternetConnection()},
                     stopForegroundService = { stopForegroundService() },
-                    startForeground = { startForegroundService() }
+                    startForeground = { startForegroundService() },
+                    context = context
                 )
             }
         }

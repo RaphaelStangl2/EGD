@@ -2,10 +2,7 @@ package com.example.egd.ui.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -23,6 +20,7 @@ fun Profile(logout: () -> Unit, modifier: Modifier, viewModel: EGDViewModel){
 
     var statusInvitationList = invitationState.statusInvitationList
     var incomingInvitationList = invitationState.incomingInvitationList
+    var deleteInvitationList = invitationState.deleteInvitationList
 
     val user = homeScreenState.user
 
@@ -40,18 +38,30 @@ fun Profile(logout: () -> Unit, modifier: Modifier, viewModel: EGDViewModel){
         Row(Modifier.padding(15.dp)){
             Column() {
 
-                Row() {
-                    Column(){
-                        Text("Invitations")
-                        InvitationList(statusInvitationList, incomingInvitationList)
-                    }
-                }
-                Row(){
-                    Button(onClick = { logout() }, modifier = Modifier.background(color=Color.White)) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
+                    Button(onClick = { logout() }, colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background), elevation = ButtonDefaults.elevation(
+                        defaultElevation = 0.dp,
+                        pressedElevation = 0.dp
+                    ),
+                    ) {
                         Icon(tint = Color.LightGray, painter = painterResource(id = R.drawable.ic_baseline_exit_to_app_24), contentDescription = "Logout")
                         Text("Log Out", color = Color.LightGray)
                     }
+                    IconButton(onClick = { viewModel.deleteInvitations() }, enabled = deleteInvitationList != null&& deleteInvitationList.isNotEmpty()) {
+                        Icon(tint = if (deleteInvitationList == null)
+                            Color.LightGray
+                            else
+                                MaterialTheme.colors.error,painter = painterResource(id = R.drawable.ic_baseline_delete_outline_24), contentDescription = "delete invitations")
+                    }
                 }
+                Divider(color = Color.LightGray)
+                Row() {
+                    Column(){
+                        Text("Invitations")
+                        InvitationList(statusInvitationList, incomingInvitationList, viewModel)
+                    }
+                }
+
             }
         }
     }

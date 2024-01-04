@@ -91,7 +91,7 @@ class BLEReceiveManager @Inject constructor(
                     //Toast.makeText(context, "State Connected", Toast.LENGTH_SHORT).show()
                     coroutineScope.launch {
                         data.emit(
-                            EGDUiState(false, "0","")
+                            EGDUiState(false, "0", connectedServiceUUID)
                         )
                     }
                     gatt.close()

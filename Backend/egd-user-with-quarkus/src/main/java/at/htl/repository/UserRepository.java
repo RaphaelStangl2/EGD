@@ -39,22 +39,28 @@ public class  UserRepository {
     @Inject
     UserCarRepository userCarRepository;
 
+    @Inject
+    CarRepository carRepository;
+
     //USERS
     public Users addUser(Users user) {
         entityManager.persist(user);
         return user;
     }
 
-    public void removeUser(final long carId) {
+    public void removeUser(final long userId) {
 
-        final List<UserCar> userCars= userCarRepository.findByCarId(carId);
+        final List<UserCar> userCars= userCarRepository.findByCarId(userId);
         for (UserCar uCar : userCars)
         {
             entityManager.remove(uCar);
         }
 
 
-        final Users user = findById(carId);
+        carRepository.removeCurrentDriverIFUserGetsRemoved(userId);
+        //da wird nur currentuser auf null gesetzt
+
+        final Users user = findById(userId);
         entityManager.remove(user);
     }
 

@@ -30,7 +30,5 @@ public class Accident {
     @JoinColumn(name = "costs_id")
     private Costs costs;
 
-    @OneToOne
-    @JoinColumn(name = "drive_id")
-    private Drive drive;
+
 }

@@ -123,4 +123,12 @@ public class CarRepository {
     }
 
 
+    public void removeCurrentDriverIFUserGetsRemoved(long userId) {
+        var acc =  entityManager.createQuery("SELECT i FROM Car i WHERE i.currentUser.id = :userId")
+                .setParameter("userId", userId).getSingleResult();
+
+        Car car = (Car) acc;
+        car.setCurrentUser(null);
+        entityManager.merge(car);
+    }
 }

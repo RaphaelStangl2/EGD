@@ -6,6 +6,7 @@ import android.location.Location
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 
 import androidx.compose.foundation.rememberScrollState
@@ -26,10 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.example.egd.R
-import com.example.egd.data.ConnectionEnum
 import com.example.egd.data.entities.Car
 import com.example.egd.ui.bottomNav.home.NoCarsIcon
-import com.example.egd.ui.dialogues.AccidentDialogue
 import com.example.egd.ui.navigation.BluetoothIconCar
 
 
@@ -45,7 +44,8 @@ fun HomeScreen(
     startForeground: () -> Unit,
     stopForegroundService: () -> Unit,
     onNoInternetConnection: () -> Boolean,
-    context: Context
+    context: Context,
+    goToStatisticsScreen: () -> Unit
 ){
     val homeUiState = viewModel.homeUiState.collectAsState().value
     var tmpBool = false
@@ -137,7 +137,8 @@ fun HomeScreen(
                         { goToMap() },
                         { goToEditScreen() },
                         context,
-                        car.isAdmin
+                        car.isAdmin,
+                        goToStatisticsScreen
                     )
                 }
             }
@@ -185,7 +186,18 @@ fun SearchBarHome(searchBarContent: String, viewModel: EGDViewModel, goToProfile
 }
 
 @Composable
-fun CarCard(car: Car, name: String, latitude: Double, longitude: Double, viewModel: EGDViewModel, goToMap: () -> Unit, goToEditScreen: () -> Unit, context: Context, isAdmin: Boolean?) {
+fun CarCard(
+    car: Car,
+    name: String,
+    latitude: Double,
+    longitude: Double,
+    viewModel: EGDViewModel,
+    goToMap: () -> Unit,
+    goToEditScreen: () -> Unit,
+    context: Context,
+    isAdmin: Boolean?,
+    goToStatisticsScreen: () -> Unit
+) {
 
     var expanded by remember {
         mutableStateOf(false)
@@ -194,7 +206,10 @@ fun CarCard(car: Car, name: String, latitude: Double, longitude: Double, viewMod
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp),
+            .padding(10.dp).clickable {
+                goToStatisticsScreen()
+                viewModel.setStatisticsCar(car)
+                                      },
         backgroundColor = MaterialTheme.colors.background,
         elevation = 8.dp,
         shape = MaterialTheme.shapes.large

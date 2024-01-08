@@ -3,7 +3,9 @@ package com.example.egd
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -51,6 +53,7 @@ fun TopAppBar(
 
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalPagerApi::class)
 @Composable
 fun EGDApp(
@@ -330,6 +333,7 @@ fun EGDApp(
                     sharedPreference = sharedPreference,
                     onNoInternetConnection = {onNoInternetConnection()},
                     stopForegroundService = { stopForegroundService() },
+                    goToStatisticsScreen = {navController.navigate(BottomNavItem.Statistics.screen_route)},
                     startForeground = { startForegroundService() },
                     context = context
                 )
@@ -352,9 +356,12 @@ fun EGDApp(
         //StatisticsScreen
         composable(route = BottomNavItem.Statistics.screen_route) {
             Scaffold(
-                bottomBar = {
-                    BottomAppBar(navController)
-                }
+                topBar = {TopAppBarBackButton(navController,
+                    onBackButtonClick = {
+                        navController.navigateUp()
+                        viewModel.setStatisticsCar(null)
+                                        },
+                    title={Text("Statistics")})}
             ) { innerPadding ->
 
                 StatisticsScreen(

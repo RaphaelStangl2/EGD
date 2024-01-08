@@ -199,6 +199,9 @@ fun StatisticsScreen(
     Column(modifier = modifier
         .fillMaxHeight()
         .verticalScroll(scrollState)) {
+    val statsState = viewModel.statsState.collectAsState().value
+    val car = statsState.car
+
 
         ScheduleField(viewModel)
 

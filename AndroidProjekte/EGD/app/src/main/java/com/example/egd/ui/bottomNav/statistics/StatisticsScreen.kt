@@ -13,6 +13,7 @@ import android.widget.DatePicker
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
@@ -48,7 +49,10 @@ import com.google.accompanist.pager.*
 import kotlinx.coroutines.launch
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 
 import androidx.compose.runtime.*
@@ -70,8 +74,7 @@ import java.util.*
 @Composable
 fun ScheduleField(viewModel: EGDViewModel) {
     var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
-    var startTime by remember { mutableStateOf("Select start time") }
-    var endTime by remember { mutableStateOf("Select end time") }
+
 
     Column(
         modifier = Modifier
@@ -129,11 +132,6 @@ private fun formatDate(date: Date): String {
 }
 
 
-
-
-private fun showTimePicker(initialTime: String, onTimeSelected: (String) -> Unit) {
-    // Implementiere hier die Logik für den TimePicker, zum Beispiel mit BottomSheet oder einem anderen UI-Element
-}
 
 @SuppressLint("ResourceAsColor")
 @OptIn(ExperimentalTextApi::class)
@@ -197,8 +195,12 @@ fun StatisticsScreen(
 
     val pagerState = rememberPagerState(initialPage = 2)
     val coroutineScope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
+    Column(modifier = modifier
+        .fillMaxHeight()
+        .verticalScroll(scrollState)) {
 
-    Column(modifier = modifier) {
+        ScheduleField(viewModel)
 
         HorizontalPager(
             count = 2,
@@ -207,19 +209,22 @@ fun StatisticsScreen(
                 .weight(1f)
                 .fillMaxWidth()
 
+
         ) { page ->
             when (page) {
-                0 -> CircleDiagram(
-                    modifier = Modifier
-                        .background(color = Color.White)
-                        // .fillMaxWidth()
-                        .fillMaxWidth()
-                        .padding(30.dp), viewModel = viewModel)
+                0 ->
+                    CircleDiagram(
+                        modifier = Modifier
+                            .background(color = Color.White)
+                            // .fillMaxWidth()
+                            .fillMaxWidth()
+                            .padding(30.dp), viewModel = viewModel)
+
 
                 1 -> LineChartDiagram(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(300.dp)
+                        .padding(30.dp)
                 )
             }
         }
@@ -229,7 +234,11 @@ fun StatisticsScreen(
                 .align(Alignment.CenterHorizontally)
                 .padding(16.dp)
         )
+        LineChartDiagram(
+            modifier = Modifier
+                .fillMaxWidth()
 
+        )
     }
 }
 

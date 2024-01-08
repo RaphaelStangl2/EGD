@@ -148,7 +148,6 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel){
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(16.dp))
-        ScheduleField(viewModel)
         DonutPieChart(
             modifier = modifier,
             donutChartData,
@@ -157,7 +156,6 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel){
                 clickedSlice = slice
             }
         )
-        Spacer(modifier = Modifier.height(16.dp))
         DonutPieChartWithSlices(slices = donutChartData.slices, donutChartConfig = donutChartConfig)
     }
 

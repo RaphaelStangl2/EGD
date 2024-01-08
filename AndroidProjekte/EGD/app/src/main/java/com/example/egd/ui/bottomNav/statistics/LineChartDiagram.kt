@@ -68,9 +68,7 @@ fun LineChartDiagram(modifier: Modifier = Modifier){
     )
 
     LineChart(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(300.dp),
+        modifier = modifier,
         lineChartData = lineChartData
     )
 }

@@ -81,7 +81,8 @@ fun CarEditScreen(onUpdate: () -> Unit, viewModel: EGDViewModel, goToFriendsAddS
                     },
                     placeholder = { Text(text="My Car") },
                     colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background),
-                    isError = !validationCarName.valid && triedToSubmit
+                    isError = !validationCarName.valid && triedToSubmit,
+                    enabled = car.isAdmin ?: false
                 )
             }
 
@@ -106,6 +107,7 @@ fun CarEditScreen(onUpdate: () -> Unit, viewModel: EGDViewModel, goToFriendsAddS
                     },
                     placeholder = { Text(text="STK1234") },
                     colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background),
+                    enabled = car.isAdmin ?: false
                 )
             }
 
@@ -127,7 +129,8 @@ fun CarEditScreen(onUpdate: () -> Unit, viewModel: EGDViewModel, goToFriendsAddS
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background),
                     modifier = Modifier.width(77.dp),
-                    isError = !validationFuelConsumption.valid && triedToSubmit
+                    isError = !validationFuelConsumption.valid && triedToSubmit,
+                    enabled = car.isAdmin ?: false
                 )
                 Text(text="liters")
             }
@@ -143,7 +146,7 @@ fun CarEditScreen(onUpdate: () -> Unit, viewModel: EGDViewModel, goToFriendsAddS
                 Text(text="Friends:", fontWeight = FontWeight.Bold)
             }
 
-            AssignedFriendList(assignedFriendsList = assignedEditFriendsList, addFriendsList, viewModel, goToFriendsAddScreen)
+            AssignedFriendList(assignedFriendsList = assignedEditFriendsList, car, addFriendsList, viewModel, goToFriendsAddScreen)
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Button(

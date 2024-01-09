@@ -230,12 +230,20 @@ fun CarCard(
                 {
                     viewModel.setCar(car, car.consumption.toString())
                     goToEditScreen()
-                }, enabled = isAdmin ?: false
+                }
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_baseline_edit_24),
-                        contentDescription = "edit Icon",
-                    )
+                    if (isAdmin == true){
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_baseline_edit_24),
+                            contentDescription = "edit Icon",
+                        )
+                    }
+                    else{
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_baseline_info_24),
+                            contentDescription = "Info Icon",
+                        )
+                    }
                 }
             }
             Divider(color = Color.LightGray)

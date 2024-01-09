@@ -137,25 +137,25 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel){
         )
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = "Fahrten",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        DonutPieChart(
-            modifier = modifier,
-            donutChartData,
-            donutChartConfig,
-            onSliceClick = { slice ->
-                clickedSlice = slice
-            }
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "Drives",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            DonutPieChart(
+                modifier = modifier,
+                donutChartData,
+                donutChartConfig,
+                onSliceClick = { slice ->
+                    clickedSlice = slice
+                }
+            )
         DonutPieChartWithSlices(slices = donutChartData.slices, donutChartConfig = donutChartConfig)
     }
 

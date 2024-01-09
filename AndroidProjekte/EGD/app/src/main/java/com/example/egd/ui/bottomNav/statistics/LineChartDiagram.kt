@@ -1,14 +1,23 @@
 package com.example.egd.ui.bottomNav.statistics
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import co.yml.charts.axis.AxisData
 import co.yml.charts.common.model.Point
+import co.yml.charts.common.utils.DataUtils
+import co.yml.charts.ui.barchart.BarChart
+import co.yml.charts.ui.barchart.models.BarChartData
 import co.yml.charts.ui.linechart.LineChart
 import co.yml.charts.ui.linechart.model.GridLines
 import co.yml.charts.ui.linechart.model.IntersectionPoint
@@ -19,56 +28,54 @@ import co.yml.charts.ui.linechart.model.LineStyle
 import co.yml.charts.ui.linechart.model.SelectionHighlightPoint
 import co.yml.charts.ui.linechart.model.SelectionHighlightPopUp
 import co.yml.charts.ui.linechart.model.ShadowUnderLine
+import co.yml.charts.ui.piechart.charts.DonutPieChart
+import com.example.egd.ui.DonutPieChartWithSlices
 
 @Composable
 fun LineChartDiagram(modifier: Modifier = Modifier){
-    val steps = 5
-    val pointsData: List<Point> =
-        listOf(
-            Point(0f, 40f),
-            Point(1f, 90f),
-            Point(2f, 0f),
-            Point(3f, 60f),
-            Point(4f, 10f)
-        )
+    val barChartListSize = 5
+    val maxRange = 1000; // maxrange = der am meisten geld hat
+    val barChartDataa = DataUtils.getBarChartData(barChartListSize, maxRange)
 
     val xAxisData = AxisData.Builder()
-        .axisStepSize(100.dp)
-        .backgroundColor(Color.Transparent)
-        .steps(pointsData.size - 1)
-        .labelData { i -> i.toString() }
+        .axisStepSize(30.dp)
+        .steps(barChartDataa.size - 1)
+        .bottomPadding(40.dp)
+        .axisLabelAngle(20f)
+        .labelData { index ->
+            barChartDataa[index].label
+        }
         .build()
 
     val yAxisData = AxisData.Builder()
-        .steps(steps)
-        .backgroundColor(Color.Transparent)
+        .steps(10)
         .labelAndAxisLinePadding(20.dp)
-        .labelData { i ->
-            val yScale = 100 / steps
-            (i * yScale).toString()
-        }.build()
+        .axisOffset(20.dp)
+        .labelData { index -> (index * (maxRange / 10)).toString() }
+        .build()
 
-    val lineChartData = LineChartData(
-        linePlotData = LinePlotData(
-            lines = listOf(
-                Line(
-                    dataPoints = pointsData,
-                    LineStyle(),
-                    IntersectionPoint(),
-                    SelectionHighlightPoint(),
-                    ShadowUnderLine(),
-                    SelectionHighlightPopUp()
-                )
-            ),
-        ),
+    val barChartData = BarChartData(
+        chartData = barChartDataa,
         xAxisData = xAxisData,
         yAxisData = yAxisData,
-        gridLines = GridLines(),
-        backgroundColor = Color.White
-    )
+        tapPadding = 20.dp,
+        showYAxis = true
 
-    LineChart(
-        modifier = modifier,
-        lineChartData = lineChartData
     )
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Text(
+            text = "Costs",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        BarChart(modifier = Modifier.height(350.dp), barChartData = barChartData)
+
+    }
+
+
 }

@@ -8,78 +8,50 @@ package com.example.egd.ui
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
-import android.graphics.Paint
 import android.widget.DatePicker
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DateRange
-import androidx.compose.material.icons.outlined.Info
-
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import co.yml.charts.ui.piechart.models.PieChartConfig
 import co.yml.charts.ui.piechart.models.PieChartData
-import com.example.egd.R
 import com.example.egd.ui.bottomNav.statistics.CircleDiagram
 import com.example.egd.ui.bottomNav.statistics.LineChartDiagram
 import com.google.accompanist.pager.*
-import kotlinx.coroutines.launch
-
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalLayoutDirection
-
-import androidx.compose.ui.platform.LocalView
-
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.*
 
+
 @Composable
-fun ScheduleField(viewModel: EGDViewModel) {
+fun ScheduleField(viewModel: EGDViewModel, modifier: Modifier) {
     var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
 
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
+        modifier = modifier
     ) {
         val date = viewModel.statsState.collectAsState().value.selectedDate
         val datePicker = DatePickerDialog(
@@ -186,6 +158,7 @@ fun DonutPieChartWithSlices(
     }
 }
 
+@SuppressLint("SuspiciousIndentation")
 @ExperimentalPagerApi
 @Composable
 fun StatisticsScreen(
@@ -196,14 +169,28 @@ fun StatisticsScreen(
     val pagerState = rememberPagerState(initialPage = 2)
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
+
     Column(modifier = modifier
         .fillMaxHeight()
         .verticalScroll(scrollState)) {
     val statsState = viewModel.statsState.collectAsState().value
     val car = statsState.car
 
+        Row(
 
-        ScheduleField(viewModel)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            ScheduleField(viewModel, Modifier
+                .fillMaxWidth(0.5f)
+                .padding(1.dp))
+            ScheduleField(viewModel,Modifier
+                .fillMaxWidth(1f)
+                .padding(1.dp))
+        }
+
 
         HorizontalPager(
             count = 2,
@@ -237,74 +224,8 @@ fun StatisticsScreen(
                 .align(Alignment.CenterHorizontally)
                 .padding(16.dp)
         )
-        LineChartDiagram(
-            modifier = Modifier
-                .fillMaxWidth()
 
-        )
+
     }
 }
 
-//
-//@Composable
-//fun StatisticsScreen(
-//    viewModel: EGDViewModel,
-//    modifier: Modifier = Modifier
-//) {
-//    val connectionSuccessful = viewModel.getStartedUiState.collectAsState().value.connectionSuccessful
-//
-//    Column(
-//        modifier = Modifier
-//            .width(200.dp)
-//            .padding(20.dp)
-//    ) {
-//        // Composable für den Kreisdiagramm-Bereich
-//        CircleDiagram(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(300.dp) // Gleiche Höhe wie die Box
-//
-//        )
-//
-//        // Composable für den Liniendiagramm-Bereich
-//        LineChartDiagram(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(300.dp) // Gleiche Höhe wie die Box
-//
-//        )
-//    }
-//
-//
-//}
-//
-//
-//@OptIn(ExperimentalMaterialApi::class)
-//@Preview
-//@Composable
-//fun StatisticsScreenPreview(){
-//
-//    Column(
-//        modifier = Modifier
-//            .width(200.dp)
-//            .padding(25.dp)
-//    ) {
-//        // Composable für den Kreisdiagramm-Bereich
-//        CircleDiagram(
-//            modifier = Modifier
-//                .width(200.dp)
-//                .height(200.dp) // Gleiche Höhe wie die Box
-//
-//        )
-//
-//        // Composable für den Liniendiagramm-Bereich
-//        LineChartDiagram(
-//            modifier = Modifier
-//                .width(200.dp)
-//                .height(200.dp) // Gleiche Höhe wie die Box
-//
-//        )
-//    }
-//
-//
-//}

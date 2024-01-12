@@ -20,14 +20,14 @@ fun AssignedFriendList(
         for (assignedFriend in assignedFriendsList){
             if (assignedFriend != homeUiStateVal.user){
                 Row(){
-                    UserCard(assignedFriend,true ,viewModel)
+                    UserCard(assignedFriend,true ,viewModel, car)
                 }
             }
         }
         if (addFriendsList != null) {
             for (addFriend in addFriendsList){
                 Row(){
-                    UserCard(addFriend, false, viewModel)
+                    UserCard(addFriend, false, viewModel,car)
                 }
             }
         }

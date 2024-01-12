@@ -148,20 +148,21 @@ fun CarEditScreen(onUpdate: () -> Unit, viewModel: EGDViewModel, goToFriendsAddS
 
             AssignedFriendList(assignedFriendsList = assignedEditFriendsList, car, addFriendsList, viewModel, goToFriendsAddScreen)
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Button(
-                    onClick = {
-                        viewModel.setTriedToSubmitEdit(true)
-                        viewModel.updateCar(onUpdate)
-                        viewModel.setAssignedEditFriendsList(null)
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = "Update")
+            if (car.isAdmin == true){
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Button(
+                        onClick = {
+                            viewModel.setTriedToSubmitEdit(true)
+                            viewModel.updateCar(onUpdate)
+                            viewModel.setAssignedEditFriendsList(null)
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = "Update")
+                    }
                 }
             }
-
-        }
         }
     }
+}
 

@@ -14,6 +14,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.egd.data.*
 import com.example.egd.data.ble.BLEReceiveManager
 import com.example.egd.data.ble.GPSService
+import com.example.egd.data.costsEnum.CostsEnum
 import com.example.egd.data.entities.*
 import com.example.egd.data.http.HttpService
 import com.example.egd.data.http.MapsHttpService
@@ -53,6 +54,9 @@ class EGDViewModel @Inject constructor(
     //stats rsheed
     private val _statsState = MutableStateFlow(StatisticsScreenState())
     val statsState: StateFlow<StatisticsScreenState> = _statsState.asStateFlow()
+
+    private val _costsState = MutableStateFlow(CostsState())
+    val costsState: StateFlow<CostsState> = _costsState.asStateFlow()
 
     private val _driveState = MutableStateFlow(DriveState())
     val driveState: StateFlow<DriveState> = _driveState.asStateFlow()
@@ -1414,6 +1418,22 @@ class EGDViewModel @Inject constructor(
         _statsState.update { state->
             state.copy(
                 car = car
+            )
+        }
+    }
+
+    fun setReason(reason: CostsEnum) {
+        _costsState.update { currentState->
+            currentState.copy(
+                reason = reason
+            )
+        }
+    }
+
+    fun setCosts(costs: String) {
+        _costsState.update { currentState->
+            currentState.copy(
+                costs = costs
             )
         }
     }

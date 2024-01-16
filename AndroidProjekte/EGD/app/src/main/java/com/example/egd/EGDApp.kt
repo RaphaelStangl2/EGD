@@ -223,7 +223,7 @@ fun EGDApp(
         composable(route = BottomNavItem.EditCarScreen.screen_route) {
             Scaffold(
                 topBar = {
-                    TopAppBarBackButton(navController, { Text("Edit Car") }, onBackButtonClick = {
+                    TopAppBarBackButton(navController, { Text("Car Info") }, onBackButtonClick = {
                         navController.navigateUp()
                     })
                 })

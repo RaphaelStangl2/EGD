@@ -3,18 +3,18 @@ package com.example.egd.ui.dialogues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.ViewModel
+import com.example.egd.ui.EGDViewModel
 
 @Composable
-fun AddCostsDialogue() {
+fun AddCostsDialogue(viewModel: EGDViewModel) {
     Dialog(
         onDismissRequest = { /*TODO*/ },
         content = {
-            AddCostsDialogueContent()
+            AddCostsDialogueContent(viewModel)
         },
         properties = DialogProperties(
             dismissOnBackPress = true,
             dismissOnClickOutside = false
-        )
+        ),
     )
 }

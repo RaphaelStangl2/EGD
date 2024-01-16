@@ -29,6 +29,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import com.example.egd.R
 import com.example.egd.data.entities.Car
 import com.example.egd.ui.bottomNav.home.NoCarsIcon
+import com.example.egd.ui.dialogues.AddCostsDialogue
 import com.example.egd.ui.navigation.BluetoothIconCar
 
 
@@ -47,6 +48,8 @@ fun HomeScreen(
     context: Context,
     goToStatisticsScreen: () -> Unit
 ){
+    AddCostsDialogue(viewModel = viewModel)
+    
     val homeUiState = viewModel.homeUiState.collectAsState().value
     var tmpBool = false
 
@@ -206,10 +209,11 @@ fun CarCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp).clickable {
+            .padding(10.dp)
+            .clickable {
                 goToStatisticsScreen()
                 viewModel.setStatisticsCar(car)
-                                      },
+            },
         backgroundColor = MaterialTheme.colors.background,
         elevation = 8.dp,
         shape = MaterialTheme.shapes.large

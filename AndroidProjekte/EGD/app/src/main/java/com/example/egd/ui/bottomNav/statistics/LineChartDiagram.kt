@@ -5,38 +5,28 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Button
 import androidx.compose.material.Text
-import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.yml.charts.axis.AxisData
-import co.yml.charts.common.model.Point
 import co.yml.charts.common.utils.DataUtils
 import co.yml.charts.ui.barchart.BarChart
 import co.yml.charts.ui.barchart.models.BarChartData
-import co.yml.charts.ui.linechart.LineChart
-import co.yml.charts.ui.linechart.model.GridLines
-import co.yml.charts.ui.linechart.model.IntersectionPoint
-import co.yml.charts.ui.linechart.model.Line
-import co.yml.charts.ui.linechart.model.LineChartData
-import co.yml.charts.ui.linechart.model.LinePlotData
-import co.yml.charts.ui.linechart.model.LineStyle
-import co.yml.charts.ui.linechart.model.SelectionHighlightPoint
-import co.yml.charts.ui.linechart.model.SelectionHighlightPopUp
-import co.yml.charts.ui.linechart.model.ShadowUnderLine
-import co.yml.charts.ui.piechart.charts.DonutPieChart
-import com.example.egd.ui.DonutPieChartWithSlices
+import com.example.egd.ui.EGDViewModel
+import com.example.egd.ui.dialogues.AddCostsDialogue
 
 @Composable
-fun LineChartDiagram(modifier: Modifier = Modifier){
+fun LineChartDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel){
     val barChartListSize = 5
     val maxRange = 1000; // maxrange = der am meisten geld hat
     val barChartDataa = DataUtils.getBarChartData(barChartListSize, maxRange)
+    
+    var showCostsScreen = viewModel.costsState.collectAsState().value.showCosts
 
     val xAxisData = AxisData.Builder()
         .axisStepSize(30.dp)
@@ -73,6 +63,12 @@ fun LineChartDiagram(modifier: Modifier = Modifier){
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold
         )
+            Button(onClick = {viewModel.setShowCosts(true)}){
+                Text("Add Costs")
+            }
+        if (showCostsScreen){
+            AddCostsDialogue(viewModel = viewModel)
+        }
         Spacer(modifier = Modifier.height(16.dp))
         BarChart(modifier = Modifier.height(350.dp), barChartData = barChartData)
 

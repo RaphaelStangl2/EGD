@@ -1437,4 +1437,34 @@ class EGDViewModel @Inject constructor(
             )
         }
     }
+
+    fun addCosts() {
+        viewModelScope.launch {
+            val response: ResponseBody = HttpService.retrofitService.getUserCarWithoutId(UserCar(homeUiState.value.user!!, statsState.value.car!!, false))
+            val userCar = readUserCarFromJson(response.byteStream())
+
+            val costs:Costs = Costs(null, costsState.value.reason.toString(), costsState.value.costs.toLong(), userCar = userCar)
+
+            HttpService.retrofitService.addCosts(costs)
+
+        }
+    }
+
+    fun setShowCosts(b: Boolean) {
+        _costsState.update { currentState->
+            currentState.copy(
+                showCosts=b
+            )
+        }
+    }
+
+    fun clearCostsData() {
+        _costsState.update { currentState->
+            currentState.copy(
+                costs="",
+                reason=null,
+                showCosts=false
+            )
+        }
+    }
 }

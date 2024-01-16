@@ -116,6 +116,10 @@ interface HttpApiService {
     @Headers("Content-Type: application/json")
     @DELETE("egd/invitations/{invId}")
     suspend fun deleteInvitation(@Path("invId") invitationId: String): Response<Unit>
+
+    @Headers("Content-Type: application/json")
+    @POST("egd/costs")
+    suspend fun addCosts(@Body costs: Costs): ResponseBody
 }
 
 object HttpService {

@@ -48,8 +48,6 @@ fun HomeScreen(
     context: Context,
     goToStatisticsScreen: () -> Unit
 ){
-    AddCostsDialogue(viewModel = viewModel)
-    
     val homeUiState = viewModel.homeUiState.collectAsState().value
     var tmpBool = false
 

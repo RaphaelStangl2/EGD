@@ -214,7 +214,8 @@ fun StatisticsScreen(
                 1 -> LineChartDiagram(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(30.dp)
+                        .padding(30.dp),
+                    viewModel
                 )
             }
         }

@@ -106,7 +106,9 @@ fun AddCostsDialogueContent(viewModel: EGDViewModel) {
            Row(modifier = Modifier
                .fillMaxWidth()
                .padding(5.dp), horizontalArrangement = Arrangement.Center){
-                Button(onClick = {}, modifier = Modifier.fillMaxWidth(0.5f)){
+                Button(onClick = { viewModel.addCosts()
+                                 viewModel.setShowCosts(false)
+                                 }, modifier = Modifier.fillMaxWidth(0.5f)){
                     Text(text="Add")
                 }
            }

@@ -8,7 +8,10 @@ import com.example.egd.ui.EGDViewModel
 @Composable
 fun AddCostsDialogue(viewModel: EGDViewModel) {
     Dialog(
-        onDismissRequest = { /*TODO*/ },
+        onDismissRequest = {
+            viewModel.setShowCosts(false)
+            viewModel.clearCostsData()
+                           },
         content = {
             AddCostsDialogueContent(viewModel)
         },

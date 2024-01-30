@@ -8,8 +8,7 @@ import java.sql.Date;
 @Getter
 @Setter
 public class DateDto {
-
+    Long carId;
     Date fromDate;
     Date toDate;
-    Long carId;
 }

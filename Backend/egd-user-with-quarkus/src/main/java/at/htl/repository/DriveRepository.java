@@ -94,9 +94,10 @@ public class DriveRepository {
         return entityManager.find(Drive.class, driveId);
     }
 
-    public List<Drive> getDrivesByDateRange(Date fromDate, Date toDate) {
-        String queryString = "SELECT d FROM Drive d WHERE d.date BETWEEN :fromDate AND :toDate";
+    public List<Drive> getDrivesByDateRange(Date fromDate, Date toDate, Long carId) {
+        String queryString = "SELECT d FROM Drive d WHERE d.userCar.car.id = :carId AND d.date BETWEEN :fromDate AND :toDate";
         TypedQuery<Drive> query = entityManager.createQuery(queryString, Drive.class);
+        query.setParameter("carId", carId);
         query.setParameter("fromDate", fromDate);
         query.setParameter("toDate", toDate);
 

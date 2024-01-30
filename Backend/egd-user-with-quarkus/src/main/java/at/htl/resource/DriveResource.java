@@ -51,5 +51,16 @@ public class DriveResource {
         return Response.ok(drives).build();
     }
 
+    @GET
+    @Path("getDrivesFiltered/")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllDrivesByUserCarIdBetween(final DateDto dateDto){
+        List<Drive> drives = driveRepository.getAllDrivesByUserIdBetween(dateDto);
 
+        if (drives == null){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.ok(drives).build();
+    }
 }

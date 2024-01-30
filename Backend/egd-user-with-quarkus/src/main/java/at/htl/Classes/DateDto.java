@@ -11,4 +11,5 @@ public class DateDto {
     Long carId;
     Date fromDate;
     Date toDate;
+    Long carId;
 }

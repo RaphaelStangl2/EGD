@@ -12,6 +12,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import javax.ws.rs.core.Response;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,17 +56,19 @@ public class DriveRepository {
         return query.getResultList();
     }
 
-    public List<Drive> getAllDrivesByUserIdBetween(DateDto dateDto,long userCarId) {
+    public List<Drive> getAllDrivesByUserIdBetween(DateDto dateDto) {
 
+        List<Drive> drives = getAllDrivesByUserId(dateDto.getCarId());
 
-        List<Drive> drives = getAllDrivesByUserId(userCarId);
-
-        Date fromDate = dateDto.getFromDate();
-        Date toDate = dateDto.getToDate();
+        LocalDate fromDate = dateDto.getFromDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate toDate = dateDto.getToDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
         List<Drive> filteredDrives = drives.stream()
-                .filter(drive -> (drive.getDate().equals(fromDate) || drive.getDate().after(fromDate))
-                        && (drive.getDate().equals(toDate) || drive.getDate().before(toDate)))
+                .filter(drive -> {
+                    LocalDate driveDate = new Date(drive.getDate().getTime()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                    return (driveDate.isEqual(fromDate) || driveDate.isAfter(fromDate))
+                            && (driveDate.isEqual(toDate) || driveDate.isBefore(toDate));
+                })
                 .collect(Collectors.toList());
 
         return filteredDrives;

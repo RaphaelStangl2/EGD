@@ -75,8 +75,8 @@ public class UserCarRepository {
 
         String jpql = "SELECT uc.id FROM UserCar uc WHERE uc.user.id = :user AND uc.car.id = :car";
         Query query = entityManager.createQuery(jpql);
-        query.setParameter("user", userCar.getUser());
-        query.setParameter("car", userCar.getCar());
+        query.setParameter("user", userCar.getUser().getId());
+        query.setParameter("car", userCar.getCar().getId());
         //query.setParameter("isAdmin", userCar.getIsAdmin());
 
         return (Long) query.getSingleResult();

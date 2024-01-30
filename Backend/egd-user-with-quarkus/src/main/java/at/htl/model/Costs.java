@@ -4,6 +4,8 @@ import at.htl.model.Drive;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.Date;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,4 +25,6 @@ public class Costs {
     @ManyToOne
     @JoinColumn(name = "user_car_id")
     private UserCar userCar;
+
+    private Date date;
 }

@@ -1,5 +1,6 @@
 package at.htl.resource;
 
+import at.htl.Classes.DateDto;
 import at.htl.model.Car;
 import at.htl.model.Drive;
 import at.htl.repository.DriveRepository;
@@ -42,6 +43,19 @@ public class DriveResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllDrivesByUserCarId(@PathParam("userCarId") Long userCarId){
         List<Drive> drives = driveRepository.getAllDrivesByUserId(userCarId);
+
+        if (drives == null){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.ok(drives).build();
+    }
+
+    @GET
+    @Path("{userCarId}/")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllDrivesByUserCarId(@PathParam("userCarId") Long userCarId,final DateDto dateDto){
+        List<Drive> drives = driveRepository.getAllDrivesByUserIdBetween(dateDto);
 
         if (drives == null){
             return Response.status(Response.Status.NOT_FOUND).build();

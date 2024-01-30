@@ -1,5 +1,6 @@
 package at.htl.repository;
 
+import at.htl.Classes.DateDto;
 import at.htl.model.Costs;
 import at.htl.model.Drive;
 import at.htl.model.UserCar;
@@ -49,6 +50,10 @@ public class DriveRepository {
         query.setParameter("userCarId", userCarId);
 
         return query.getResultList();
+    }
+
+    public List<Drive> getAllDrivesByUserIdBetween(DateDto dateDto) {
+       return null;
     }
 
 

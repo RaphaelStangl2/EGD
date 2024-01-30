@@ -73,7 +73,7 @@ public class UserCarRepository {
 
     public long getUserCarIdByUserCar(UserCar userCar) {
 
-        String jpql = "SELECT uc.id FROM UserCar uc WHERE uc.user = :user AND uc.car = :car";
+        String jpql = "SELECT uc.id FROM UserCar uc WHERE uc.user.id = :user AND uc.car.id = :car";
         Query query = entityManager.createQuery(jpql);
         query.setParameter("user", userCar.getUser());
         query.setParameter("car", userCar.getCar());

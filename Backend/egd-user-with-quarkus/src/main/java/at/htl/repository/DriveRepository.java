@@ -12,7 +12,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import javax.ws.rs.core.Response;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class DriveRepository {
@@ -52,8 +54,20 @@ public class DriveRepository {
         return query.getResultList();
     }
 
-    public List<Drive> getAllDrivesByUserIdBetween(DateDto dateDto) {
-       return null;
+    public List<Drive> getAllDrivesByUserIdBetween(DateDto dateDto,long userCarId) {
+
+
+        List<Drive> drives = getAllDrivesByUserId(userCarId);
+
+        Date fromDate = dateDto.getFromDate();
+        Date toDate = dateDto.getToDate();
+
+        List<Drive> filteredDrives = drives.stream()
+                .filter(drive -> (drive.getDate().equals(fromDate) || drive.getDate().after(fromDate))
+                        && (drive.getDate().equals(toDate) || drive.getDate().before(toDate)))
+                .collect(Collectors.toList());
+
+        return filteredDrives;
     }
 
 

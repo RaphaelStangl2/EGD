@@ -51,16 +51,5 @@ public class DriveResource {
         return Response.ok(drives).build();
     }
 
-    @GET
-    @Path("{userCarId}/")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllDrivesByUserCarId(@PathParam("userCarId") Long userCarId,final DateDto dateDto){
-        List<Drive> drives = driveRepository.getAllDrivesByUserIdBetween(dateDto);
 
-        if (drives == null){
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-
-        return Response.ok(drives).build();
-    }
 }

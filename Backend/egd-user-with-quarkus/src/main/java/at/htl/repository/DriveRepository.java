@@ -80,7 +80,22 @@ public class DriveRepository {
         return query.getResultList();
     }
 
+    public List<Drive> getAllDrives() {
+        String queryString = "SELECT d FROM Drive d";
+        TypedQuery<Drive> query = entityManager.createQuery(queryString, Drive.class);
+
+        return query.getResultList();
+    }
     private Drive findByDriveId(long driveId) {
         return entityManager.find(Drive.class, driveId);
+    }
+
+    public List<Drive> getDrivesByDateRange(Date fromDate, Date toDate) {
+        String queryString = "SELECT d FROM Drive d WHERE d.date BETWEEN :fromDate AND :toDate";
+        TypedQuery<Drive> query = entityManager.createQuery(queryString, Drive.class);
+        query.setParameter("fromDate", fromDate);
+        query.setParameter("toDate", toDate);
+
+        return query.getResultList();
     }
 }

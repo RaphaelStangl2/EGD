@@ -38,6 +38,7 @@ import com.example.egd.data.entities.Drive
 import com.example.egd.ui.DonutPieChartWithSlices
 import com.example.egd.ui.EGDViewModel
 import com.example.egd.ui.ScheduleField
+import com.example.egd.ui.dialogues.AddCostsDialogue
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneId
@@ -48,6 +49,7 @@ import java.util.Date
 @Composable
 fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutChartData: PieChartData, header:String){
 
+    val showCostsScreen = viewModel.costsState.collectAsState().value.showCosts
 
     val donutChartConfig = PieChartConfig(
         percentVisible = true,
@@ -83,14 +85,11 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutC
         }else if (header == "Drives"){
             //hier von berdan aufrufen und auf drivesList setzen
 
-            drivesList = listOf(
-                Drive(date = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()),
-                    kilometers = 100.0, id = 0, userCar = null));
+//            drivesList = listOf(
+//                Drive(date = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()),
+//                    kilometers = 100.0, id = 0, userCar = null));
 
         }
-
-
-
 
         AlertDialog(
             modifier = Modifier
@@ -186,17 +185,30 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutC
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
-            Spacer(modifier = Modifier.height(16.dp))
-            DonutPieChart(
-                modifier = modifier,
-                donutChartData,
-                donutChartConfig,
-                onSliceClick = { slice ->
-                    clickedSlice = slice
+            if (header == "Costs"){
+                Button(onClick = {viewModel.setShowCosts(true)}){
+                    Text("Add Costs")
                 }
-            )
+                if (showCostsScreen){
+                    AddCostsDialogue(viewModel = viewModel)
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (donutChartData.slices.isNotEmpty() && donutChartConfig != null ) {
+                DonutPieChart(
+                    modifier = modifier,
+                    donutChartData,
+                    donutChartConfig,
+                    onSliceClick = { slice ->
+                        clickedSlice = slice
+                    }
+                )
+            }
         DonutPieChartWithSlices(slices = donutChartData.slices, donutChartConfig = donutChartConfig)
     }
 
 }
+
 

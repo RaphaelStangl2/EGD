@@ -233,6 +233,7 @@ fun CarCard(
                 {
                     viewModel.setCar(car, car.consumption.toString())
                     goToEditScreen()
+                    viewModel.getDrivesByUserCar()
                 }
                 ) {
                     if (isAdmin == true){

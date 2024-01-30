@@ -217,9 +217,9 @@ fun StatisticsScreen(
                             .background(color = Color.White)
                             // .fillMaxWidth()
                             .fillMaxWidth()
-                            .padding(30.dp), viewModel = viewModel,
+                            .padding(30.dp),
+                        viewModel = viewModel,
                         donutChartData= userToPieChartData(drivesList),
-
 //                        PieChartData(
 //                            slices = listOf(
 //                                PieChartData.Slice("Max", 15f, Color(0xFF5F0A87)),
@@ -230,7 +230,7 @@ fun StatisticsScreen(
 //                            plotType = PlotType.Donut
 //
 //                        ),
-                        header="Drives"
+                        header="Drives",
                     )
 
 

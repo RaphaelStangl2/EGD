@@ -52,15 +52,35 @@ public class DriveResource {
     }
 
     @GET
-    @Path("getDrivesFiltered/")
+    @Path("allDrives")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllDrivesByUserCarIdBetween(final DateDto dateDto){
-        List<Drive> drives = driveRepository.getAllDrivesByUserIdBetween(dateDto);
+    public Response getAllDrives() {
+        List<Drive> allDrives = driveRepository.getAllDrives();
 
-        if (drives == null){
+        if (allDrives == null || allDrives.isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.ok(allDrives).build();
+    }
+
+
+    @POST
+    @Path("getDrivesByDateRange")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDrivesByDateRange(final DateDto dateDto) {
+        if (dateDto == null || dateDto.getFromDate() == null || dateDto.getToDate() == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid date range").build();
+        }
+
+        List<Drive> drives = driveRepository.getDrivesByDateRange(dateDto.getFromDate(), dateDto.getToDate());
+
+        if (drives == null || drives.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
         return Response.ok(drives).build();
     }
+
 }

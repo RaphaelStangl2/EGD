@@ -73,9 +73,9 @@ public class DriveResource {
         if (dateDto == null || dateDto.getFromDate() == null || dateDto.getToDate() == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Invalid date range").build();
         }
-        List<Drive> drives = driveRepository.getDrivesByDateRange(dateDto.getFromDate(), dateDto.getToDate());
+        List<Drive> drives = driveRepository.getDrivesByDateRange(dateDto.getFromDate(), dateDto.getToDate(), dateDto.getCarId());
 
- 
+
         return Response.ok(drives).build();
     }
 

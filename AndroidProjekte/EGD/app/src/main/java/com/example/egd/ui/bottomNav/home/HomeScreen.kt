@@ -48,7 +48,7 @@ fun HomeScreen(
     context: Context,
     goToStatisticsScreen: () -> Unit
 ){
-    AddCostsDialogue(viewModel = viewModel)
+    //AddCostsDialogue(viewModel = viewModel)
     
     val homeUiState = viewModel.homeUiState.collectAsState().value
     var tmpBool = false
@@ -213,6 +213,7 @@ fun CarCard(
             .clickable {
                 goToStatisticsScreen()
                 viewModel.setStatisticsCar(car)
+                viewModel.getDrivesByUserCar()
             },
         backgroundColor = MaterialTheme.colors.background,
         elevation = 8.dp,

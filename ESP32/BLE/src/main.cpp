@@ -111,6 +111,7 @@ TaskHandle_t Task1;
 bool accidentHappend = false;
 
 bool axesSet = false; //Wenn die Achsen schon gesetzt sind soll es auf true gesetzt werden
+std::string sendIntinString = "3";
 
 void Task1code(void *parameter) {
   const int numValues = 50;    // Anzahl der zu speichernden Werte
@@ -119,37 +120,51 @@ void Task1code(void *parameter) {
   float zAchseArray[numValues];
   int currentIndex = 0;        // Aktueller Index im Array
 
+
+
+
+
   while(true){
-      /* Get new sensor events with the readings */
-      sensors_event_t a, g, temp;
-      mpu.getEvent(&a, &g, &temp);
+    
+   sensors_event_t a, g, temp;
+    mpu.getEvent(&a, &g, &temp);
+    /* Get new sensor events with the readings */
+   
+   if (a.acceleration.x > 20 || a.acceleration.x < 0)
+    {
+      sendIntinString = "1";
+      Serial.println("Fall erkannt");
+    }
 
-      /* Print out the values */
-      Serial.println("Wir sind im Task1Code für den Sensor");
-      Serial.println("Wir sind im Kern:");
-      Serial.println(xPortGetCoreID());
+    /* Print out the values */
+    Serial.println("Wir sind im Task1Code für den Sensor");
+    Serial.println("Wir sind im Kern:");
+    Serial.println(xPortGetCoreID());
 
-      Serial.print("Acceleration X: ");
-      Serial.print(a.acceleration.x);
-      Serial.print(", Y: ");
-      Serial.print(a.acceleration.y);
-      Serial.print(", Z: ");
-      Serial.print(a.acceleration.z);
-      Serial.println(" m/s^2");
+    Serial.print("Acceleration X: ");
+    Serial.print(a.acceleration.x);
+    Serial.print(", Y: ");
+    Serial.print(a.acceleration.y);
+    Serial.print(", Z: ");
+    Serial.print(a.acceleration.z);
+    Serial.println(" m/s^2");
 
-      Serial.print("Rotation X: ");
-      Serial.print(g.gyro.x);
-      Serial.print(", Y: ");
-      Serial.print(g.gyro.y);
-      Serial.print(", Z: ");
-      Serial.print(g.gyro.z);
-      Serial.println(" rad/s");
+    Serial.print("Rotation X: ");
+    Serial.print(g.gyro.x);
+    Serial.print(", Y: ");
+    Serial.print(g.gyro.y);
+    Serial.print(", Z: ");
+    Serial.print(g.gyro.z);
+    Serial.println(" rad/s");
 
-      Serial.print("Temperature: ");
-      Serial.print(temp.temperature);
-      Serial.println(" degC");
+    Serial.print("Temperature: ");
+    Serial.print(temp.temperature);
+    Serial.println(" degC");
 
-      Serial.println("");
+    Serial.println("");
+
+    
+    
 
       // Bedingungen für die Achsenwerte
       const float threshold = 9.81;  // Schwellenwert für die Y-Achse
@@ -185,6 +200,7 @@ void Task1code(void *parameter) {
       std::string rechtsLinksAchseString = "";
 
       
+    
       if(axesSet==false)
       {
           if (a.acceleration.y >= (threshold * (1.0 - percentage)) && a.acceleration.y <= (threshold * (1.0 + percentage))) {
@@ -284,8 +300,7 @@ void Task1code(void *parameter) {
         Serial.print("Diffrence between tow: ");
         Serial.println(difference);
 
-        
-
+        axesSet = true;
 
         //Wenn der Unterschie xGesamt und yGesamt nicht zu groß ist dann hat das Auto wahrscheinlich noch nicht gestartet
         //Wenn trotzdem xGesamt viel größer ist als yGesamt dann ist wahrscheinlich die xAchsen zuständig für Vorne und hinten.
@@ -361,6 +376,7 @@ void Task1code(void *parameter) {
         
       }
       }
+    
       // Überprüfen der Y-Achse
       
 
@@ -375,9 +391,10 @@ void Task1code(void *parameter) {
       Serial.print("Die Achse die für Oben und Unten zuständig ist: ");
       Serial.println(obenUntenAchseString.c_str());
 
-      delay(1000);
-  }
+      delay(10);
+  } 
 }
+
 
 void setup() {
   Serial.begin(921600);
@@ -550,20 +567,40 @@ void loop() {
     digitalWrite(LED, HIGH);
     Serial.println("Wir sind beim Sendprozess....");
 
-    randomNr = random(1, 9);
-    std::string sendIntinString = std::to_string(randomNr);
+   
+    sensors_event_t a, g, temp;
+    mpu.getEvent(&a, &g, &temp);
 
+    
+
+    if (a.acceleration.x > 15 || a.acceleration.x < 0)
+    {
+      sendIntinString = "1";
+      Serial.println("Fall erkannt");
+      //delay(1000);
+    }
     byte bytes[sendIntinString.size()];
     
 
-    for (size_t i = 0; i < sendIntinString.size(); i++) {
-        bytes[i] = sendIntinString[i];
-    }
    
-    customCharacteristic.setValue(bytes, 1);
-    customCharacteristic.notify();
 
-    delay(10000);
+
+    if(sendIntinString == "1"){
+     // sendIntinString = std::to_string(randomNr);
+
+      for (size_t i = 0; i < sendIntinString.size(); i++) {
+          bytes[i] = sendIntinString[i];
+          customCharacteristic.setValue(bytes, 1);
+          customCharacteristic.notify();
+          sendIntinString = "0";
+      }
+    }
+
+
+
+   
+
+   delay(1000);
   }
 
 }

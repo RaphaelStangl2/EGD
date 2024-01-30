@@ -1,5 +1,6 @@
 package com.example.egd.ui.bottomNav.statistics
 
+import android.service.autofill.DateTransformation
 import android.text.TextUtils
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -18,6 +19,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,29 +33,22 @@ import co.yml.charts.common.model.PlotType
 import co.yml.charts.ui.piechart.charts.DonutPieChart
 import co.yml.charts.ui.piechart.models.PieChartConfig
 import co.yml.charts.ui.piechart.models.PieChartData
+import com.example.egd.data.entities.Costs
+import com.example.egd.data.entities.Drive
 import com.example.egd.ui.DonutPieChartWithSlices
 import com.example.egd.ui.EGDViewModel
 import com.example.egd.ui.ScheduleField
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.ZoneId
+import java.util.Date
 
 
-data class Drive(
-    val date: String,
-    val kmCount: Int
-)
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel){
+fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutChartData: PieChartData, header:String){
 
-    val donutChartData = PieChartData(
-        slices = listOf(
-            PieChartData.Slice("HP", 15f, Color(0xFF5F0A87)),
-            PieChartData.Slice("Dell", 30f, Color(0xFF20BF55)),
-            PieChartData.Slice("Lenovo", 40f,  Color(0xFFEC9F05)),
-            PieChartData.Slice("Asus", 10f, Color(0xFFF53844))
-        ),
-        plotType = PlotType.Donut
 
-    )
     val donutChartConfig = PieChartConfig(
         percentVisible = true,
         percentageFontSize = 42.sp,
@@ -69,25 +64,32 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel){
     var clickedSlice by remember { mutableStateOf<PieChartData.Slice?>(null) }
 
 
-    val drivesList: List<Drive>
+    var drivesList: List<Drive>
+    var costsList: List<Costs>
     clickedSlice?.let { slice ->
-
-        //hier von berdan aufrufen und auf drivesList setzen
         drivesList = listOf(
-                Drive(date = "2023-01-01", kmCount = 100),
-        Drive(date = "2023-01-05", kmCount = 150),
-        Drive(date = "2023-01-10", kmCount = 120),
-        Drive(date = "2023-01-01", kmCount = 100),
-        Drive(date = "2023-01-05", kmCount = 150),
-        Drive(date = "2023-01-10", kmCount = 120),
-        Drive(date = "2023-01-01", kmCount = 100),
-        Drive(date = "2023-01-05", kmCount = 150),
-        Drive(date = "2023-01-10", kmCount = 120),
-        Drive(date = "2023-01-01", kmCount = 100),
-        Drive(date = "2023-01-05", kmCount = 150),
-        Drive(date = "2023-01-10", kmCount = 120),
-        // ... Weitere Elemente hinzufügen
+            Drive(date = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                kilometers = 100.0, id = 0, userCar = null));
+
+        costsList = listOf(
+            Costs(id = 0, description = "Tank",costs=200.00,userCar = null)
         )
+        if (header=="Costs"){
+            //hier von berdan aufrufen und auf drivesList setzen
+
+            costsList = listOf(
+                Costs(id = 0, description = "Tank",costs=200.00,userCar = null)
+            )
+        }else if (header == "Drives"){
+            //hier von berdan aufrufen und auf drivesList setzen
+
+            drivesList = listOf(
+                Drive(date = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                    kilometers = 100.0, id = 0, userCar = null));
+
+        }
+
+
 
 
         AlertDialog(
@@ -102,21 +104,29 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel){
                 Text("")
             },
             text = {
-                LazyColumn {
+                LazyColumn {if (header == "Drives"){
+
+                    // Define the desired date format
+                    val desiredDateFormat = SimpleDateFormat("dd.MM.yyyy")
+
+
                     items(items = drivesList) { drive ->
+                        // Format the date using the desired format
+                        val formattedDate = desiredDateFormat.format(drive.date)
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(8.dp)
                         ) {
                             Text(
-                                text = "Date: ${drive.date}",
+
+                                text = "Date: $formattedDate",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp,
                                 color = Color.Black
                             )
                             Text(
-                                text = "KM Count: ${drive.kmCount}",
+                                text = "KM Count: ${drive.kilometers}",
                                 fontSize = 14.sp,
                                 color = Color.Gray
                             )
@@ -124,6 +134,35 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel){
                             Divider(color = Color.Gray, thickness = 1.dp)
                         }
                     }
+
+
+                }else if( header == "Costs"){
+
+                    items(items = costsList) { cost ->
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
+                        ) {
+                            Text(
+                                text = "Description: ${cost.description}",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                color = Color.Black
+                            )
+                            Text(
+                                text = "Costs: ${cost.costs}",
+                                fontSize = 14.sp,
+                                color = Color.Gray
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Divider(color = Color.Gray, thickness = 1.dp)
+                        }
+                    }
+
+                }
+
+
                 }
             },
             confirmButton = {
@@ -143,7 +182,7 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel){
                 .padding(16.dp)
         ) {
             Text(
-                text = "Drives",
+                text = header,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )

@@ -388,7 +388,7 @@ class EGDViewModel @Inject constructor(
         viewModelScope.launch {
             carList.forEach {
                 if (homeUiState.value.user != null){
-                    val response: ResponseBody = HttpService.retrofitService.getUserCarWithoutId(UserCar(homeUiState.value.user!!, it, false))
+                    val response: ResponseBody = HttpService.retrofitService.getUserCarWithoutId(UserCar(null, homeUiState.value.user!!, it, false))
                     val userCar = readUserCarFromJson(response.byteStream())
                     it.isAdmin = userCar!!.isAdmin
                 }
@@ -584,7 +584,7 @@ class EGDViewModel @Inject constructor(
             password = value.password
         )
         var car = Car(null, value.carName, value.averageCarConsumption.toDouble(), 0.0, 0.0, value.currentUUID, value.licensePlate, null, null)
-        var userCarToAdd = UserCar(userToAdd, car, true)
+        var userCarToAdd = UserCar(null,userToAdd, car, true)
 
         var friendsAssignList: ArrayList<UserCar> = ArrayList<UserCar>()
         var invitationList: ArrayList<Invitation> = ArrayList<Invitation>()
@@ -1054,7 +1054,7 @@ class EGDViewModel @Inject constructor(
                     )
                 }
             }*/
-            friendsAssignList.add(UserCar(homeValue.user!!, car, true))
+            friendsAssignList.add(UserCar(null, homeValue.user!!, car, true))
 
             var finalList: Array<UserCar> = friendsAssignList.toTypedArray()
 
@@ -1065,7 +1065,7 @@ class EGDViewModel @Inject constructor(
                 if (homeValue.assignedFriendsList != null) {
                     for (user in homeValue.assignedFriendsList!!){
                         if (homeValue.user != null){
-                            HttpService.retrofitService.addInvitation(Invitation(null,user,UserCar(homeValue.user, car, true), "waiting"))
+                            HttpService.retrofitService.addInvitation(Invitation(null,user,UserCar(null,homeValue.user, car, true), "waiting"))
                         }
                     }
                 }
@@ -1111,7 +1111,7 @@ class EGDViewModel @Inject constructor(
                     if (removedFriendsList != null){
                         for (user in removedFriendsList){
                             try{
-                                HttpService.retrofitService.deleteUserCar(UserCar(user, car, false))
+                                HttpService.retrofitService.deleteUserCar(UserCar(null,user, car, false))
                             } catch( e:Exception){
                             }
                         }
@@ -1119,7 +1119,7 @@ class EGDViewModel @Inject constructor(
                     if (addedFriendsList != null) {
                         for (user in addedFriendsList){
                             if (homeValue.user != null){
-                                HttpService.retrofitService.addInvitation(Invitation(null,user,UserCar(homeValue.user, car, true), "waiting"))
+                                HttpService.retrofitService.addInvitation(Invitation(null,user,UserCar(null,homeValue.user, car, true), "waiting"))
                             }
                         }
                     }
@@ -1254,7 +1254,7 @@ class EGDViewModel @Inject constructor(
             }
         }
         if (homeState.user != null && car != null){
-            userCar = UserCar(homeState.user, car, true)
+            userCar = UserCar(null,homeState.user, car, true)
         }
         return userCar
     }
@@ -1436,5 +1436,29 @@ class EGDViewModel @Inject constructor(
                 costs = costs
             )
         }
+    }
+
+    fun getDrivesByUserCar(){
+        val statisticsState = statsState.value
+
+        viewModelScope.launch {
+            val response: ResponseBody = HttpService.retrofitService.getUserCarWithoutId(UserCar(null, homeUiState.value.user!!, statisticsState.car!!, false))
+            val userCar = readUserCarFromJson(response.byteStream())
+
+            var response2: ResponseBody = HttpService.retrofitService.getDrivesByUserCar(userCar!!.id!!)
+            var arrayDrives = readDriveListFromJson(response2.byteStream())
+
+            _statsState.update { currentState ->
+                currentState.copy(
+                    driveStatistics = arrayDrives
+                )
+            }
+        }
+    }
+
+    private fun readDriveListFromJson(inputStream: InputStream): Array<Drive> {
+        var jsonStringVar = inputStream.bufferedReader()
+            .use { it.readText() }
+        return Gson().fromJson(jsonStringVar, Array<Drive>::class.java)
     }
 }

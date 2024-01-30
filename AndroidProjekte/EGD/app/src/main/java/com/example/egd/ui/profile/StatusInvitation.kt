@@ -124,13 +124,13 @@ fun getMessageForStatus(status:String, userName: String): String{
     }
 }
 
-@Composable
-@Preview
-fun PreviewStatusInvitation(){
-    var invitation = Invitation(1, User(id = 1, userName = "Test User", email="", password = ""),
-        UserCar(user = User(id = 1, userName = "Test 2 User", email="", password = ""),
-            car = Car(1, name= "Test Car", consumption = 5.0, latitude = 0.0, longitude = 0.0, uuid="", licensePlate = "", currentUser = null, null),
-            isAdmin = true
-        ), status="agree")
-    //StatusInvitation(statusInvitation = invitation, viewModel =)
-}
+//@Composable
+//@Preview
+//fun PreviewStatusInvitation(){
+//    var invitation = Invitation(1, User(id = 1, userName = "Test User", email="", password = ""),
+//        UserCar(user = User(id = 1, userName = "Test 2 User", email="", password = ""),
+//            car = Car(1, name= "Test Car", consumption = 5.0, latitude = 0.0, longitude = 0.0, uuid="", licensePlate = "", currentUser = null, null),
+//            isAdmin = true
+//        ), status="agree")
+//    //StatusInvitation(statusInvitation = invitation, viewModel =)
+//}

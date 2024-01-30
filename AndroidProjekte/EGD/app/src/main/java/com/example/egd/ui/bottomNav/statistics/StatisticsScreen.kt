@@ -35,8 +35,11 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import co.yml.charts.common.model.PlotType
 import co.yml.charts.ui.piechart.models.PieChartConfig
 import co.yml.charts.ui.piechart.models.PieChartData
+import com.example.egd.data.entities.Drive
+import com.example.egd.data.entities.User
 import com.example.egd.ui.bottomNav.statistics.CircleDiagram
 import com.example.egd.ui.bottomNav.statistics.LineChartDiagram
 import com.google.accompanist.pager.*
@@ -170,6 +173,12 @@ fun StatisticsScreen(
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
 
+    var drivesList: List<Drive>? = null
+    val driveState = viewModel.statsState.collectAsState().value
+    if (driveState.driveStatistics != null){
+        drivesList = driveState.driveStatistics.toList()
+    }
+
     Column(modifier = modifier
         .fillMaxHeight()
         .verticalScroll(scrollState)) {
@@ -208,13 +217,38 @@ fun StatisticsScreen(
                             .background(color = Color.White)
                             // .fillMaxWidth()
                             .fillMaxWidth()
-                            .padding(30.dp), viewModel = viewModel)
+                            .padding(30.dp), viewModel = viewModel,
+                        donutChartData= userToPieChartData(drivesList),
+
+//                        PieChartData(
+//                            slices = listOf(
+//                                PieChartData.Slice("Max", 15f, Color(0xFF5F0A87)),
+//                                PieChartData.Slice("Sabina", 30f, Color(0xFF20BF55)),
+//                                PieChartData.Slice("Michael", 40f,  Color(0xFFEC9F05)),
+//                                PieChartData.Slice("Franz", 10f, Color(0xFFF53844))
+//                            ),
+//                            plotType = PlotType.Donut
+//
+//                        ),
+                        header="Drives"
+                    )
 
 
-                1 -> LineChartDiagram(
+                1 -> CircleDiagram(
                     modifier = Modifier
+                        .background(color = Color.White)
+                        // .fillMaxWidth()
                         .fillMaxWidth()
-                        .padding(30.dp)
+                        .padding(30.dp), viewModel = viewModel,
+                    donutChartData=PieChartData(
+                        slices = listOf(
+                            PieChartData.Slice("Max", 15f, Color(0xFF5F0A87)),
+                            PieChartData.Slice("Sabina", 30f, Color(0xFF20BF55)),
+                            PieChartData.Slice("Michael", 40f,  Color(0xFFEC9F05)),
+                            PieChartData.Slice("Franz", 10f, Color(0xFFF53844))
+                        ),
+                        plotType = PlotType.Donut),
+                    header="Costs"
                 )
             }
         }
@@ -228,4 +262,45 @@ fun StatisticsScreen(
 
     }
 }
+fun userToPieChartData(drives: List<Drive>?): PieChartData {
+    // Create a map to store the sum of kilometers for each user
+    val userKilometersMap = mutableMapOf<String, Double>()
+
+    // Sum up kilometers for each user
+    if (drives == null){
+
+    }
+    else{
+        for (drive in drives) {
+            val userName = drive.userCar?.user?.userName
+            val kilometers = drive.kilometers ?: 0.0
+
+            if (userName != null) {
+                userKilometersMap[userName] = (userKilometersMap[userName] ?: 0.0) + kilometers
+            }
+        }
+    }
+    // Convert the map entries to PieChartData slices
+    val slices = userKilometersMap.entries.mapIndexed { index, (userName, kilometers) ->
+        val color = generateColor(index)
+        PieChartData.Slice(userName, kilometers.toFloat(), color)
+    }
+
+    // Create and return PieChartData
+    return PieChartData(slices, PlotType.Donut)
+}
+
+// Helper function to generate distinct colors for each slice
+fun generateColor(index: Int): Color {
+    // You can customize the color generation logic based on your preference
+    val colors = listOf(
+        Color(0xFF5F0A87),
+        Color(0xFF20BF55),
+        Color(0xFFEC9F05),
+        Color(0xFFF53844)
+    )
+
+    return colors.get(index % colors.size);
+}
+
 

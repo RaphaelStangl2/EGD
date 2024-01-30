@@ -12,7 +12,7 @@ data class Costs(
     var description:String = "",
     @SerializedName("costs")
     @Expose
-    var costs: Long = 0,
+    var costs: Double = 0.00,
     @SerializedName("userCar")
     @Expose
     var userCar: UserCar? = null,

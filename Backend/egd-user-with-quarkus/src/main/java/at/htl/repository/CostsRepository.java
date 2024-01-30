@@ -18,6 +18,13 @@ public class CostsRepository {
     @Inject
     AccidentRepository accidentRepository;
 
+    public List<Costs> findAllCosts() {
+        List<Costs> allCosts = entityManager.createQuery("SELECT c FROM Costs c", Costs.class)
+                .getResultList();
+
+        return allCosts;
+    }
+
     public List<Costs> findAllCostsByCarId(long carId) {
         return entityManager.createQuery("SELECT c FROM Costs c WHERE c.userCar.car.id = :carId", Costs.class)
                 .setParameter("carId", carId)

@@ -20,6 +20,21 @@ public class CostsResource {
     CostsRepository costsRepository;
 
 
+
+
+    @GET
+    @Path("allCosts")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllCosts() {
+        List<Costs> allCosts = costsRepository.findAllCosts();
+
+        if (allCosts == null || allCosts.isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.ok(allCosts).build();
+    }
+
     @POST
     @Path("")
     @Consumes(MediaType.APPLICATION_JSON)

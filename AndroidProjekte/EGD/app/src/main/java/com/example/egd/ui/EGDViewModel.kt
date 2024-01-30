@@ -18,6 +18,7 @@ import com.example.egd.data.costsEnum.CostsEnum
 import com.example.egd.data.entities.*
 import com.example.egd.data.http.HttpService
 import com.example.egd.data.http.MapsHttpService
+import com.example.egd.data.validation.ValidationObject
 import com.example.egd.ui.validation.ValidationService
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.maps.model.LatLng
@@ -36,6 +37,7 @@ import java.io.InputStream
 import java.time.LocalDate
 import java.time.DateTimeException
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -388,7 +390,7 @@ class EGDViewModel @Inject constructor(
         viewModelScope.launch {
             carList.forEach {
                 if (homeUiState.value.user != null){
-                    val response: ResponseBody = HttpService.retrofitService.getUserCarWithoutId(UserCar(homeUiState.value.user!!, it, false))
+                    val response: ResponseBody = HttpService.retrofitService.getUserCarWithoutId(UserCar(null,homeUiState.value.user!!, it, false))
                     val userCar = readUserCarFromJson(response.byteStream())
                     it.isAdmin = userCar!!.isAdmin
                 }
@@ -584,7 +586,7 @@ class EGDViewModel @Inject constructor(
             password = value.password
         )
         var car = Car(null, value.carName, value.averageCarConsumption.toDouble(), 0.0, 0.0, value.currentUUID, value.licensePlate, null, null)
-        var userCarToAdd = UserCar(userToAdd, car, true)
+        var userCarToAdd = UserCar(null,userToAdd, car, true)
 
         var friendsAssignList: ArrayList<UserCar> = ArrayList<UserCar>()
         var invitationList: ArrayList<Invitation> = ArrayList<Invitation>()
@@ -680,6 +682,7 @@ class EGDViewModel @Inject constructor(
                         currentState.copy(
                             connectionSuccessful = false,
                             accidentCode = result.accidentCode,
+                            currentUUID = ""
                         )
                     }
                 }
@@ -939,20 +942,39 @@ class EGDViewModel @Inject constructor(
         }
     }
 
-    fun logout(sharedPreference: () -> SharedPreferences?, stopForegroundService: () -> Unit) {
-        val sharedPreference = sharedPreference()
-
-        var editor = sharedPreference?.edit()
-
+    fun clearDataLogout(){
         homeUiState.value.assignedFriendsList = null
         homeUiState.value.searchFriendList = null
         homeUiState.value.cars = null
         invitation.value.statusInvitationList = null
         invitation.value.incomingInvitationList = null
-        getStartedUiState.value.step = 1
-        getStartedUiState.value.numberOfSteps = 5
-        setUser(User(id = null, userName = "", email = "", password = "",))
+        _getStartedUiState.update { currentState ->
+            currentState.copy(
+                step = 1,
+                numberOfSteps = 5,
+                currentUUID = "",
+                email = "",
+                password = "",
+                connectionSuccessful = false,
+                averageCarConsumption = "",
+                friendSearchBarContent = "",
+                triedToSubmit = false,
+                buttonClicked = false,
+                accidentCode = "",
+                carName = "",
+                licensePlate = ""
+            )
+        }
+    }
 
+    fun logout(sharedPreference: () -> SharedPreferences?, stopForegroundService: () -> Unit) {
+        val sharedPreference = sharedPreference()
+
+        var editor = sharedPreference?.edit()
+
+
+
+        setUser(User(id = null, userName = "", email = "", password = "",))
 
         editor?.putString("email", "")
         editor?.putBoolean("isLoggedIn", false)
@@ -1054,7 +1076,7 @@ class EGDViewModel @Inject constructor(
                     )
                 }
             }*/
-            friendsAssignList.add(UserCar(homeValue.user!!, car, true))
+            friendsAssignList.add(UserCar(null,homeValue.user!!, car, true))
 
             var finalList: Array<UserCar> = friendsAssignList.toTypedArray()
 
@@ -1065,7 +1087,7 @@ class EGDViewModel @Inject constructor(
                 if (homeValue.assignedFriendsList != null) {
                     for (user in homeValue.assignedFriendsList!!){
                         if (homeValue.user != null){
-                            HttpService.retrofitService.addInvitation(Invitation(null,user,UserCar(homeValue.user, car, true), "waiting"))
+                            HttpService.retrofitService.addInvitation(Invitation(null,user,UserCar(null,homeValue.user, car, true), "waiting"))
                         }
                     }
                 }
@@ -1111,7 +1133,7 @@ class EGDViewModel @Inject constructor(
                     if (removedFriendsList != null){
                         for (user in removedFriendsList){
                             try{
-                                HttpService.retrofitService.deleteUserCar(UserCar(user, car, false))
+                                HttpService.retrofitService.deleteUserCar(UserCar(null,user, car, false))
                             } catch( e:Exception){
                             }
                         }
@@ -1119,7 +1141,7 @@ class EGDViewModel @Inject constructor(
                     if (addedFriendsList != null) {
                         for (user in addedFriendsList){
                             if (homeValue.user != null){
-                                HttpService.retrofitService.addInvitation(Invitation(null,user,UserCar(homeValue.user, car, true), "waiting"))
+                                HttpService.retrofitService.addInvitation(Invitation(null,user,UserCar(null,homeValue.user, car, true), "waiting"))
                             }
                         }
                     }
@@ -1133,12 +1155,24 @@ class EGDViewModel @Inject constructor(
                     setAssignedFriendsList(emptyArray())
                     setRemovedFriendsList(emptyArray())
                     setTriedToSubmitEdit(false)
+                    clearAddCarData()
                     onUpdated()
 
                 } catch (e: Exception) {
                     throw e
                 }
             }
+        }
+    }
+
+    private fun clearAddCarData() {
+        _editCarUiState.update { currentState ->
+            currentState.copy(
+                car = null,
+                name = "",
+                consumption = "",
+                licensePlate = ""
+            )
         }
     }
 
@@ -1254,7 +1288,7 @@ class EGDViewModel @Inject constructor(
             }
         }
         if (homeState.user != null && car != null){
-            userCar = UserCar(homeState.user, car, true)
+            userCar = UserCar(null,homeState.user, car, true)
         }
         return userCar
     }
@@ -1439,14 +1473,49 @@ class EGDViewModel @Inject constructor(
     }
 
     fun addCosts() {
-        viewModelScope.launch {
-            val response: ResponseBody = HttpService.retrofitService.getUserCarWithoutId(UserCar(homeUiState.value.user!!, statsState.value.car!!, false))
-            val userCar = readUserCarFromJson(response.byteStream())
+        var validationService = ValidationService()
+        if (validationService.validateCostsScreen(costsState.value.costs, costsState.value.reason)) {
+            viewModelScope.launch {
+                val response: ResponseBody = HttpService.retrofitService.getUserCarWithoutId(
+                    UserCar(
+                        id = null,
+                        homeUiState.value.user!!,
+                        statsState.value.car!!,
+                        false
+                    )
+                )
+                val userCar = readUserCarFromJson(response.byteStream())
 
-            val costs:Costs = Costs(null, costsState.value.reason.toString(), costsState.value.costs.toLong(), userCar = userCar)
+                val costs: Costs = Costs(
+                    null,
+                    costsState.value.reason.toString(),
+                    costsState.value.costs.toDouble(),
+                    userCar = userCar,
+                    date = Date.from(LocalDate.now().atStartOfDay(ZoneId.of("UTC")).toInstant())
+                )
 
-            HttpService.retrofitService.addCosts(costs)
+                val response2 = HttpService.retrofitService.addCosts(costs)
 
+                val repsone3 = response2
+                setShowCosts(false)
+                resetCosts()
+            }
+        }else{
+            _costsState.update { currentState->
+                currentState.copy(
+                    triedToSubmit = true
+                )
+            }
+        }
+    }
+
+    private fun resetCosts() {
+        _costsState.update { currentState->
+            currentState.copy(
+                triedToSubmit = false,
+                costs = "",
+                reason = null,
+            )
         }
     }
 
@@ -1463,7 +1532,8 @@ class EGDViewModel @Inject constructor(
             currentState.copy(
                 costs="",
                 reason=null,
-                showCosts=false
+                showCosts=false,
+                triedToSubmit = false
             )
         }
     }

@@ -17,7 +17,7 @@ data class GetStartedUiState(
     val friendSearchBarContent:String = "",
     val triedToSubmit:Boolean = false,
     val connectionSuccessful:Boolean = false,
-    val currentUUID: String = "",
+    var currentUUID: String = "",
     val buttonClicked: Boolean = false,
     val accidentCode: String = ""
 )

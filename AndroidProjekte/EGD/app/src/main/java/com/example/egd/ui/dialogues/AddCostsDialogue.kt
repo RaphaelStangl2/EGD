@@ -17,7 +17,7 @@ fun AddCostsDialogue(viewModel: EGDViewModel) {
         },
         properties = DialogProperties(
             dismissOnBackPress = true,
-            dismissOnClickOutside = false
+            dismissOnClickOutside = true
         ),
     )
 }

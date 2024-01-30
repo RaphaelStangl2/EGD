@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.egd.data.costsEnum.CostsEnum
 import com.example.egd.ui.EGDViewModel
+import com.example.egd.ui.validation.ErrorText
+import com.example.egd.ui.validation.ValidationService
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -26,6 +28,13 @@ fun AddCostsDialogueContent(viewModel: EGDViewModel) {
     var costsState = viewModel.costsState.collectAsState().value
     var costs = costsState.costs
     var reason = costsState.reason
+
+    var validationService = ValidationService()
+
+    var validationCosts = validationService.validateCosts(costs)
+    var validationReason = validationService.validateReason(reason)
+
+    var triedToSubmit = costsState.triedToSubmit
 
     var isExpanded by remember {
         mutableStateOf(false)
@@ -58,6 +67,11 @@ fun AddCostsDialogueContent(viewModel: EGDViewModel) {
                )
                Text(text="€")
            }
+            Row{
+                if (!validationCosts.valid && triedToSubmit){
+                    ErrorText(message = validationCosts.message)
+                }
+            }
            Row(verticalAlignment = Alignment.CenterVertically){
                Text(text = "Reason:", fontSize = 15.sp, modifier = Modifier.fillMaxWidth(0.23f))
                Box(){
@@ -103,11 +117,16 @@ fun AddCostsDialogueContent(viewModel: EGDViewModel) {
                    }
                }
            }
+            Row{
+                if (!validationReason.valid && triedToSubmit){
+                    ErrorText(message = validationReason.message)
+                }
+            }
            Row(modifier = Modifier
                .fillMaxWidth()
                .padding(5.dp), horizontalArrangement = Arrangement.Center){
                 Button(onClick = { viewModel.addCosts()
-                                 viewModel.setShowCosts(false)
+                                 //viewModel.setShowCosts(false)
                                  }, modifier = Modifier.fillMaxWidth(0.5f)){
                     Text(text="Add")
                 }

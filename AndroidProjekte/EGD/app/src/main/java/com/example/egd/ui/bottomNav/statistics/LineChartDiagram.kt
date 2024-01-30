@@ -18,18 +18,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.yml.charts.axis.AxisData
+import co.yml.charts.ui.barchart.models.BarData
 import com.example.egd.ui.EGDViewModel
 import com.example.egd.ui.dialogues.AddCostsDialogue
 
-@Composable
-fun LineChartDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel){
-    val barChartListSize = 5
 import co.yml.charts.common.model.AccessibilityConfig
 import co.yml.charts.common.model.Point
 import co.yml.charts.common.utils.DataUtils
 import co.yml.charts.ui.barchart.BarChart
 import co.yml.charts.ui.barchart.models.BarChartData
-import co.yml.charts.ui.barchart.models.BarData
 import co.yml.charts.ui.barchart.models.BarStyle
 import co.yml.charts.ui.linechart.LineChart
 import co.yml.charts.ui.linechart.model.GridLines
@@ -45,7 +42,7 @@ import co.yml.charts.ui.piechart.charts.DonutPieChart
 import com.example.egd.ui.DonutPieChartWithSlices
 
 @Composable
-fun LineChartDiagram(modifier: Modifier = Modifier){
+fun LineChartDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel){
  /*   val barChartListSize = 5
     val maxRange = 1000; // maxrange = der am meisten geld hat
     val barChartDataa = DataUtils.getBarChartData(barChartListSize, maxRange)
@@ -82,7 +79,7 @@ fun LineChartDiagram(modifier: Modifier = Modifier){
 
 
 //usage
-
+    val showCostsScreen = viewModel.costsState.collectAsState().value.showCosts
    // BarChart(modifier = Modifier.height(350.dp), barChartData = barChartData)
     Column(
         modifier = Modifier

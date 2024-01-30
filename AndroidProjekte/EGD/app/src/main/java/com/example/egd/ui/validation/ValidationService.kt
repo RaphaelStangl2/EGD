@@ -1,6 +1,7 @@
 package com.example.egd.ui.validation
 
 import androidx.compose.runtime.collectAsState
+import com.example.egd.data.costsEnum.CostsEnum
 import com.example.egd.data.validation.ValidationObject
 import com.example.egd.ui.EGDViewModel
 
@@ -80,5 +81,28 @@ class ValidationService () {
         }
         return ValidationObject(true, "")
 
+    }
+
+    fun validateCosts(costs:String):ValidationObject{
+        try{
+            costs.toDouble()
+        } catch (e:Exception){
+            return ValidationObject(false, "Wrong costs format")
+        }
+        return ValidationObject(true, "")
+    }
+
+    fun validateReason(reason:CostsEnum?): ValidationObject{
+        if(reason == null){
+            return ValidationObject(false, "Reason must be selected")
+        }
+        return ValidationObject(true,"")
+    }
+
+    fun validateCostsScreen(costs:String, reason: CostsEnum?): Boolean{
+        if (validateReason(reason).valid && validateCosts(costs).valid){
+            return true
+        }
+        return false
     }
 }

@@ -11,8 +11,6 @@ fun TopAppBarProfile(viewModel: EGDViewModel){
         title = { Text("") },
         actions = {
             //SearchBarHome(searchBarContent = "", viewModel = viewModel)
-
-            BluetoothIcon(viewModel)
         }
     )
 }

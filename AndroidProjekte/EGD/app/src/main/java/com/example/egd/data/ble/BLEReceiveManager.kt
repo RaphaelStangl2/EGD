@@ -185,14 +185,14 @@ class BLEReceiveManager @Inject constructor(
                         if (connectedServiceUUID != null){
                             coroutineScope.launch {
                                 data.emit(
-                                    EGDUiState(boolean, test, connectedServiceUUID)
+                                    EGDUiState(test=boolean, test, connectedServiceUUID)
                                 )
                             }
                         }
                         else{
                             coroutineScope.launch {
                                 data.emit(
-                                    EGDUiState(boolean, test, "")
+                                    EGDUiState(test=boolean, test, "")
                                 )
                             }
                         }

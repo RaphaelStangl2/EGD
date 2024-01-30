@@ -69,7 +69,7 @@ public class DriveResource {
     @Path("getDrivesByDateRange")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getDrivesByDateRange(DateDto dateDto) {
+    public Response getDrivesByDateRange(final DateDto dateDto) {
         if (dateDto == null || dateDto.getFromDate() == null || dateDto.getToDate() == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Invalid date range").build();
         }

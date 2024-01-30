@@ -390,7 +390,7 @@ class EGDViewModel @Inject constructor(
         viewModelScope.launch {
             carList.forEach {
                 if (homeUiState.value.user != null){
-                    val response: ResponseBody = HttpService.retrofitService.getUserCarWithoutId(UserCar(null,homeUiState.value.user!!, it, false))
+                    val response: ResponseBody = HttpService.retrofitService.getUserCarWithoutId(UserCar(null, homeUiState.value.user!!, it, false))
                     val userCar = readUserCarFromJson(response.byteStream())
                     it.isAdmin = userCar!!.isAdmin
                 }
@@ -1076,7 +1076,7 @@ class EGDViewModel @Inject constructor(
                     )
                 }
             }*/
-            friendsAssignList.add(UserCar(null,homeValue.user!!, car, true))
+            friendsAssignList.add(UserCar(null, homeValue.user!!, car, true))
 
             var finalList: Array<UserCar> = friendsAssignList.toTypedArray()
 
@@ -1509,6 +1509,24 @@ class EGDViewModel @Inject constructor(
         }
     }
 
+    fun getDrivesByUserCar(){
+        val statisticsState = statsState.value
+
+        viewModelScope.launch {
+            val response: ResponseBody = HttpService.retrofitService.getUserCarWithoutId(UserCar(null, homeUiState.value.user!!, statisticsState.car!!, false))
+            val userCar = readUserCarFromJson(response.byteStream())
+
+            var response2: ResponseBody = HttpService.retrofitService.getDrivesByUserCar(userCar!!.id!!)
+            var arrayDrives = readDriveListFromJson(response2.byteStream())
+
+            _statsState.update { currentState ->
+                currentState.copy(
+                    driveStatistics = arrayDrives
+                )
+            }
+        }
+    }
+
     private fun resetCosts() {
         _costsState.update { currentState->
             currentState.copy(
@@ -1536,5 +1554,10 @@ class EGDViewModel @Inject constructor(
                 triedToSubmit = false
             )
         }
+    }
+    private fun readDriveListFromJson(inputStream: InputStream): Array<Drive> {
+        var jsonStringVar = inputStream.bufferedReader()
+            .use { it.readText() }
+        return Gson().fromJson(jsonStringVar, Array<Drive>::class.java)
     }
 }

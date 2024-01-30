@@ -29,6 +29,10 @@ interface HttpApiService {
     suspend fun addDrive(@Body drive: Drive): ResponseBody
 
     @Headers("Content-Type: application/json")
+    @GET("egd/drives/{userCarId}")
+    suspend fun getDrivesByUserCar(@Path ("userCarId") userCarId:Long): ResponseBody
+
+    @Headers("Content-Type: application/json")
     @DELETE("egd/drives/{driveId}")
     suspend fun removeDrive(@Path ("driveId") driveId:Long): ResponseBody
 

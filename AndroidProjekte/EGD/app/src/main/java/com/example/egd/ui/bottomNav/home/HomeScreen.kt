@@ -211,6 +211,7 @@ fun CarCard(
             .clickable {
                 goToStatisticsScreen()
                 viewModel.setStatisticsCar(car)
+                viewModel.getDrivesByUserCar()
             },
         backgroundColor = MaterialTheme.colors.background,
         elevation = 8.dp,

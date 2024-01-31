@@ -2,6 +2,7 @@ package com.example.egd.data.entities
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import java.time.LocalDate
 import java.util.*
 
 data class Costs(
@@ -19,5 +20,5 @@ data class Costs(
     var userCar: UserCar? = null,
     @SerializedName("date")
     @Expose
-    var date: Date? = null,
+    var date: LocalDate? = null,
 )

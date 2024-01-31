@@ -15,6 +15,7 @@ import com.example.egd.data.*
 import com.example.egd.data.ble.BLEReceiveManager
 import com.example.egd.data.ble.GPSService
 import com.example.egd.data.costsEnum.CostsEnum
+import com.example.egd.data.dto.DateRangeDto
 import com.example.egd.data.entities.*
 import com.example.egd.data.http.HttpService
 import com.example.egd.data.http.MapsHttpService
@@ -34,10 +35,12 @@ import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 import java.io.Closeable
 import java.io.InputStream
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.DateTimeException
 import java.time.ZoneId
 import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -750,7 +753,7 @@ class EGDViewModel @Inject constructor(
                                                 LatLng(location.latitude, location.longitude)
                                             )
                                             setDriveStartPosition(LatLng(location.latitude, location.longitude))
-                                            var drive: Drive = Drive(null, driveState.kilometers, userCar = null, date = localDateToDate(LocalDate.now()))
+                                            var drive: Drive = Drive(null, driveState.kilometers, userCar = null, date = LocalDate.now())
                                             HttpService.retrofitService.addDrive(drive)
                                             // UserCar setzen
                                         }
@@ -1337,10 +1340,17 @@ class EGDViewModel @Inject constructor(
         }
     }
 
-    fun setDate(selectedDate: LocalDate) {
-        _statsState.update { statisticsScreenState ->
-            statisticsScreenState.copy(selectedDate=selectedDate)
+    fun setDate(selectedDate: LocalDate, identifier:String) {
+        if (identifier == "toDate"){
+            _statsState.update { statisticsScreenState ->
+                statisticsScreenState.copy(toDate=selectedDate)
+            }
+        } else if (identifier == "fromDate"){
+            _statsState.update { statisticsScreenState ->
+                statisticsScreenState.copy(fromDate =selectedDate)
+            }
         }
+
     }
 
 
@@ -1491,7 +1501,7 @@ class EGDViewModel @Inject constructor(
                     costsState.value.reason.toString(),
                     costsState.value.costs.toDouble(),
                     userCar = userCar,
-                    date = Date.from(LocalDate.now().atStartOfDay(ZoneId.of("UTC")).toInstant())
+                    date = LocalDate.now()
                 )
 
                 val response2 = HttpService.retrofitService.addCosts(costs)
@@ -1509,15 +1519,16 @@ class EGDViewModel @Inject constructor(
         }
     }
 
-    fun getDrivesByUserCar2() {
+    fun getDrivesByCarBetweenDateRange() {
         val statisticsState = statsState.value
 
         viewModelScope.launch {
-            val response: ResponseBody = HttpService.retrofitService.getUserCarWithoutId(UserCar(null, homeUiState.value.user!!, statisticsState.car!!, false))
-            val userCar = readUserCarFromJson(response.byteStream())
+            var response: ResponseBody = HttpService.retrofitService.getDrivesByCarBetweenDateRange(DateRangeDto(
+                statisticsState.car!!.id,
+                statisticsState.fromDate,
+                statisticsState.toDate))
+            var arrayDrives = readDriveListFromJson(response.byteStream())
 
-            var response2: ResponseBody = HttpService.retrofitService.getDrivesByUserCar(userCar!!.id!!)
-            var arrayDrives = readDriveListFromJson(response2.byteStream())
 
             _statsState.update { currentState ->
                 currentState.copy(
@@ -1579,5 +1590,4 @@ class EGDViewModel @Inject constructor(
         return Gson().fromJson(jsonStringVar, Array<Drive>::class.java)
     }
 
-    //private fun getDrivesByCarBetweenDateRange ()
 }

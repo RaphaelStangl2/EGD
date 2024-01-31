@@ -39,9 +39,7 @@ import co.yml.charts.common.model.PlotType
 import co.yml.charts.ui.piechart.models.PieChartConfig
 import co.yml.charts.ui.piechart.models.PieChartData
 import com.example.egd.data.entities.Drive
-import com.example.egd.data.entities.User
 import com.example.egd.ui.bottomNav.statistics.CircleDiagram
-import com.example.egd.ui.bottomNav.statistics.LineChartDiagram
 import com.google.accompanist.pager.*
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -49,20 +47,20 @@ import java.util.*
 
 
 @Composable
-fun ScheduleField(viewModel: EGDViewModel, modifier: Modifier) {
+fun ScheduleField(viewModel: EGDViewModel, date: LocalDate, identifier: String, modifier: Modifier) {
     var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
 
 
     Column(
         modifier = modifier
     ) {
-        val date = viewModel.statsState.collectAsState().value.selectedDate
+        val date = date
         val datePicker = DatePickerDialog(
             LocalContext.current,
             { _: DatePicker, selectedYear: Int, selectedMonth: Int, selectedDayOfMonth: Int ->
                 selectedDate = LocalDate.of(selectedYear, selectedMonth +1, selectedDayOfMonth)
                 if (selectedDate != null){
-                    viewModel.setDate(selectedDate!!)
+                    viewModel.setDate(selectedDate!!, identifier)
                 }
                 //appointmentEvent(AppointmentEvents.SetDateEvent(selectedDate))
             }, date.year, date.monthValue -1, date.dayOfMonth
@@ -169,21 +167,25 @@ fun StatisticsScreen(
     modifier: Modifier = Modifier
 ) {
 
+
     val pagerState = rememberPagerState(initialPage = 2)
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
 
     var drivesList: List<Drive>? = null
-    val driveState = viewModel.statsState.collectAsState().value
-    if (driveState.driveStatistics != null){
-        drivesList = driveState.driveStatistics.toList()
+    val statsState = viewModel.statsState.collectAsState().value
+    if (statsState.driveStatistics != null){
+        drivesList = statsState.driveStatistics.toList()
     }
+
+    val fromDate = statsState.fromDate
+    val toDate = statsState.toDate
 
     Column(modifier = modifier
         .fillMaxHeight()
         .verticalScroll(scrollState)) {
-    val statsState = viewModel.statsState.collectAsState().value
-    val car = statsState.car
+
+        val car = statsState.car
 
         Row(
 
@@ -192,10 +194,10 @@ fun StatisticsScreen(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ScheduleField(viewModel, Modifier
+            ScheduleField(viewModel, fromDate, "fromDate", Modifier
                 .fillMaxWidth(0.5f)
                 .padding(1.dp))
-            ScheduleField(viewModel,Modifier
+            ScheduleField(viewModel, toDate, "toDate", Modifier
                 .fillMaxWidth(1f)
                 .padding(1.dp))
         }

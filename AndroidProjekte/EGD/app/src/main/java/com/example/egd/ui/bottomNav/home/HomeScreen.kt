@@ -211,7 +211,7 @@ fun CarCard(
             .clickable {
                 goToStatisticsScreen()
                 viewModel.setStatisticsCar(car)
-                viewModel.getDrivesByUserCar2()
+                viewModel.getDrivesByCarBetweenDateRange()
             },
         backgroundColor = MaterialTheme.colors.background,
         elevation = 8.dp,

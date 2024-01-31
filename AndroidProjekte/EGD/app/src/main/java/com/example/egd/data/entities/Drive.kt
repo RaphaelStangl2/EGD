@@ -17,5 +17,5 @@ data class Drive(
     var userCar: UserCar?,
     @SerializedName("date")
     @Expose
-    var date: Date?,
+    var date: LocalDate?,
 )

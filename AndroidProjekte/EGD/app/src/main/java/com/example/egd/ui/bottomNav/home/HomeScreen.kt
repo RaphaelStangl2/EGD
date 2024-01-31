@@ -211,7 +211,7 @@ fun CarCard(
             .clickable {
                 goToStatisticsScreen()
                 viewModel.setStatisticsCar(car)
-                viewModel.getDrivesByUserCar()
+                viewModel.getDrivesByUserCar2()
             },
         backgroundColor = MaterialTheme.colors.background,
         elevation = 8.dp,
@@ -233,7 +233,6 @@ fun CarCard(
                 {
                     viewModel.setCar(car, car.consumption.toString())
                     goToEditScreen()
-                    viewModel.getDrivesByUserCar()
                 }
                 ) {
                     if (isAdmin == true){

@@ -64,18 +64,14 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutC
         )
 
     var clickedSlice by remember { mutableStateOf<PieChartData.Slice?>(null) }
-
+    var statsState = viewModel.statsState.collectAsState().value
 
     var drivesList: List<Drive>
     var costsList: List<Costs>
     clickedSlice?.let { slice ->
-        drivesList = listOf(
-            Drive(date = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()),
-                kilometers = 100.0, id = 0, userCar = null));
+        drivesList = emptyList()
 
-        costsList = listOf(
-            Costs(id = 0, description = "Tank",costs=200.00,userCar = null)
-        )
+        costsList = emptyList()
         if (header=="Costs"){
             //hier von berdan aufrufen und auf drivesList setzen
 
@@ -84,11 +80,12 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutC
             )
         }else if (header == "Drives"){
             //hier von berdan aufrufen und auf drivesList setzen
-
 //            drivesList = listOf(
 //                Drive(date = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()),
 //                    kilometers = 100.0, id = 0, userCar = null));
-
+            if (statsState.popupDrives != null){
+                drivesList = (statsState.popupDrives)!!.toList()
+            }
         }
 
         AlertDialog(
@@ -133,7 +130,6 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutC
                             Divider(color = Color.Gray, thickness = 1.dp)
                         }
                     }
-
 
                 }else if( header == "Costs"){
 
@@ -202,6 +198,7 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutC
                     donutChartData,
                     donutChartConfig,
                     onSliceClick = { slice ->
+                        viewModel.getDrivesByUserCar()
                         clickedSlice = slice
                     }
                 )

@@ -1509,7 +1509,7 @@ class EGDViewModel @Inject constructor(
         }
     }
 
-    fun getDrivesByUserCar(){
+    fun getDrivesByUserCar2() {
         val statisticsState = statsState.value
 
         viewModelScope.launch {
@@ -1522,6 +1522,24 @@ class EGDViewModel @Inject constructor(
             _statsState.update { currentState ->
                 currentState.copy(
                     driveStatistics = arrayDrives
+                )
+            }
+        }
+    }
+
+    fun getDrivesByUserCar() {
+        val statisticsState = statsState.value
+
+        viewModelScope.launch {
+            val response: ResponseBody = HttpService.retrofitService.getUserCarWithoutId(UserCar(null, homeUiState.value.user!!, statisticsState.car!!, false))
+            val userCar = readUserCarFromJson(response.byteStream())
+
+            var response2: ResponseBody = HttpService.retrofitService.getDrivesByUserCar(userCar!!.id!!)
+            var arrayDrives = readDriveListFromJson(response2.byteStream())
+
+            _statsState.update { currentState ->
+                currentState.copy(
+                    popupDrives = arrayDrives
                 )
             }
         }
@@ -1560,4 +1578,6 @@ class EGDViewModel @Inject constructor(
             .use { it.readText() }
         return Gson().fromJson(jsonStringVar, Array<Drive>::class.java)
     }
+
+    //private fun getDrivesByCarBetweenDateRange ()
 }

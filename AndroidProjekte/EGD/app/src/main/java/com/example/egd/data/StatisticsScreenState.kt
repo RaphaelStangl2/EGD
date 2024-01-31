@@ -7,6 +7,7 @@ import java.time.LocalDate
 data class StatisticsScreenState (
     val selectedDate: LocalDate = LocalDate.now(),
     val car: Car? = null,
-    val driveStatistics: Array<Drive>? = null
+    val driveStatistics: Array<Drive>? = null,
+    val popupDrives: Array<Drive>? = null
 
 )

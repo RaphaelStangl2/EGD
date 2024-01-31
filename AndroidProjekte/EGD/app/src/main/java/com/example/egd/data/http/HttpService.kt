@@ -1,6 +1,7 @@
 package com.example.egd.data.http
 
 import com.example.egd.data.DateJsonAdapter
+import com.example.egd.data.dto.DateRangeDto
 import com.example.egd.data.entities.*
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -27,6 +28,10 @@ interface HttpApiService {
     @Headers("Content-Type: application/json")
     @POST("egd/drives")
     suspend fun addDrive(@Body drive: Drive): ResponseBody
+
+    @Headers("Content-Type: application/json")
+    @POST("egd/drives")
+    suspend fun getDrivesByCarBetweenDateRange(@Body dateRangeDto: DateRangeDto): ResponseBody
 
     @Headers("Content-Type: application/json")
     @GET("egd/drives/{userCarId}")

@@ -4,6 +4,7 @@ import at.htl.model.Drive;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
@@ -26,5 +27,5 @@ public class Costs {
     @JoinColumn(name = "user_car_id")
     private UserCar userCar;
 
-    private Date date;
+    private LocalDate date;
 }

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -28,7 +29,7 @@ public class Drive {
 
     private Double kilometers;
 
-    private Date date;
+    private LocalDate date;
 
 
 

@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -59,7 +60,7 @@ public class CostsRepository {
         entityManager.remove(costs);
     }
 
-    public List<Costs> getAllCostsByDateRange(Date fromDate, Date toDate, Long carId) {
+    public List<Costs> getAllCostsByDateRange(LocalDate fromDate, LocalDate toDate, Long carId) {
         String queryString = "SELECT d FROM Costs d WHERE d.userCar.car.id = :carId AND d.date BETWEEN :fromDate AND :toDate";
         TypedQuery<Costs> query = entityManager.createQuery(queryString, Costs.class);
         query.setParameter("carId", carId);

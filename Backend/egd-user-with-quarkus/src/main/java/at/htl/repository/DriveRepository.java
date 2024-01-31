@@ -58,20 +58,20 @@ public class DriveRepository {
 
     public List<Drive> getAllDrivesByUserIdBetween(DateDto dateDto) {
 
-        List<Drive> drives = getAllDrivesByUserId(dateDto.getCarId());
+//        List<Drive> drives = getAllDrivesByUserId(dateDto.getCarId());
+//
+//        LocalDate fromDate = dateDto.getFromDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+//        LocalDate toDate = dateDto.getToDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+//
+//        List<Drive> filteredDrives = drives.stream()
+//                .filter(drive -> {
+//                    LocalDate driveDate = new Date(drive.getDate().getTime()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+//                    return (driveDate.isEqual(fromDate) || driveDate.isAfter(fromDate))
+//                            && (driveDate.isEqual(toDate) || driveDate.isBefore(toDate));
+//                })
+//                .collect(Collectors.toList());
 
-        LocalDate fromDate = dateDto.getFromDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        LocalDate toDate = dateDto.getToDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-
-        List<Drive> filteredDrives = drives.stream()
-                .filter(drive -> {
-                    LocalDate driveDate = new Date(drive.getDate().getTime()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                    return (driveDate.isEqual(fromDate) || driveDate.isAfter(fromDate))
-                            && (driveDate.isEqual(toDate) || driveDate.isBefore(toDate));
-                })
-                .collect(Collectors.toList());
-
-        return filteredDrives;
+        return null;
     }
 
 
@@ -94,7 +94,7 @@ public class DriveRepository {
         return entityManager.find(Drive.class, driveId);
     }
 
-    public List<Drive> getDrivesByDateRange(Date fromDate, Date toDate, Long carId) {
+    public List<Drive> getDrivesByDateRange(LocalDate fromDate, LocalDate toDate, Long carId) {
         String queryString = "SELECT d FROM Drive d WHERE d.userCar.car.id = :carId AND d.date BETWEEN :fromDate AND :toDate";
         TypedQuery<Drive> query = entityManager.createQuery(queryString, Drive.class);
         query.setParameter("carId", carId);

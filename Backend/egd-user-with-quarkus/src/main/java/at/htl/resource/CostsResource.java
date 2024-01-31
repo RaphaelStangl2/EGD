@@ -76,10 +76,10 @@ public class CostsResource {
         if (dateDto == null || dateDto.getFromDate() == null || dateDto.getToDate() == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Invalid date range").build();
         }
-        List<Drive> drives = costsRepository.getAllCostsByDateRange(dateDto.getFromDate(), dateDto.getToDate(), dateDto.getCarId());
+        List<Costs> costs = costsRepository.getAllCostsByDateRange(dateDto.getFromDate(), dateDto.getToDate(), dateDto.getCarId());
 
 
-        return Response.ok(drives).build();
+        return Response.ok(costs).build();
     }
 
 }

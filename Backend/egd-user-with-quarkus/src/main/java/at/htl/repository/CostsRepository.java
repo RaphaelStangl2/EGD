@@ -58,4 +58,14 @@ public class CostsRepository {
         entityManager.remove(costs);
     }
 
+    public List<Drive> getAllCostsByDateRange(Date fromDate, Date toDate, Long carId) {
+        String queryString = "SELECT d FROM Drive d WHERE d.userCar.car.id = :carId AND d.date BETWEEN :fromDate AND :toDate";
+        TypedQuery<Drive> query = entityManager.createQuery(queryString, Drive.class);
+        query.setParameter("carId", carId);
+        query.setParameter("fromDate", fromDate);
+        query.setParameter("toDate", toDate);
+
+        return query.getResultList();
+    }
+
 }

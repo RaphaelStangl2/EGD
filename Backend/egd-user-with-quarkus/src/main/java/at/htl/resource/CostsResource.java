@@ -1,5 +1,6 @@
 package at.htl.resource;
 
+import at.htl.Classes.DateDto;
 import at.htl.model.Car;
 import at.htl.model.Costs;
 import at.htl.model.Drive;
@@ -67,17 +68,18 @@ public class CostsResource {
          return Response.ok(costs).build();
     }
 
-    @GET
-    @Path("costsByCarId/{carId}")
+    @POST
+    @Path("getAllCostsByDateRange")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllCostsByCarId(@PathParam("carId") Long carId){
-        List<Costs> costs = costsRepository.findAllCostsByCarId(carId);
-
-        if (costs == null){
-            return Response.status(Response.Status.NOT_FOUND).build();
+    public Response getDrivesByDateRange(final DateDto dateDto) {
+        if (dateDto == null || dateDto.getFromDate() == null || dateDto.getToDate() == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid date range").build();
         }
+        List<Drive> drives = costsRepository.getAllCostsByDateRange(dateDto.getFromDate(), dateDto.getToDate(), dateDto.getCarId());
 
-        return Response.ok(costs).build();
+
+        return Response.ok(drives).build();
     }
 
 }

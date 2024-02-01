@@ -92,6 +92,8 @@ public class UserCarResource {
     public Response addUserCarsList(List<UserCar> userCarsToAdd) throws NoSuchAlgorithmException, InvalidKeySpecException {
 
         Car newCar = carRepository.addCar(userCarsToAdd.get(0).getCar());
+        int x=0;
+        UserCar userCartoReturn = new UserCar();
 
         for (UserCar userCar:userCarsToAdd ) {
             userCar.setCar(newCar);
@@ -112,9 +114,13 @@ public class UserCarResource {
             if (createdUserCar==null){
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
+
+            if (x==0){
+                userCartoReturn=createdUserCar;
+            }
         }
 
-        return Response.created(URI.create("/api/cars/")).build();
+        return Response.ok(userCartoReturn).build();
 
     }
 

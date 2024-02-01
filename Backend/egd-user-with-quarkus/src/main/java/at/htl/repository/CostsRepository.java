@@ -40,8 +40,6 @@ public class CostsRepository {
                 .getResultList();
 
        return  costs;
-
-
     }
 
     @Transactional

@@ -281,7 +281,7 @@ fun userToPieChartData(drives: List<Drive>?): PieChartData {
     val slices = userKilometersMap.entries.mapIndexed { index, (userName, kilometersWithId) ->
         val (totalKilometers, userCarId) = kilometersWithId
         val color = generateColor(index)
-        val description = userCarId?.toString() ?: ""
+        val description = userCarId?.toString() ?: "0"
         PieChartData.Slice(userName, totalKilometers.toFloat(), color){_ -> description}
     }
 

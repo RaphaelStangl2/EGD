@@ -205,6 +205,7 @@ fun EGDApp(
                     TopAppBarBackButton(navController, { Text("Add Car") }, onBackButtonClick = {
                         if (getStartedUiState.step == 1) {
                             navController.navigateUp()
+                            viewModel.closeConnection()
                             viewModel.clearDataLogin()
                         } else {
                             viewModel.setStep(getStartedUiState.step - 1)

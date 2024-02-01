@@ -320,7 +320,7 @@ fun costsToPieChartData(costsList: List<Costs>?): PieChartData {
     // Convert the map entries to PieChartData slices
     val slices = userCostsMap.entries.mapIndexed { index, (userName, costs) ->
         val color = generateColor(index)
-        PieChartData.Slice(userName, costs.toFloat(), color)
+        PieChartData.Slice(userName, costs.toFloat(), color) { _ -> "2"}
     }
 
     // Create and return PieChartData

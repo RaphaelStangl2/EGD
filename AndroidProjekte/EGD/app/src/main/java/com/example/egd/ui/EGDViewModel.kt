@@ -10,7 +10,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.egd.data.*
 import com.example.egd.data.ble.BLEReceiveManager
 import com.example.egd.data.ble.GPSService
@@ -19,7 +18,6 @@ import com.example.egd.data.dto.DateRangeDto
 import com.example.egd.data.entities.*
 import com.example.egd.data.http.HttpService
 import com.example.egd.data.http.MapsHttpService
-import com.example.egd.data.validation.ValidationObject
 import com.example.egd.ui.validation.ValidationService
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.maps.model.LatLng
@@ -35,12 +33,8 @@ import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 import java.io.Closeable
 import java.io.InputStream
-import java.text.SimpleDateFormat
 import java.time.LocalDate
-import java.time.DateTimeException
 import java.time.ZoneId
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -534,6 +528,7 @@ class EGDViewModel @Inject constructor(
         setUUIDListBLE(emptyArray())
         setCurrentUUID("")
         setNumberOfSteps(5)
+        setConnectionState(ConnectionEnum.Uninitialized)
     }
 
     private suspend fun sendRegisterRequestWithoutCar(onRegistered: () -> Unit, sharedPreference: () -> SharedPreferences?) {
@@ -729,7 +724,7 @@ class EGDViewModel @Inject constructor(
             carTrackingServiceIsRunning = true
 
             viewModelScope.launch {
-                while(true){
+                while(carTrackingServiceIsRunning){
                     delay(3000)
                     var homeUiState = homeUiState.value
                     var getStartedState = getStartedUiState.value
@@ -755,7 +750,9 @@ class EGDViewModel @Inject constructor(
                                                 LatLng(location.latitude, location.longitude)
                                             )
                                             setDriveStartPosition(LatLng(location.latitude, location.longitude))
-                                            var drive: Drive = Drive(null, driveState.kilometers, userCar = null, date = LocalDate.now())
+
+                                            val userCar = HttpService.retrofitService.getUserCarWithoutId(getUserCarForUUID(getStartedState.currentUUID)!!)
+                                            var drive: Drive = Drive(null, driveState.kilometers, userCar = userCar, date = LocalDate.now())
                                             HttpService.retrofitService.addDrive(drive)
                                             // UserCar setzen
                                         }
@@ -953,6 +950,7 @@ class EGDViewModel @Inject constructor(
         homeUiState.value.cars = null
         invitation.value.statusInvitationList = null
         invitation.value.incomingInvitationList = null
+        setConnectionState(ConnectionEnum.Uninitialized)
         _getStartedUiState.update { currentState ->
             currentState.copy(
                 step = 1,
@@ -991,6 +989,7 @@ class EGDViewModel @Inject constructor(
         homeUiState.value.cars = emptyArray()
         BLEServiceIsRunning = false
         InvitationServiceIsRunning = false
+        carTrackingServiceIsRunning = false
 
         onCleared()
         setConnectionSuccessful(false)
@@ -1149,7 +1148,8 @@ class EGDViewModel @Inject constructor(
                     if (addedFriendsList != null) {
                         for (user in addedFriendsList){
                             if (homeValue.user != null){
-                                HttpService.retrofitService.addInvitation(Invitation(null,user,UserCar(null,homeValue.user, car, true), "waiting"))
+                                val userCar = HttpService.retrofitService.getUserCarWithoutId(UserCar(null,homeValue.user, car, true))
+                                HttpService.retrofitService.addInvitation(Invitation(null, user, userCar, "waiting"))
                             }
                         }
                     }
@@ -1545,7 +1545,7 @@ class EGDViewModel @Inject constructor(
         }
     }
 
-    fun getDrivesByUserCar() {
+    fun getDrivesByUserCar(id: Long) {
         val statisticsState = statsState.value
 
         viewModelScope.launch {
@@ -1581,14 +1581,14 @@ class EGDViewModel @Inject constructor(
         }
     }
 
-    fun getCostsByUserCar() {
+    fun getCostsByUserCar(id: Long) {
         val statisticsState = statsState.value
 
         viewModelScope.launch {
-            val response  = HttpService.retrofitService.getUserCarWithoutId(UserCar(null, homeUiState.value.user!!, statisticsState.car!!, false))
+            //val response = HttpService.retrofitService.getUserCarWithoutId(UserCar(null, homeUiState.value.user!!, statisticsState.car!!, false))
             //val userCar = readUserCarFromJson(response.byteStream())
 
-            var response2: Array<Costs> = HttpService.retrofitService.getCostsByUserCar(response!!.id!!)
+            var response2: Array<Costs> = HttpService.retrofitService.getCostsByUserCar(id)
             //var arrayDrives = readDriveListFromJson(response2.byteStream())
 
             _statsState.update { currentState ->

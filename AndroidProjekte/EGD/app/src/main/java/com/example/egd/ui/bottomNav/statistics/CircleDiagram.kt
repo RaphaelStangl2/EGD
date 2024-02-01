@@ -1,11 +1,9 @@
 package com.example.egd.ui.bottomNav.statistics
 
-import android.service.autofill.DateTransformation
 import android.text.TextUtils
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,8 +18,6 @@ import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -37,7 +33,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import co.yml.charts.common.model.PlotType
 import co.yml.charts.ui.piechart.charts.DonutPieChart
 import co.yml.charts.ui.piechart.models.PieChartConfig
 import co.yml.charts.ui.piechart.models.PieChartData
@@ -46,12 +41,8 @@ import com.example.egd.data.entities.Costs
 import com.example.egd.data.entities.Drive
 import com.example.egd.ui.DonutPieChartWithSlices
 import com.example.egd.ui.EGDViewModel
-import com.example.egd.ui.ScheduleField
 import com.example.egd.ui.dialogues.AddCostsDialogue
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.ZoneId
-import java.util.Date
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -207,12 +198,11 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutC
                     donutChartData,
                     donutChartConfig,
                     onSliceClick = { slice ->
-
                         if (header == "Drives"){
-                            viewModel.getDrivesByUserCar()
+                            viewModel.getDrivesByUserCar(id = 0)
                         }
                         else{
-                            viewModel.getCostsByUserCar()
+                            viewModel.getCostsByUserCar(id = slice.sliceDescription(0).toLong())
                         }
                         clickedSlice = slice
                     }

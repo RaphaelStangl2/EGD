@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import co.yml.charts.common.model.PlotType
 import co.yml.charts.ui.piechart.models.PieChartConfig
 import co.yml.charts.ui.piechart.models.PieChartData
+import com.example.egd.data.entities.Costs
 import com.example.egd.data.entities.Drive
 import com.example.egd.ui.bottomNav.statistics.CircleDiagram
 import com.google.accompanist.pager.*
@@ -264,6 +265,10 @@ fun StatisticsScreen(
 
     }
 }
+
+
+
+
 fun userToPieChartData(drives: List<Drive>?): PieChartData {
     // Create a map to store the sum of kilometers for each user
     val userKilometersMap = mutableMapOf<String, Double>()
@@ -305,4 +310,29 @@ fun generateColor(index: Int): Color {
     return colors.get(index % colors.size);
 }
 
+
+
+fun costsToPieChartData(costsList: List<Costs>): PieChartData {
+    // Create a map to store the sum of costs for each user
+    val userCostsMap = mutableMapOf<String, Double>()
+
+    // Sum up costs for each user
+    for (cost in costsList) {
+        val userName = cost.userCar?.user?.userName
+        val costValue = cost.costs
+
+        if (userName != null) {
+            userCostsMap[userName] = (userCostsMap[userName] ?: 0.0) + costValue
+        }
+    }
+
+    // Convert the map entries to PieChartData slices
+    val slices = userCostsMap.entries.mapIndexed { index, (userName, costs) ->
+        val color = generateColor(index)
+        PieChartData.Slice(userName, costs.toFloat(), color)
+    }
+
+    // Create and return PieChartData
+    return PieChartData(slices, PlotType.Donut)
+}
 

@@ -242,7 +242,7 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutC
                     }
                     if (header =="Costs"){
                         Icon(
-                            painter = painterResource(id = R.drawable.baseline_car_repair_24),
+                            painter = painterResource(id = R.drawable.baseline_euro_24),
                             contentDescription = "Car Icon",
                             modifier = Modifier
                                 .size(96.dp)
@@ -250,7 +250,7 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutC
                             tint = Color.Gray
                         )
                         Text(
-                            text = "This car hasn't had any drives yet. Drives will be automatically added if any user of the car drives more than 1 km.",
+                            text = "This car hasn't had any costs yet.You can add costs by clicking the Add Costs Button",
                             textAlign = TextAlign.Center,
                             modifier = Modifier
                                 .fillMaxWidth()

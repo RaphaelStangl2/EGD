@@ -300,30 +300,34 @@ fun generateColor(index: Int): Color {
 
 fun costsToPieChartData(costsList: List<Costs>?): PieChartData {
     // Create a map to store the sum of costs for each user
-    val userCostsMap = mutableMapOf<String, Double>()
+    val userCostsMap = mutableMapOf<String, Pair<Double, Long?>>()
 
-    if (costsList == null){
-
-    }
-    else{
+    if (costsList != null) {
         for (cost in costsList) {
             val userName = cost.userCar?.user?.userName
+            val userCarId = cost.userCar?.id
             val costValue = cost.costs
 
             if (userName != null) {
-                userCostsMap[userName] = (userCostsMap[userName] ?: 0.0) + costValue
+                val existingCosts = userCostsMap[userName]
+                if (existingCosts != null) {
+                    val (totalCosts, _) = existingCosts
+                    userCostsMap[userName] = Pair(totalCosts + costValue, userCarId)
+                } else {
+                    userCostsMap[userName] = Pair(costValue, userCarId)
+                }
             }
         }
     }
-    // Sum up costs for each user
 
     // Convert the map entries to PieChartData slices
-    val slices = userCostsMap.entries.mapIndexed { index, (userName, costs) ->
+    val slices = userCostsMap.entries.mapIndexed { index, (userName, costsWithId) ->
+        val (costs, userCarId) = costsWithId
         val color = generateColor(index)
-        PieChartData.Slice(userName, costs.toFloat(), color) { _ -> "2"}
+        val description = userCarId?.toString() ?: "0"
+        PieChartData.Slice(userName, costs.toFloat(), color){_ -> description}
     }
 
     // Create and return PieChartData
     return PieChartData(slices, PlotType.Donut)
 }
-

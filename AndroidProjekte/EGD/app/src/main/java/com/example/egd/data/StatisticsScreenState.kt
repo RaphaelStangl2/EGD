@@ -9,6 +9,8 @@ data class StatisticsScreenState (
     val car: Car? = null,
     val driveStatistics: Array<Drive>? = null,
     val popupDrives: Array<Drive>? = null,
+    val costsStatistics: Array<Drive>? = null,
+    val popupCosts: Array<Drive>? = null,
     val fromDate: LocalDate = LocalDate.now().minusYears(50),
     val toDate: LocalDate = LocalDate.now().plusYears(50)
 

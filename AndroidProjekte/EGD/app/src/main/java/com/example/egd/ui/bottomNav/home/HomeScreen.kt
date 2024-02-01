@@ -212,6 +212,7 @@ fun CarCard(
                 goToStatisticsScreen()
                 viewModel.setStatisticsCar(car)
                 viewModel.getDrivesByCarBetweenDateRange()
+                viewModel.getCostsByCarBetweenDateRange()
             },
         backgroundColor = MaterialTheme.colors.background,
         elevation = 8.dp,

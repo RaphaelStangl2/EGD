@@ -108,7 +108,7 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutC
 
                     items(items = drivesList) { drive ->
                         // Format the date using the desired format
-                        val formattedDate = desiredDateFormat.format(drive.date)
+                        val formattedDate = drive.date
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()

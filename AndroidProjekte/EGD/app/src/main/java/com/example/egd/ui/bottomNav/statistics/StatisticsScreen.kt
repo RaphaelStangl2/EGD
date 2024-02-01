@@ -97,12 +97,12 @@ fun ScheduleField(viewModel: EGDViewModel, date: LocalDate, identifier: String, 
         }
     }
 }
-
-@Composable
-private fun formatDate(date: Date): String {
-    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-    return dateFormat.format(date)
-}
+//
+//@Composable
+//private fun formatDate(date: Date): String {
+//    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+//    return dateFormat.format(date)
+//}
 
 
 

@@ -1,6 +1,7 @@
 package com.example.egd.data.http
 
 import com.example.egd.data.DateJsonAdapter
+import com.example.egd.data.LocalDateJsonAdapter
 import com.example.egd.data.dto.DateRangeDto
 import com.example.egd.data.entities.*
 import com.squareup.moshi.Moshi
@@ -15,7 +16,9 @@ private const val BASE_URL =
     "https://student.cloud.htl-leonding.ac.at/r.alo/egd-user-with-quarkus/"
 
 private val moshi = Moshi.Builder()
-    .add(KotlinJsonAdapterFactory()).add(DateJsonAdapter())
+    .add(KotlinJsonAdapterFactory())
+    //.add(DateJsonAdapter())
+    .add(LocalDateJsonAdapter())
     .build()
 
 private val retrofit = Retrofit.Builder()
@@ -30,12 +33,20 @@ interface HttpApiService {
     suspend fun addDrive(@Body drive: Drive): ResponseBody
 
     @Headers("Content-Type: application/json")
-    @POST("egd/drives")
-    suspend fun getDrivesByCarBetweenDateRange(@Body dateRangeDto: DateRangeDto): ResponseBody
+    @POST("egd/drives/getDrivesByDateRange")
+    suspend fun getDrivesByCarBetweenDateRange(@Body dateRangeDto: DateRangeDto): Array<Drive>
 
     @Headers("Content-Type: application/json")
     @GET("egd/drives/{userCarId}")
-    suspend fun getDrivesByUserCar(@Path ("userCarId") userCarId:Long): ResponseBody
+    suspend fun getDrivesByUserCar(@Path ("userCarId") userCarId:Long): Array<Drive>
+
+    @Headers("Content-Type: application/json")
+    @POST("egd/drives/getAllCostsByDateRange")
+    suspend fun getCostsByCarBetweenDateRange(@Body dateRangeDto: DateRangeDto): Array<Drive>
+
+    @Headers("Content-Type: application/json")
+    @GET("egd/drives/costsByUserId/{userCarId}")
+    suspend fun getCostsByUserCar(@Path ("userCarId") userCarId:Long): Array<Drive>
 
     @Headers("Content-Type: application/json")
     @DELETE("egd/drives/{driveId}")
@@ -120,7 +131,7 @@ interface HttpApiService {
 
     @Headers("Content-Type: application/json")
     @POST("egd/userCar/getUserCarWithOutId")
-    suspend fun getUserCarWithoutId(@Body userCar: UserCar): ResponseBody
+    suspend fun getUserCarWithoutId(@Body userCar: UserCar): UserCar
 
     @Headers("Content-Type: application/json")
     @DELETE("egd/invitations/{invId}")

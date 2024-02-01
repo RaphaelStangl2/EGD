@@ -42,7 +42,7 @@ fun AddCostsDialogueContent(viewModel: EGDViewModel) {
     Card(
         modifier = Modifier
             .fillMaxHeight(0.55f)
-            .fillMaxWidth(0.9f),
+            .fillMaxWidth(0.95f),
         shape = RoundedCornerShape(8.dp),
         backgroundColor = Color.White
     ) {

@@ -229,25 +229,49 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutC
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_car_repair_24),
-                        contentDescription = "Car Icon",
-                        modifier = Modifier
-                            .size(96.dp)
-                            .padding(bottom = 16.dp),
-                        tint = Color.Gray
-                    )
-                    Text(
-                        text = "This car hasn't had any drives yet. Drives will be automatically added if any user of the car drives more than 1 km.",
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        style = TextStyle(
-                            color = Color.Gray,
-                            fontSize = 16.sp
+                    if (header == "Drives"){
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_car_repair_24),
+                            contentDescription = "Car Icon",
+                            modifier = Modifier
+                                .size(96.dp)
+                                .padding(bottom = 16.dp),
+                            tint = Color.Gray
                         )
-                    )
+                        Text(
+                            text = "This car hasn't had any drives yet. Drives will be automatically added if any user of the car drives more than 1 km.",
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            style = TextStyle(
+                                color = Color.Gray,
+                                fontSize = 16.sp
+                            )
+                        )
+                    }
+                    if (header =="Costs"){
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_car_repair_24),
+                            contentDescription = "Car Icon",
+                            modifier = Modifier
+                                .size(96.dp)
+                                .padding(bottom = 16.dp),
+                            tint = Color.Gray
+                        )
+                        Text(
+                            text = "This car hasn't had any drives yet. Drives will be automatically added if any user of the car drives more than 1 km.",
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            style = TextStyle(
+                                color = Color.Gray,
+                                fontSize = 16.sp
+                            )
+                        )
+                    }
+
                 }
             }
 

@@ -257,31 +257,38 @@ fun StatisticsScreen(
 
 fun userToPieChartData(drives: List<Drive>?): PieChartData {
     // Create a map to store the sum of kilometers for each user
-    val userKilometersMap = mutableMapOf<String, Double>()
+    val userKilometersMap = mutableMapOf<String, Pair<Double, Long?>>()
 
-    // Sum up kilometers for each user
-    if (drives == null){
-
-    }
-    else{
+    if (drives != null) {
         for (drive in drives) {
             val userName = drive.userCar?.user?.userName
+            val userCarId = drive.userCar?.id
             val kilometers = drive.kilometers ?: 0.0
 
             if (userName != null) {
-                userKilometersMap[userName] = (userKilometersMap[userName] ?: 0.0) + kilometers
+                val existingKilometers = userKilometersMap[userName]
+                if (existingKilometers != null) {
+                    val (totalKilometers, _) = existingKilometers
+                    userKilometersMap[userName] = Pair(totalKilometers + kilometers, userCarId)
+                } else {
+                    userKilometersMap[userName] = Pair(kilometers, userCarId)
+                }
             }
         }
     }
+
     // Convert the map entries to PieChartData slices
-    val slices = userKilometersMap.entries.mapIndexed { index, (userName, kilometers) ->
+    val slices = userKilometersMap.entries.mapIndexed { index, (userName, kilometersWithId) ->
+        val (totalKilometers, userCarId) = kilometersWithId
         val color = generateColor(index)
-        PieChartData.Slice(userName, kilometers.toFloat(), color)
+        val description = userCarId?.toString() ?: ""
+        PieChartData.Slice(userName, totalKilometers.toFloat(), color){_ -> description}
     }
 
     // Create and return PieChartData
     return PieChartData(slices, PlotType.Donut)
 }
+
 
 // Helper function to generate distinct colors for each slice
 fun generateColor(index: Int): Color {

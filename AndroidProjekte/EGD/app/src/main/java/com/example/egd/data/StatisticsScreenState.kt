@@ -12,7 +12,7 @@ data class StatisticsScreenState (
     val popupDrives: Array<Drive>? = null,
     val costsStatistics: Array<Costs>? = null,
     val popupCosts: Array<Costs>? = null,
-    val fromDate: LocalDate = LocalDate.now().minusYears(50),
-    val toDate: LocalDate = LocalDate.now().plusYears(50)
+    val fromDate: LocalDate = LocalDate.now().minusYears(1),
+    val toDate: LocalDate = LocalDate.now().plusYears(1)
 
 )

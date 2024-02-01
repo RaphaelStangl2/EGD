@@ -1552,7 +1552,7 @@ class EGDViewModel @Inject constructor(
             val response  = HttpService.retrofitService.getUserCarWithoutId(UserCar(null, homeUiState.value.user!!, statisticsState.car!!, false))
             //val userCar = readUserCarFromJson(response.byteStream())
 
-            var response2: Array<Drive> = HttpService.retrofitService.getDrivesByUserCar(response!!.id!!)
+            var response2: Array<Drive> = HttpService.retrofitService.getDrivesByUserCar(id)
             //var arrayDrives = readDriveListFromJson(response2.byteStream())
 
             _statsState.update { currentState ->

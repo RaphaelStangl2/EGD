@@ -252,9 +252,6 @@ fun StatisticsScreen(
     }
 }
 
-
-
-
 fun userToPieChartData(drives: List<Drive>?): PieChartData {
     // Create a map to store the sum of kilometers for each user
     val userKilometersMap = mutableMapOf<String, Double>()

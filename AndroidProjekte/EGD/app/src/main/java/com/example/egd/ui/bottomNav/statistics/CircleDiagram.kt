@@ -199,7 +199,7 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutC
                     donutChartConfig,
                     onSliceClick = { slice ->
                         if (header == "Drives"){
-                            viewModel.getDrivesByUserCar(id = 0)
+                            viewModel.getDrivesByUserCar(id = slice.sliceDescription(0).toLong())
                         }
                         else{
                             viewModel.getCostsByUserCar(id = slice.sliceDescription(0).toLong())

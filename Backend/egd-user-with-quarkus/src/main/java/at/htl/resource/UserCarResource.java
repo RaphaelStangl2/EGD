@@ -175,9 +175,11 @@ public class UserCarResource {
 
         UserCar createdUserCar = userCarRepository.addUserCar(userCar);
         if (createdUserCar!=null){
-            return Response.created(URI.create("/api/cars/" + createdUserCar.getId())).build();
+            return Response.ok(createdUserCar).build();
+
         }
         return Response.status(Response.Status.NOT_FOUND).build();
+
     }
 
 

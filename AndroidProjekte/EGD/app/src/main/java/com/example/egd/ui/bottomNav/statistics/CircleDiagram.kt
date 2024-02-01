@@ -4,12 +4,7 @@ import android.text.TextUtils
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.Divider
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -58,6 +53,10 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutC
     var clickedSlice by remember { mutableStateOf<PieChartData.Slice?>(null) }
     var statsState = viewModel.statsState.collectAsState().value
 
+    val fromDate = statsState.fromDate
+    val toDate = statsState.toDate
+
+
     var drivesList: List<Drive>
     var costsList: List<Costs>
     clickedSlice?.let { slice ->
@@ -83,7 +82,8 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutC
         AlertDialog(
             modifier = Modifier
                 .width(400.dp)
-                .height(550.dp),
+                .height(500.dp)
+                .padding(40.dp),
             onDismissRequest = {
                 // Dismiss the dialog when clicked outside
                 clickedSlice = null
@@ -155,16 +155,19 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutC
                     }
 
                 }
-
-
                 }
             },
             confirmButton = {
-                Button(onClick = {
-                    // Dismiss the dialog when the button is clicked
-                    clickedSlice = null
-                }) {
-                    Text("OK")
+//                Button(onClick = {
+//                    // Dismiss the dialog when the button is clicked
+//                    clickedSlice = null
+//                }) {
+//                    Text("OK")
+//                }
+            },
+            dismissButton = {
+                IconButton(onClick = {clickedSlice = null}) {
+                    Icon(painter = painterResource(id = R.drawable.ic_baseline_close_24), contentDescription = "Test" )
                 }
             }
         )
@@ -175,7 +178,7 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutC
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Row (horizontalArrangement = Arrangement.SpaceBetween){
+            Row (modifier =Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
                 Text(
                     text = header,
                     fontSize = 24.sp,
@@ -233,7 +236,7 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutC
                             tint = Color.Gray
                         )
                         Text(
-                            text = "This car hasn't had any drives yet. Drives will be automatically added if any user of the car drives more than 1 km.",
+                            text = "This car hasn't had any drives between the $fromDate and the $toDate yet. Drives will be automatically added if any user of the car drives more than 1 km.",
                             textAlign = TextAlign.Center,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -254,7 +257,7 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutC
                             tint = Color.Gray
                         )
                         Text(
-                            text = "This car hasn't had any costs yet.You can add costs by clicking the Add Costs Button",
+                            text = "This car hasn't had any costs between the $fromDate and the $toDate yet.You can add costs by clicking the Add Costs Button",
                             textAlign = TextAlign.Center,
                             modifier = Modifier
                                 .fillMaxWidth()

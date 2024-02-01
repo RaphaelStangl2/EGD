@@ -35,7 +35,7 @@ public class CostsRepository {
 
     public List<Costs> findCostsByUserId(long userId) {
 
-        List<Costs> costs= entityManager.createQuery("SELECT c FROM Costs c WHERE c.userCar.user.id = :userId", Costs.class)
+        List<Costs> costs= entityManager.createQuery("SELECT c FROM Costs c WHERE c.userCar.id = :userId", Costs.class)
                 .setParameter("userId", userId)
                 .getResultList();
 

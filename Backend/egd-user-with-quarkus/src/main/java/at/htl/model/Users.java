@@ -34,12 +34,12 @@ public class Users {
     private String healthProblems;
 
 
-    /* @OneToMany(cascade = CascadeType.ALL)
-    private List<Car> cars;
-    */
-    @ManyToOne
-    @JoinColumn(name = "place_id")
-    private Place place;
+//    /* @OneToMany(cascade = CascadeType.ALL)
+//    private List<Car> cars;
+//    */
+//    @ManyToOne
+//    @JoinColumn(name = "place_id")
+//    private Place place;
 
     @Lob
     private   byte[] image;

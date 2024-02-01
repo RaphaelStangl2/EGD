@@ -1,10 +1,20 @@
 package com.example.egd.ui.bottomNav.statistics
 
 import android.text.TextUtils
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
+
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Divider
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -13,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -178,15 +189,38 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutC
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Row (modifier =Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
+
+            Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
                 Text(
                     text = header,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
                 )
                 if (header == "Costs") {
-                    Button(onClick = { viewModel.setShowCosts(true) }) {
-                        Text("Add Costs")
+                    Button(
+                        onClick = { viewModel.setShowCosts(true) },
+                        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background, contentColor = MaterialTheme.colors.primaryVariant),
+
+                        modifier = Modifier.shadow(0.dp),
+                        elevation = ButtonDefaults.elevation(
+                        defaultElevation = 0.dp,
+                        pressedElevation = 0.dp
+                    ),
+                    shape= MaterialTheme.shapes.large
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_add_24),
+                                contentDescription = "Add Icon",
+                                tint = MaterialTheme.colors.primaryVariant,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Text(text="Add Costs",color = MaterialTheme.colors.primaryVariant, fontWeight = MaterialTheme.typography.body2.fontWeight)
+
+                        }
                     }
                 }
             }

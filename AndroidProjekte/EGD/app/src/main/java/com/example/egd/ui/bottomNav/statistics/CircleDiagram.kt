@@ -126,16 +126,23 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutC
                 }else if(header == "Costs"){
 
                     items(items = costsList) { cost ->
+                        val formattedDate = cost.date
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(8.dp)
                         ) {
                             Text(
-                                text = "Description: ${cost.description}",
+
+                                text = "Date: $formattedDate",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp,
                                 color = Color.Black
+                            )
+                            Text(
+                                text = "Description: ${cost.description}",
+                                fontSize = 14.sp,
+                                color = Color.Gray
                             )
                             Text(
                                 text = "Costs: ${cost.costs}",

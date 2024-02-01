@@ -48,6 +48,8 @@ fun AddCarDialogue(viewModel: EGDViewModel, onAdded: () -> Unit,modifier: Modifi
     var licensePlate = carUiState.licensePlate
     var triedToSubmit = carUiState.triedToSubmit
     var searchBarContent = carUiState.friendSearchBarContent
+    var connectionSuccessful = carUiState.connectionSuccessful
+
 
 
     var passwordVisibility = loginUiState.passwordVisibility
@@ -92,11 +94,22 @@ fun AddCarDialogue(viewModel: EGDViewModel, onAdded: () -> Unit,modifier: Modifi
             Button(
                 onClick = {
                     if (step + 1 > numberOfSteps){
-
                         viewModel.addCar(onAdded = onAdded)
-
                         onAdded()
-                    } else if (step == 2){
+                    }
+
+                    if (step == 1){
+                        if (validationService.validateConnectionScreen(connectionSuccessful).valid)
+                        {
+                            viewModel.setStep(step + 1)
+                            viewModel.setButtonClicked(false)
+                            viewModel.setTriedToSubmit(false)
+                        } else{
+                            viewModel.setTriedToSubmit(true)
+                            viewModel.setButtonClicked(false)
+                        }
+                    }
+                    else if (step == 2){
                         if (validationService.validateCarInfoScreen(carName, fuelConsumption, licensePlate)){
                             viewModel.setStep(step + 1)
                             viewModel.setTriedToSubmit(false)
@@ -114,7 +127,5 @@ fun AddCarDialogue(viewModel: EGDViewModel, onAdded: () -> Unit,modifier: Modifi
                 Text(text = "NEXT")
             }
         }
-
     }
-
 }

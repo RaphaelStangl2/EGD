@@ -510,6 +510,7 @@ class EGDViewModel @Inject constructor(
             editor?.putString("email", value.email)
             editor?.putBoolean("isLoggedIn", true)
             editor?.apply()
+            clearDataLogin()
 
         } catch (e: Exception) {
             if (e.localizedMessage == "HTTP 404 ") {
@@ -523,6 +524,16 @@ class EGDViewModel @Inject constructor(
             }
         }
 
+    }
+
+    fun clearDataLogin(){
+        setTriedToSubmit(false)
+        setCarName("")
+        setFuelConsumption("")
+        bleReceiveManager.closeConnection()
+        setUUIDListBLE(emptyArray())
+        setCurrentUUID("")
+        setNumberOfSteps(5)
     }
 
     private suspend fun sendRegisterRequestWithoutCar(onRegistered: () -> Unit, sharedPreference: () -> SharedPreferences?) {
@@ -551,14 +562,7 @@ class EGDViewModel @Inject constructor(
                     }
                 }
 
-                setTriedToSubmit(false)
-                setCarName("")
-                setFuelConsumption("")
-                onRegistered()
-                bleReceiveManager.closeConnection()
-                setUUIDListBLE(emptyArray())
-                setCurrentUUID("")
-                setNumberOfSteps(5)
+                clearDataLogin()
 
                 var editor = sharedPreference?.edit()
                 editor?.putString("email", value.email)
@@ -613,27 +617,22 @@ class EGDViewModel @Inject constructor(
             try {
 
                 //response = HttpService.retrofitService.postRegistration(userToAdd)
-                response = HttpService.retrofitService.postUserCars(finalList)
+                val userCar = HttpService.retrofitService.postUserCars(finalList)
                 for (invitation in invitationList){
+                    //val userCar = HttpService.retrofitService.getUserCarWithoutId(invitation.userCar)
+                    invitation.userCar = userCar
                     HttpService.retrofitService.addInvitation(invitation)
                 }
 
                 if (response != null) {
                     _loginUiState.update { currentState ->
                         currentState.copy(
-                            response = response.string()
+                            response = userCar.toString()
                         )
                     }
                 }
 
-                setTriedToSubmit(false)
-                setCarName("")
-                setFuelConsumption("")
-                onRegistered()
-                bleReceiveManager.closeConnection()
-                setUUIDListBLE(emptyArray())
-                setCurrentUUID("")
-                setNumberOfSteps(5)
+                clearDataLogin()
 
                 var editor = sharedPreference?.edit()
                 editor?.putString("email", value.email)
@@ -642,6 +641,9 @@ class EGDViewModel @Inject constructor(
             } catch (e: Exception) {
                 if (e.localizedMessage == "HTTP 404 ") {
                     setResponse("Email address already exists")
+                }
+                if (e.localizedMessage == "HTTP 500"){
+                    setResponse("Error occured on request")
                 }
             }
         }
@@ -779,7 +781,7 @@ class EGDViewModel @Inject constructor(
             InvitationServiceIsRunning = true
 
             viewModelScope.launch {
-                while(true){
+                while(InvitationServiceIsRunning){
                     var homeUiState = homeUiState.value
                     var invitationState = invitation.value
                     invitationState.incomingInvitationList
@@ -838,7 +840,7 @@ class EGDViewModel @Inject constructor(
             BLEServiceIsRunning = true
 
             viewModelScope.launch {
-                while(true){
+                while(BLEServiceIsRunning){
                     var homeUiState = homeUiState.value
                     if (homeUiState.cars != null){
                         val listCars = homeUiState.cars
@@ -965,7 +967,8 @@ class EGDViewModel @Inject constructor(
                 buttonClicked = false,
                 accidentCode = "",
                 carName = "",
-                licensePlate = ""
+                licensePlate = "",
+                userName = ""
             )
         }
     }
@@ -974,8 +977,6 @@ class EGDViewModel @Inject constructor(
         val sharedPreference = sharedPreference()
 
         var editor = sharedPreference?.edit()
-
-
 
         setUser(User(id = null, userName = "", email = "", password = "",))
 
@@ -988,9 +989,13 @@ class EGDViewModel @Inject constructor(
         bleReceiveManager.closeConnection()
         setCurrentUUID("")
         homeUiState.value.cars = emptyArray()
+        BLEServiceIsRunning = false
+        InvitationServiceIsRunning = false
 
         onCleared()
         setConnectionSuccessful(false)
+        clearDataLogout()
+
     }
 
     private fun setCars(emptyArray: Array<Car>) {
@@ -1085,7 +1090,7 @@ class EGDViewModel @Inject constructor(
 
             try {
                 //response = HttpService.retrofitService.postRegistration(userToAdd)
-                response = HttpService.retrofitService.postUserCars(finalList)
+                val userCar = HttpService.retrofitService.postUserCars(finalList)
 
                 if (homeValue.assignedFriendsList != null) {
                     for (user in homeValue.assignedFriendsList!!){
@@ -1098,7 +1103,7 @@ class EGDViewModel @Inject constructor(
                 if (response != null) {
                     _loginUiState.update { currentState ->
                         currentState.copy(
-                            response = response.string()
+                            response = userCar.toString()
                         )
                     }
                 }
@@ -1350,7 +1355,8 @@ class EGDViewModel @Inject constructor(
                 statisticsScreenState.copy(fromDate =selectedDate)
             }
         }
-
+        getDrivesByCarBetweenDateRange()
+        getCostsByCarBetweenDateRange()
     }
 
 
@@ -1509,6 +1515,7 @@ class EGDViewModel @Inject constructor(
                 val repsone3 = response2
                 setShowCosts(false)
                 resetCosts()
+                getCostsByCarBetweenDateRange()
             }
         }else{
             _costsState.update { currentState->
@@ -1560,12 +1567,11 @@ class EGDViewModel @Inject constructor(
         val statisticsState = statsState.value
 
         viewModelScope.launch {
-            var response: Array<Drive> = HttpService.retrofitService.getCostsByCarBetweenDateRange(DateRangeDto(
+            var response: Array<Costs> = HttpService.retrofitService.getCostsByCarBetweenDateRange(DateRangeDto(
                 statisticsState.car!!.id,
                 statisticsState.fromDate,
                 statisticsState.toDate))
             //var arrayDrives = readDriveListFromJson(response.byteStream())
-
 
             _statsState.update { currentState ->
                 currentState.copy(
@@ -1582,7 +1588,7 @@ class EGDViewModel @Inject constructor(
             val response  = HttpService.retrofitService.getUserCarWithoutId(UserCar(null, homeUiState.value.user!!, statisticsState.car!!, false))
             //val userCar = readUserCarFromJson(response.byteStream())
 
-            var response2: Array<Drive> = HttpService.retrofitService.getCostsByUserCar(response!!.id!!)
+            var response2: Array<Costs> = HttpService.retrofitService.getCostsByUserCar(response!!.id!!)
             //var arrayDrives = readDriveListFromJson(response2.byteStream())
 
             _statsState.update { currentState ->

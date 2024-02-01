@@ -180,6 +180,7 @@ fun EGDApp(
                             if (getStartedUiState.step == 1) {
                                 navController.navigateUp()
                                 viewModel.closeConnection()
+                                viewModel.clearDataLogout()
                             } else if (getStartedUiState.step == 2){
                                 viewModel.closeConnection()
                                 viewModel.setStep(getStartedUiState.step - 1)
@@ -204,6 +205,7 @@ fun EGDApp(
                     TopAppBarBackButton(navController, { Text("Add Car") }, onBackButtonClick = {
                         if (getStartedUiState.step == 1) {
                             navController.navigateUp()
+                            viewModel.clearDataLogin()
                         } else {
                             viewModel.setStep(getStartedUiState.step - 1)
                         }

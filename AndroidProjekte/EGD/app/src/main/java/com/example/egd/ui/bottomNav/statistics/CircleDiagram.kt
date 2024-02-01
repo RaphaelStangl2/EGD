@@ -75,9 +75,9 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutC
         if (header=="Costs"){
             //hier von berdan aufrufen und auf drivesList setzen
 
-            costsList = listOf(
-                Costs(id = 0, description = "Tank",costs=200.00,userCar = null)
-            )
+            if (statsState.popupCosts != null){
+                costsList = (statsState.popupCosts)!!.toList()
+            }
         }else if (header == "Drives"){
             //hier von berdan aufrufen und auf drivesList setzen
 //            drivesList = listOf(
@@ -131,7 +131,7 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutC
                         }
                     }
 
-                }else if( header == "Costs"){
+                }else if(header == "Costs"){
 
                     items(items = costsList) { cost ->
                         Column(
@@ -198,7 +198,13 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutC
                     donutChartData,
                     donutChartConfig,
                     onSliceClick = { slice ->
-                        viewModel.getDrivesByUserCar()
+
+                        if (header == "Drives"){
+                            viewModel.getDrivesByUserCar()
+                        }
+                        else{
+                            viewModel.getCostsByUserCar()
+                        }
                         clickedSlice = slice
                     }
                 )

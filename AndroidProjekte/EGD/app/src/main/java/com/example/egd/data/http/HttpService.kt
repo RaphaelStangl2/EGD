@@ -41,12 +41,12 @@ interface HttpApiService {
     suspend fun getDrivesByUserCar(@Path ("userCarId") userCarId:Long): Array<Drive>
 
     @Headers("Content-Type: application/json")
-    @POST("egd/drives/getAllCostsByDateRange")
-    suspend fun getCostsByCarBetweenDateRange(@Body dateRangeDto: DateRangeDto): Array<Drive>
+    @POST("egd/costs/getAllCostsByDateRange")
+    suspend fun getCostsByCarBetweenDateRange(@Body dateRangeDto: DateRangeDto): Array<Costs>
 
     @Headers("Content-Type: application/json")
-    @GET("egd/drives/costsByUserId/{userCarId}")
-    suspend fun getCostsByUserCar(@Path ("userCarId") userCarId:Long): Array<Drive>
+    @GET("egd/costs/costsByUserId/{userCarId}")
+    suspend fun getCostsByUserCar(@Path ("userCarId") userCarId:Long): Array<Costs>
 
     @Headers("Content-Type: application/json")
     @DELETE("egd/drives/{driveId}")
@@ -110,7 +110,7 @@ interface HttpApiService {
 
     @Headers("Content-Type: application/json")
     @POST("egd/userCar/addUserCarsList")
-    suspend fun postUserCars(@Body userCarList: Array<UserCar>): ResponseBody
+    suspend fun postUserCars(@Body userCarList: Array<UserCar>): UserCar
 
     @Headers("Content-Type: application/json")
     @POST("egd/users/login/")

@@ -174,9 +174,13 @@ fun StatisticsScreen(
     val scrollState = rememberScrollState()
 
     var drivesList: List<Drive>? = null
+    var costsList: List<Costs>? = null
     val statsState = viewModel.statsState.collectAsState().value
     if (statsState.driveStatistics != null){
         drivesList = statsState.driveStatistics.toList()
+    }
+    if (statsState.costsStatistics != null){
+        costsList = statsState.costsStatistics.toList()
     }
 
     val fromDate = statsState.fromDate
@@ -223,34 +227,16 @@ fun StatisticsScreen(
                             .padding(30.dp),
                         viewModel = viewModel,
                         donutChartData= userToPieChartData(drivesList),
-//                        PieChartData(
-//                            slices = listOf(
-//                                PieChartData.Slice("Max", 15f, Color(0xFF5F0A87)),
-//                                PieChartData.Slice("Sabina", 30f, Color(0xFF20BF55)),
-//                                PieChartData.Slice("Michael", 40f,  Color(0xFFEC9F05)),
-//                                PieChartData.Slice("Franz", 10f, Color(0xFFF53844))
-//                            ),
-//                            plotType = PlotType.Donut
-//
-//                        ),
                         header="Drives",
                     )
-
-
                 1 -> CircleDiagram(
                     modifier = Modifier
                         .background(color = Color.White)
                         // .fillMaxWidth()
                         .fillMaxWidth()
-                        .padding(30.dp), viewModel = viewModel,
-                    donutChartData=PieChartData(
-                        slices = listOf(
-                            PieChartData.Slice("Max", 15f, Color(0xFF5F0A87)),
-                            PieChartData.Slice("Sabina", 30f, Color(0xFF20BF55)),
-                            PieChartData.Slice("Michael", 40f,  Color(0xFFEC9F05)),
-                            PieChartData.Slice("Franz", 10f, Color(0xFFF53844))
-                        ),
-                        plotType = PlotType.Donut),
+                        .padding(30.dp),
+                    viewModel = viewModel,
+                    donutChartData=costsToPieChartData(costsList),
                     header="Costs"
                 )
             }
@@ -312,19 +298,24 @@ fun generateColor(index: Int): Color {
 
 
 
-fun costsToPieChartData(costsList: List<Costs>): PieChartData {
+fun costsToPieChartData(costsList: List<Costs>?): PieChartData {
     // Create a map to store the sum of costs for each user
     val userCostsMap = mutableMapOf<String, Double>()
 
-    // Sum up costs for each user
-    for (cost in costsList) {
-        val userName = cost.userCar?.user?.userName
-        val costValue = cost.costs
+    if (costsList == null){
 
-        if (userName != null) {
-            userCostsMap[userName] = (userCostsMap[userName] ?: 0.0) + costValue
+    }
+    else{
+        for (cost in costsList) {
+            val userName = cost.userCar?.user?.userName
+            val costValue = cost.costs
+
+            if (userName != null) {
+                userCostsMap[userName] = (userCostsMap[userName] ?: 0.0) + costValue
+            }
         }
     }
+    // Sum up costs for each user
 
     // Convert the map entries to PieChartData slices
     val slices = userCostsMap.entries.mapIndexed { index, (userName, costs) ->

@@ -48,7 +48,9 @@ public class UserCarRepository {
 
     @Transactional
     public void deleteUserCarById(UserCar userCar) {
-        entityManager.remove(userCar);
+        entityManager.createQuery("DELETE FROM UserCar u WHERE u.id = :userCarId")
+                .setParameter("userCarId", userCar.getId())
+                .executeUpdate();
         //Accident accident = accidentRepository.findByUserCarId(userCar.getId());
         //accidentRepository.removeAccident(accident.getId());
 

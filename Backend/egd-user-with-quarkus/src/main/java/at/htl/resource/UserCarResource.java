@@ -71,6 +71,22 @@ public class UserCarResource {
 
     }
 
+    @DELETE
+    @Path("/removeById/{userCarId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response removeUserCarById(@PathParam("userCarId") Long userCarId) {
+
+        UserCar userCarToRemove = userCarRepository.findById(userCarId);
+
+        if (userCarToRemove == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        userCarRepository.deleteUserCarById(userCarToRemove);
+
+        return Response.noContent().build();
+    }
+
     @POST
     @Path("/removeUserCar")
     public Response removeUserCar(UserCar userCar) {

@@ -71,17 +71,13 @@ public class UserCarResource {
 
     }
 
-    @POST
-    @Path("/removeUserCar")
-    public Response removeUserCar(UserCar userCar) {
-
-        if (userCar==null){
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
 
 
+    @DELETE
+    @Path("{userCarId}/")
+    public Response removeUserCar(@PathParam("userCarId") Long userCarId) {
 
-       userCarRepository.removeUserCar(userCar);
+       userCarRepository.removeUserCar(userCarId);
 
         return Response.noContent().build();
     }

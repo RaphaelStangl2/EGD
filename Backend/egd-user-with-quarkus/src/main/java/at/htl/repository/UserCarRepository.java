@@ -47,19 +47,12 @@ public class UserCarRepository {
     }
 
     @Transactional
-    public void removeUserCar(UserCar userCar) {
+    public void removeUserCar(long userCarId) {
 
-        long userId = userCar.getUser().getId();
-        long carId = userCar.getCar().getId();
+        UserCar userCarToRemove = findById(userCarId);
 
-        long id =  entityManager.createQuery("SELECT uc.id FROM UserCar uc WHERE uc.user.id = :userId AND uc.car.id = :carId", Long.class)
-                .setParameter("userId", userId)
-                .setParameter("carId", carId)
-                .getSingleResult();
 
-        UserCar userCarToRemove = findById(id);
-
-        Accident accident = accidentRepository.findByUserCarId(userCarToRemove.getId());
+        Accident accident = accidentRepository.findByUserCarId(userCarId);
         accidentRepository.removeAccident(accident.getId());
 
         entityManager.remove(userCarToRemove);

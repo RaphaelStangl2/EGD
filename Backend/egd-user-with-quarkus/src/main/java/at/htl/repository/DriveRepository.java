@@ -1,10 +1,7 @@
 package at.htl.repository;
 
 import at.htl.Classes.DateDto;
-import at.htl.model.Costs;
-import at.htl.model.Drive;
-import at.htl.model.UserCar;
-import at.htl.model.Users;
+import at.htl.model.*;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -82,6 +79,13 @@ public class DriveRepository {
         query.setParameter("carId", carId);
 
         return query.getResultList();
+    }
+
+    public Drive findByUserCarId(long userCarId) {
+        var acc =  entityManager.createQuery("SELECT i FROM Drive i WHERE i.userCar.id = :userCarId")
+                .setParameter("userCarId", userCarId).getSingleResult();
+
+        return (Drive) acc;
     }
 
     public List<Drive> getAllDrives() {

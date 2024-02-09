@@ -19,6 +19,12 @@ public class UserCarRepository {
     @Inject
     AccidentRepository accidentRepository;
 
+    @Inject
+    CostsRepository costsRepository;
+
+    @Inject
+    DriveRepository driveRepository;
+
     public UserCar findById(long userCarId) {
         return entityManager.find(UserCar.class, userCarId);
     }
@@ -54,6 +60,14 @@ public class UserCarRepository {
 
         Accident accident = accidentRepository.findByUserCarId(userCarId);
         accidentRepository.removeAccident(accident.getId());
+
+
+        Costs costs = costsRepository.findByUserCarId(userCarId);
+        accidentRepository.removeAccident(costs.getId());
+
+        Drive drive = driveRepository.findByUserCarId(userCarId);
+        accidentRepository.removeAccident(drive.getId());
+
 
         entityManager.remove(userCarToRemove);
     }

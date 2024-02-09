@@ -64,8 +64,6 @@ public class CostsRepository {
         query.setParameter("carId", carId);
         query.setParameter("fromDate", fromDate);
         query.setParameter("toDate", toDate);
-
         return query.getResultList();
     }
-
 }

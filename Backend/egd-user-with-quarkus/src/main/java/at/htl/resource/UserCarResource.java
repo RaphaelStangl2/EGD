@@ -39,22 +39,29 @@ public class UserCarResource {
     public Response contactEmergency(UserCar userCar) {
 
 
-        String emergencyText = "Dies ist ein IoT-Gerät für Autos, das Unfälle erkennt. Es hat soeben einen Unfall registriert.\n\n"
-                + "Details zum Unfall:\n"
-                + "----------------------------------\n"
-                + "Name der beteiligten Person: "+userCar.getUser().getUserName()+"\n"
-                + "Ort des Unfalls:\n"
-                + "  - Längengrad: "+userCar.getCar().getLongitude()+"\n"
-                + "  - Breitengrad: "+userCar.getCar().getLatitude()+"\n\n"
-                + "Fahrzeuginformationen:\n"
-                + "  - Kennzeichen: "+userCar.getCar().getLicensePlate()+"\n\n"
-                + "Zusätzliche Anmerkungen: Es ist wahrscheinlich, dass die Person bewusstlos ist.\n";
+        String emergencyText = "<html><body style=\"font-family: Arial, sans-serif;\">"
+                + "<h2 style=\"color: #333;\">Emergency Alert: Accident Detected</h2>"
+                + "<p>Details of the accident:</p>"
+                + "<hr>"
+                + "<p><strong>Name:</strong> " + userCar.getUser().getUserName() + "</p>"
+                + "<p><strong>Location:</strong></p>"
+                + "<ul>"
+                + "<li>Longitude: " + userCar.getCar().getLongitude() + "</li>"
+                + "<li>Latitude: " + userCar.getCar().getLatitude() + "</li>"
+                + "</ul>"
+                + "<p><strong>Vehicle Information:</strong></p>"
+                + "<ul>"
+                + "<li>License Plate: " + userCar.getCar().getLicensePlate() + "</li>"
+                + "</ul>"
+                + "<p><strong>Additional Notes:</strong> It is likely that the person is unconscious.</p>";
 
-        if (userCar.getUser().getHealthProblems() != ""){
-            emergencyText += "Keine";
-            //emergencyText += "Gesundheitliche Probleme der Person: "+userCar.getUser().getHealthProblems()+"\n"
-             //       + "----------------------------------\n";
+        if (!userCar.getUser().getHealthProblems().isEmpty()) {
+            emergencyText += "<p><strong>Health Problems: No</strong> "  + "</p>"
+                    + "<hr>";
         }
+
+        emergencyText += "</body></html>";
+
 
 
 

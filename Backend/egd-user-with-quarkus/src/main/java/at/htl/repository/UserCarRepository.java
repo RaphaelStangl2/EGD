@@ -77,7 +77,7 @@ public class UserCarRepository {
         if(drive!=null){
             driveRepository.removeDrive(drive.getId());
         }
-        
+
 
 
         entityManager.remove(userCarToRemove);

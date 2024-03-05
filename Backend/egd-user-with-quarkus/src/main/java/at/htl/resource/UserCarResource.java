@@ -39,7 +39,7 @@ public class UserCarResource {
     public Response contactEmergency(UserCar userCar) {
 
 
-        String emergencyText = "Dies ist ein IoT-Gerät für Autos, das Unfälle erkennt. Es hat soeben einen Unfall registriert.\n\n"
+        String emergencyText = "Dies ist ein IoT-Gerät für Autos, das Unfälle erkennt. Es hat soeben einen Unfall registriert. \n\n"
                 + "Details zum Unfall:\n"
                 + "----------------------------------\n"
                 + "Name der beteiligten Person: "+userCar.getUser().getUserName()+"\n"

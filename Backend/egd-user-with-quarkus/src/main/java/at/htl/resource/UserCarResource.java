@@ -51,7 +51,7 @@ public class UserCarResource {
                 + "Zusätzliche Anmerkungen: Es ist wahrscheinlich, dass die Person bewusstlos ist.\n";
 
         if (userCar.getUser().getHealthProblems() != ""){
-            emergencyText += "\"Gesundheitliche Probleme der Person: Keine";
+            emergencyText += "\"Gesundheitliche Probleme der Person: Keine ";
             //emergencyText += "Gesundheitliche Probleme der Person: "+userCar.getUser().getHealthProblems()+"\n"
              //       + "----------------------------------\n";
         }

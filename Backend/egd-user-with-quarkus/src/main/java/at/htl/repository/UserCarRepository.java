@@ -58,7 +58,7 @@ public class UserCarRepository {
         UserCar userCarToRemove = findById(userCarId);
 
 
-        Accident accident = accidentRepository.findByUserCarId(userCarId);
+        Accident  accident = accidentRepository.findByUserCarId(userCarId);
         accidentRepository.removeAccident(accident.getId());
 
 

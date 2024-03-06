@@ -31,7 +31,7 @@ public class UserCarResource {
     @Inject
     CarRepository carRepository;
 
-    private final String emergencyEmail = "rsheedalo@gmail.com";
+    private final String emergencyEmail = "raphael.stangl.12@gmail.com";
 
     @POST
     @Path("/contactEmergency")

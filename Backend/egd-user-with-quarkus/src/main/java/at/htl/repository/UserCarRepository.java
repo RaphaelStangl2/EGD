@@ -58,26 +58,15 @@ public class UserCarRepository {
         UserCar userCarToRemove = findById(userCarId);
 
 
-        Accident accident = accidentRepository.findByUserCarId(userCarId);
-
-        if(accident!=null){
-            accidentRepository.removeAccident(accident.getId());
-        }
+        Accident  accident = accidentRepository.findByUserCarId(userCarId);
+        accidentRepository.removeAccident(accident.getId());
 
 
         Costs costs = costsRepository.findByUserCarId(userCarId);
-        if(costs!=null){
-            costsRepository.removeCosts(costs.getId());
-        }
-
-
-
+        accidentRepository.removeAccident(costs.getId());
 
         Drive drive = driveRepository.findByUserCarId(userCarId);
-        if(drive!=null){
-            driveRepository.removeDrive(drive.getId());
-        }
-
+        accidentRepository.removeAccident(drive.getId());
 
 
         entityManager.remove(userCarToRemove);

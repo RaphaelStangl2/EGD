@@ -176,19 +176,21 @@ fun StatisticsScreen(
     var drivesList: List<Drive>? = null
     var costsList: List<Costs>? = null
     val statsState = viewModel.statsState.collectAsState().value
-    if (statsState.driveStatistics != null){
+    if (statsState.driveStatistics != null) {
         drivesList = statsState.driveStatistics.toList()
     }
-    if (statsState.costsStatistics != null){
+    if (statsState.costsStatistics != null) {
         costsList = statsState.costsStatistics.toList()
     }
 
     val fromDate = statsState.fromDate
     val toDate = statsState.toDate
 
-    Column(modifier = modifier
-        .fillMaxHeight()
-        .verticalScroll(scrollState)) {
+    Column(
+        modifier = modifier
+            .fillMaxHeight()
+            .verticalScroll(scrollState)
+    ) {
 
         val car = statsState.car
 
@@ -199,149 +201,143 @@ fun StatisticsScreen(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ScheduleField(viewModel, fromDate, "fromDate", "From", Modifier
-                .fillMaxWidth(0.5f)
-                .padding(1.dp))
-            ScheduleField(viewModel, toDate, "toDate","To", Modifier
-                .fillMaxWidth(1f)
-                .padding(1.dp))
-        }
+            ScheduleField(
+                viewModel, fromDate, "fromDate", "From", Modifier
+                    .fillMaxWidth(0.5f)
+                    .padding(1.dp)
+            )
+            ScheduleField(
+                viewModel, toDate, "toDate", "To", Modifier
+                    .fillMaxWidth(1f)
+                    .padding(1.dp)
+            )
 
 
-        HorizontalPager(
-            count = 3,
-            state = pagerState,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
+
+            HorizontalPager(
+                count = 2,
+                state = pagerState,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
 
 
-        ) { page ->
-            when (page) {
-                0 ->
-                    CircleDiagram(
+            ) { page ->
+                when (page) {
+                    0 ->
+                        CircleDiagram(
+                            modifier = Modifier
+                                .background(color = Color.White)
+                                // .fillMaxWidth()
+                                .fillMaxWidth()
+                                .padding(30.dp),
+                            viewModel = viewModel,
+                            donutChartData = userToPieChartData(drivesList),
+                            header = "Drives",
+                        )
+                    1 -> CircleDiagram(
                         modifier = Modifier
                             .background(color = Color.White)
                             // .fillMaxWidth()
                             .fillMaxWidth()
                             .padding(30.dp),
                         viewModel = viewModel,
-                        donutChartData= userToPieChartData(drivesList),
-                        header="Drives",
+                        donutChartData = costsToPieChartData(costsList),
+                        header = "Costs"
                     )
-                1 -> CircleDiagram(
-                    modifier = Modifier
-                        .background(color = Color.White)
-                        // .fillMaxWidth()
-                        .fillMaxWidth()
-                        .padding(30.dp),
-                    viewModel = viewModel,
-                    donutChartData=costsToPieChartData(costsList),
-                    header="Costs"
-                )
-                2 -> CircleDiagram(
-                    modifier = Modifier
-                        .background(color = Color.White)
-                        // .fillMaxWidth()
-                        .fillMaxWidth()
-                        .padding(30.dp),
-                    viewModel = viewModel,
-                    donutChartData=costsToPieChartData(costsList),
-                    header="Balance"
-                )
+                }
+            }
+            HorizontalPagerIndicator(
+                pagerState = pagerState,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(16.dp)
+            )
+
+
+        }
+    }
+
+    fun userToPieChartData(drives: List<Drive>?): PieChartData {
+        // Create a map to store the sum of kilometers for each user
+        val userKilometersMap = mutableMapOf<String, Pair<Double, Long?>>()
+
+        if (drives != null) {
+            for (drive in drives) {
+                val userName = drive.userCar?.user?.userName
+                val userCarId = drive.userCar?.id
+                val kilometers = drive.kilometers ?: 0.0
+
+                if (userName != null) {
+                    val existingKilometers = userKilometersMap[userName]
+                    if (existingKilometers != null) {
+                        val (totalKilometers, _) = existingKilometers
+                        userKilometersMap[userName] = Pair(totalKilometers + kilometers, userCarId)
+                    } else {
+                        userKilometersMap[userName] = Pair(kilometers, userCarId)
+                    }
+                }
             }
         }
-        HorizontalPagerIndicator(
-            pagerState = pagerState,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(16.dp)
+
+        // Convert the map entries to PieChartData slices
+        val slices = userKilometersMap.entries.mapIndexed { index, (userName, kilometersWithId) ->
+            val (totalKilometers, userCarId) = kilometersWithId
+            val color = generateColor(index)
+            val description = userCarId?.toString() ?: "0"
+            PieChartData.Slice(userName, totalKilometers.toFloat(), color) { _ -> description }
+        }
+
+        // Create and return PieChartData
+        return PieChartData(slices, PlotType.Donut)
+    }
+
+
+    // Helper function to generate distinct colors for each slice
+    fun generateColor(index: Int): Color {
+        // You can customize the color generation logic based on your preference
+        val colors = listOf(
+            Color(0xFF5F0A87),
+            Color(0xFF20BF55),
+            Color(0xFFEC9F05),
+            Color(0xFFF53844)
         )
 
-
+        return colors.get(index % colors.size);
     }
-}
 
-fun userToPieChartData(drives: List<Drive>?): PieChartData {
-    // Create a map to store the sum of kilometers for each user
-    val userKilometersMap = mutableMapOf<String, Pair<Double, Long?>>()
 
-    if (drives != null) {
-        for (drive in drives) {
-            val userName = drive.userCar?.user?.userName
-            val userCarId = drive.userCar?.id
-            val kilometers = drive.kilometers ?: 0.0
+    fun costsToPieChartData(costsList: List<Costs>?): PieChartData {
+        // Create a map to store the sum of costs for each user
+        val userCostsMap = mutableMapOf<String, Pair<Double, Long?>>()
 
-            if (userName != null) {
-                val existingKilometers = userKilometersMap[userName]
-                if (existingKilometers != null) {
-                    val (totalKilometers, _) = existingKilometers
-                    userKilometersMap[userName] = Pair(totalKilometers + kilometers, userCarId)
-                } else {
-                    userKilometersMap[userName] = Pair(kilometers, userCarId)
+        if (costsList != null) {
+            for (cost in costsList) {
+                val userName = cost.userCar?.user?.userName
+                val userCarId = cost.userCar?.id
+                val costValue = cost.costs
+
+                if (userName != null) {
+                    val existingCosts = userCostsMap[userName]
+                    if (existingCosts != null) {
+                        val (totalCosts, _) = existingCosts
+                        userCostsMap[userName] = Pair(totalCosts + costValue, userCarId)
+                    } else {
+                        userCostsMap[userName] = Pair(costValue, userCarId)
+                    }
                 }
             }
         }
-    }
 
-    // Convert the map entries to PieChartData slices
-    val slices = userKilometersMap.entries.mapIndexed { index, (userName, kilometersWithId) ->
-        val (totalKilometers, userCarId) = kilometersWithId
-        val color = generateColor(index)
-        val description = userCarId?.toString() ?: "0"
-        PieChartData.Slice(userName, totalKilometers.toFloat(), color){_ -> description}
-    }
-
-    // Create and return PieChartData
-    return PieChartData(slices, PlotType.Donut)
-}
-
-
-// Helper function to generate distinct colors for each slice
-fun generateColor(index: Int): Color {
-    // You can customize the color generation logic based on your preference
-    val colors = listOf(
-        Color(0xFF5F0A87),
-        Color(0xFF20BF55),
-        Color(0xFFEC9F05),
-        Color(0xFFF53844)
-    )
-
-    return colors.get(index % colors.size);
-}
-
-
-
-fun costsToPieChartData(costsList: List<Costs>?): PieChartData {
-    // Create a map to store the sum of costs for each user
-    val userCostsMap = mutableMapOf<String, Pair<Double, Long?>>()
-
-    if (costsList != null) {
-        for (cost in costsList) {
-            val userName = cost.userCar?.user?.userName
-            val userCarId = cost.userCar?.id
-            val costValue = cost.costs
-
-            if (userName != null) {
-                val existingCosts = userCostsMap[userName]
-                if (existingCosts != null) {
-                    val (totalCosts, _) = existingCosts
-                    userCostsMap[userName] = Pair(totalCosts + costValue, userCarId)
-                } else {
-                    userCostsMap[userName] = Pair(costValue, userCarId)
-                }
-            }
+        // Convert the map entries to PieChartData slices
+        val slices = userCostsMap.entries.mapIndexed { index, (userName, costsWithId) ->
+            val (costs, userCarId) = costsWithId
+            val color = generateColor(index)
+            val description = userCarId?.toString() ?: "0"
+            PieChartData.Slice(userName, costs.toFloat(), color) { _ -> description }
         }
-    }
 
-    // Convert the map entries to PieChartData slices
-    val slices = userCostsMap.entries.mapIndexed { index, (userName, costsWithId) ->
-        val (costs, userCarId) = costsWithId
-        val color = generateColor(index)
-        val description = userCarId?.toString() ?: "0"
-        PieChartData.Slice(userName, costs.toFloat(), color){_ -> description}
+        // Create and return PieChartData
+        return PieChartData(slices, PlotType.Donut)
     }
-
-    // Create and return PieChartData
-    return PieChartData(slices, PlotType.Donut)
 }

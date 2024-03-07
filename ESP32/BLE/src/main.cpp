@@ -130,7 +130,7 @@ void Task1code(void *parameter) {
     mpu.getEvent(&a, &g, &temp);
     /* Get new sensor events with the readings */
    
-   if (a.acceleration.x > 20 || a.acceleration.x < 0)
+   if (a.acceleration.x > 40 )
     {
       sendIntinString = "1";
       Serial.println("Fall erkannt");
@@ -573,7 +573,7 @@ void loop() {
 
     
 
-    if (a.acceleration.x > 15 || a.acceleration.x < 0)
+    if (a.acceleration.x > 40 )
     {
       sendIntinString = "1";
       Serial.println("Fall erkannt");

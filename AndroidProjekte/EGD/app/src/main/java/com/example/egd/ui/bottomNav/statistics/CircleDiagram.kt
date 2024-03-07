@@ -250,10 +250,13 @@ fun CircleDiagram(modifier: Modifier = Modifier, viewModel: EGDViewModel, donutC
                         clickedSlice = slice
                     }
                 )
-                DonutPieChartWithSlices(
-                    slices = donutChartData.slices,
-                    donutChartConfig = donutChartConfig
-                )
+                if (header == "Costs" || header == "Drives"){
+                    DonutPieChartWithSlices(
+                        slices = donutChartData.slices,
+                        donutChartConfig = donutChartConfig
+                    )
+                }
+
             } else {
                 Column(
                     modifier = Modifier

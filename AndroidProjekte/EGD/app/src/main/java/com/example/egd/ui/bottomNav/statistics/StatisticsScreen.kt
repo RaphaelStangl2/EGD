@@ -209,7 +209,7 @@ fun StatisticsScreen(
 
 
         HorizontalPager(
-            count = 2,
+            count = 3,
             state = pagerState,
             modifier = Modifier
                 .weight(1f)
@@ -238,6 +238,16 @@ fun StatisticsScreen(
                     viewModel = viewModel,
                     donutChartData=costsToPieChartData(costsList),
                     header="Costs"
+                )
+                2 -> CircleDiagram(
+                    modifier = Modifier
+                        .background(color = Color.White)
+                        // .fillMaxWidth()
+                        .fillMaxWidth()
+                        .padding(30.dp),
+                    viewModel = viewModel,
+                    donutChartData=costsToPieChartData(costsList),
+                    header="Balance"
                 )
             }
         }

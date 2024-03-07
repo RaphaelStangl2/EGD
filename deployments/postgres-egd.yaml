@@ -1,0 +1,108 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dbman-postgres-config
+  namespace: student-r-alo
+  labels:
+    app: dbman
+data:
+  POSTGRES_DB: dbman
+  POSTGRES_USER: dbman
+  POSTGRES_HOST: dbman-postgres
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dbman-postgres-secret
+  namespace: student-r-alo
+  labels:
+    app: dbman
+data:
+  POSTGRES_PASSWORD: UzNjcjN0LkRibWFuMg==
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: dbman-postgres-claim
+  namespace: student-r-alo
+  labels:
+    app: dbman
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dbman-postgres
+  namespace: student-r-alo
+  labels:
+    app: dbman
+    tier: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dbman
+      tier: database
+  template:
+    metadata:
+      labels:
+        app: dbman
+        tier: database
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:13.5
+          imagePullPolicy: "IfNotPresent"
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "0.5"
+            requests:
+              memory: 128Mi
+              cpu: "0.1"
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_DB
+                  name: dbman-postgres-config
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_USER
+                  name: dbman-postgres-config
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: POSTGRES_PASSWORD
+                  name: dbman-postgres-secret
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgredb             
+      volumes:
+        - name: postgredb
+          persistentVolumeClaim:
+            claimName: dbman-postgres-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+ name: dbman-postgres
+ namespace: student-r-alo
+ labels:
+   app: dbman
+spec:
+  type: NodePort
+  ports:
+    - port: 5432
+  selector:
+    app: dbman
+    tier: database

@@ -73,8 +73,8 @@ interface HttpApiService {
     suspend fun addInvitation(@Body invitation:Invitation): ResponseBody?
 
     @Headers("Content-Type: application/json")
-    @POST("egd/userCar/removeUserCar")
-    suspend fun deleteUserCar(@Body userCar:UserCar)
+    @DELETE("egd/userCar/{userCarId}")
+    suspend fun deleteUserCar(@Path("userCarId") userCarId:Long)
 
     @Headers("Content-Type: application/json")
     @PUT("egd/cars")
@@ -132,6 +132,10 @@ interface HttpApiService {
     @Headers("Content-Type: application/json")
     @POST("egd/userCar/getUserCarWithOutId")
     suspend fun getUserCarWithoutId(@Body userCar: UserCar): UserCar
+
+    @Headers("Content-Type: application/json")
+    @POST("egd/userCar/contactEmergency")
+    suspend fun contactEmergency(@Body userCar: UserCar): ResponseBody
 
     @Headers("Content-Type: application/json")
     @DELETE("egd/invitations/{invId}")

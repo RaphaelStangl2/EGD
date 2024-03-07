@@ -11,13 +11,14 @@ import com.example.egd.ui.EGDViewModel
 @Composable
 fun AccidentDialogue(viewModel: EGDViewModel){
     Dialog(
-        onDismissRequest = { /*TODO*/ },
+        onDismissRequest = { viewModel.setAccidentCode("0")
+        },
         content = {
                   AccidenDialogContent(viewModel)
         },
         properties = DialogProperties(
             dismissOnBackPress = true,
-            dismissOnClickOutside = false
+            dismissOnClickOutside = true
         )
         )
 }

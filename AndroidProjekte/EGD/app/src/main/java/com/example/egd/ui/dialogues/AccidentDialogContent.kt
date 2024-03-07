@@ -31,10 +31,13 @@ fun AccidenDialogContent(viewModel: EGDViewModel){
                 )
             }
             Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.padding(start= 20.dp)){
-                Text("Raphael hatte einen Unfall im Test60 Car. Die Rettung wurde automatisch alamiert")
+                Text("Raphael hatte einen Unfall im Mustang. Die Rettung wurde automatisch alamiert")
             }
             Row(horizontalArrangement = Arrangement.Center){
-                Button(onClick = { viewModel.setAccidentCode("0") }) {
+                Button(onClick = {
+                    viewModel.setAccidentCode("0")
+                    viewModel.callAmbulance()
+                }) {
                     Text("Ok")
                 }
             }

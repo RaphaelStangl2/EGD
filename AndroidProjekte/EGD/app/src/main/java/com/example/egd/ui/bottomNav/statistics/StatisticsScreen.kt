@@ -48,7 +48,7 @@ import java.util.*
 
 
 @Composable
-fun ScheduleField(viewModel: EGDViewModel, date: LocalDate, identifier: String, modifier: Modifier) {
+fun ScheduleField(viewModel: EGDViewModel, date: LocalDate, identifier: String, text:String, modifier: Modifier) {
     var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
 
 
@@ -76,7 +76,7 @@ fun ScheduleField(viewModel: EGDViewModel, date: LocalDate, identifier: String, 
                 value = date.toString(),
                 onValueChange = { },
                 label = {
-                    Text("Date")
+                    Text(text)
                 },
                 leadingIcon = {
                     Icon(
@@ -199,10 +199,10 @@ fun StatisticsScreen(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ScheduleField(viewModel, fromDate, "fromDate", Modifier
+            ScheduleField(viewModel, fromDate, "fromDate", "From", Modifier
                 .fillMaxWidth(0.5f)
                 .padding(1.dp))
-            ScheduleField(viewModel, toDate, "toDate", Modifier
+            ScheduleField(viewModel, toDate, "toDate","To", Modifier
                 .fillMaxWidth(1f)
                 .padding(1.dp))
         }

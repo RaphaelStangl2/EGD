@@ -69,7 +69,6 @@ fun HomeScreen(
     //    AccidentDialogue(viewModel = viewModel)
     //}
 
-
     DisposableEffect(
         key1 = lifecycleOwner
     ) {
@@ -128,19 +127,21 @@ fun HomeScreen(
                     .verticalScroll(scrollState)
             ) {
                 for (car in listCars) {
-
-                    CarCard(
-                        car = car,
-                        name = car.name,
-                        car.latitude,
-                        car.longitude,
-                        viewModel,
-                        { goToMap() },
-                        { goToEditScreen() },
-                        context,
-                        car.isAdmin,
-                        goToStatisticsScreen
-                    )
+                    if (car.name.contains(searchBarContent, true))
+                    {
+                        CarCard(
+                            car = car,
+                            name = car.name,
+                            car.latitude,
+                            car.longitude,
+                            viewModel,
+                            { goToMap() },
+                            { goToEditScreen() },
+                            context,
+                            car.isAdmin,
+                            goToStatisticsScreen
+                        )
+                    }
                 }
             }
         }else if (listCars != null && listCars.isEmpty()) {

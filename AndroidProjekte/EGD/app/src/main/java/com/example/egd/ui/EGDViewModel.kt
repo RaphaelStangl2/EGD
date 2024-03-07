@@ -725,7 +725,7 @@ class EGDViewModel @Inject constructor(
 
             viewModelScope.launch {
                 while(carTrackingServiceIsRunning){
-                    delay(3000)
+                    delay(500)
                     var homeUiState = homeUiState.value
                     var getStartedState = getStartedUiState.value
                     var driveState = driveState.value
@@ -917,7 +917,7 @@ class EGDViewModel @Inject constructor(
         viewModelScope.launch {
             while (mapUiState.getCars){
                 getCarsForUserId(userId)
-                delay(4000)
+                delay(500)
             }
             /*timer!!.schedule(timerTask {
                 getCarsForUserId(userId)
@@ -983,11 +983,11 @@ class EGDViewModel @Inject constructor(
         editor?.apply()
 
         //stopForegroundService()
+        BLEServiceIsRunning = false
         bleReceiveManager.disconnect()
         bleReceiveManager.closeConnection()
         setCurrentUUID("")
         homeUiState.value.cars = emptyArray()
-        BLEServiceIsRunning = false
         InvitationServiceIsRunning = false
         carTrackingServiceIsRunning = false
 
@@ -1140,8 +1140,10 @@ class EGDViewModel @Inject constructor(
                     if (removedFriendsList != null){
                         for (user in removedFriendsList){
                             try{
-                                HttpService.retrofitService.deleteUserCar(UserCar(null,user, car, false))
+                                var userCar = HttpService.retrofitService.getUserCarWithoutId(UserCar(null,user, car, false))
+                                HttpService.retrofitService.deleteUserCar(userCar.id!!)
                             } catch( e:Exception){
+                                val e = e.message
                             }
                         }
                     }
@@ -1549,7 +1551,7 @@ class EGDViewModel @Inject constructor(
         val statisticsState = statsState.value
 
         viewModelScope.launch {
-            val response  = HttpService.retrofitService.getUserCarWithoutId(UserCar(null, homeUiState.value.user!!, statisticsState.car!!, false))
+            //val response  = HttpService.retrofitService.getUserCarWithoutId(UserCar(null, homeUiState.value.user!!, statisticsState.car!!, false))
             //val userCar = readUserCarFromJson(response.byteStream())
 
             var response2: Array<Drive> = HttpService.retrofitService.getDrivesByUserCar(id)
@@ -1632,6 +1634,12 @@ class EGDViewModel @Inject constructor(
             .use { it.readText() }
 
         return Gson().fromJson(jsonStringVar, Array<Drive>::class.java)
+    }
+
+    fun callAmbulance() {
+        viewModelScope.launch {
+            HttpService.retrofitService.contactEmergency(getUserCarForUUID(getStartedUiState.value.currentUUID)!!)
+        }
     }
 
 }

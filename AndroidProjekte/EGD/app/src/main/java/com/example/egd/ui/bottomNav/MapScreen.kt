@@ -5,6 +5,9 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.location.Location
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -14,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
@@ -23,6 +27,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.example.egd.R
+import com.example.egd.data.costsEnum.CostsEnum
 import com.example.egd.ui.getStarted.ConnectScreen
 import com.example.egd.ui.internet.NoInternetScreen
 import com.example.egd.ui.permissions.PermissionUtils
@@ -211,42 +216,95 @@ fun MapScreen(
                     modifier = Modifier.fillMaxSize(),
                     cameraPositionState = cameraPositionState
                 )*/
-                    OutlinedTextField(
-                        value = searchBarContent,
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                        keyboardActions = KeyboardActions(onSearch = {}),
-                        onValueChange = { viewModel.setMapSearchBarContent(it) },
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_baseline_search_24),
-                                contentDescription = "Search Bar"
-                            )
-                        },
-                        trailingIcon = {
-                            IconButton(onClick = {}) {
+                    var isExpanded by remember {
+                        mutableStateOf(false)
+                    }
+                    Box(modifier = Modifier.padding(20.dp)) {
+                        OutlinedTextField(
+                            value = searchBarContent,
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                            keyboardActions = KeyboardActions(onSearch = {}),
+                            onValueChange = { viewModel.setMapSearchBarContent(it) },
+                            leadingIcon = {
                                 Icon(
-                                    painter = painterResource(id = R.drawable.ic_baseline_account_circle_24),
-                                    contentDescription = "Person Icon",
-                                    modifier = Modifier.size(30.dp)
+                                    painter = painterResource(id = R.drawable.ic_baseline_search_24),
+                                    contentDescription = "Search Bar"
                                 )
-                            }
-                        },
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            backgroundColor = MaterialTheme.colors.background,
-                            focusedBorderColor = MaterialTheme.colors.background,
-                            unfocusedBorderColor = MaterialTheme.colors.background
+                            },
+                            trailingIcon = {
+                                IconButton(onClick = {}) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_baseline_account_circle_24),
+                                        contentDescription = "Person Icon",
+                                        modifier = Modifier.size(30.dp)
+                                    )
+                                }
+                            },
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                backgroundColor = MaterialTheme.colors.background,
+                                focusedBorderColor = MaterialTheme.colors.background,
+                                unfocusedBorderColor = MaterialTheme.colors.background
 
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp)
-                            .shadow(6.dp, shape = RoundedCornerShape(20.dp))
-                    )
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .shadow(6.dp, shape = RoundedCornerShape(20.dp)),
+                            interactionSource = remember { MutableInteractionSource() }
+                                .also { interactionSource ->
+                                    LaunchedEffect(interactionSource) {
+                                        interactionSource.interactions.collect {
+                                            if (it is PressInteraction.Release) {
+                                                isExpanded = !isExpanded
+                                            }
+                                        }
+                                    }
+                                }
+                            )
+                            DropdownMenu(
+                                expanded = isExpanded,
+                                onDismissRequest = { isExpanded = false },
+
+                                modifier = Modifier
+                                    .shadow(6.dp, shape = RoundedCornerShape(20.dp))
+                                    .background(color = Color.White),
+                            ) {
+                                if (homeUiState.cars != null) {
+                                    for (car in homeUiState.cars!!) {
+                                        if (car.name.contains(searchBarContent, false)) {
+                                            DropdownMenuItem(
+                                                onClick = {
+                                                    isExpanded = isExpanded
+                                                    cameraPositionState.move(
+                                                        CameraUpdateFactory.newCameraPosition(
+                                                            CameraPosition.fromLatLngZoom(
+                                                                LatLng(
+                                                                    car.latitude ?: 0.0,
+                                                                    cars?.get(0)?.longitude ?: 0.0
+                                                                ), 12f
+                                                            )
+                                                        )
+                                                    )
+                                                },
+                                                enabled = true,
+                                                //contentPadding = PaddingValues(top=0.dp, bottom = 0.dp),
+                                                modifier = Modifier.background(color = Color.White)
+                                            ) {
+                                                Text(
+                                                    color = MaterialTheme.colors.primary,
+                                                    text = car.name
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
     }
-}
+
 
 fun bitmapDescriptorFromVector(
     context: Context,

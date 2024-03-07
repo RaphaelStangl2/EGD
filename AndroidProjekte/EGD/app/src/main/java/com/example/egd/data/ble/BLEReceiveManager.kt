@@ -67,7 +67,7 @@ class BLEReceiveManager @Inject constructor(
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             if(result.device.name == DEVICE_NAME){
                 if(isScanning){
-                    Toast.makeText(context, "Device Found", Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(context, "Device Found", Toast.LENGTH_SHORT).show()
                     result.device.connectGatt(context,true, gattCallback)
                     isScanning = false
                     bleScanner.stopScan(this)
@@ -102,6 +102,7 @@ class BLEReceiveManager @Inject constructor(
 
                 gatt.close()
                 currentConnectionAttempt+=1
+                isScanning = true
 
                 coroutineScope.launch {
                     data.emit(
@@ -206,7 +207,7 @@ class BLEReceiveManager @Inject constructor(
     }
 
     fun startReceiving() {
-        Toast.makeText(context, "Start Receiving", Toast.LENGTH_SHORT).show()
+        //Toast.makeText(context, "Start Receiving", Toast.LENGTH_SHORT).show()
 
         isScanning = true
         bleScanner.startScan(null,scanSettings,scanCallback)

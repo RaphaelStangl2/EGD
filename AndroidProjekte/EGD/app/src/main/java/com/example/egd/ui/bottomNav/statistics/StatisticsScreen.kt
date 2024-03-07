@@ -211,6 +211,7 @@ fun StatisticsScreen(
                     .fillMaxWidth(1f)
                     .padding(1.dp)
             )
+        }
 
 
 
@@ -247,6 +248,7 @@ fun StatisticsScreen(
                     )
                 }
             }
+
             HorizontalPagerIndicator(
                 pagerState = pagerState,
                 modifier = Modifier
@@ -254,9 +256,10 @@ fun StatisticsScreen(
                     .padding(16.dp)
             )
 
-
         }
     }
+
+
 
     fun userToPieChartData(drives: List<Drive>?): PieChartData {
         // Create a map to store the sum of kilometers for each user
@@ -340,4 +343,4 @@ fun StatisticsScreen(
         // Create and return PieChartData
         return PieChartData(slices, PlotType.Donut)
     }
-}
+
